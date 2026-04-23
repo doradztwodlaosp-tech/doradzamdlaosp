@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OPP dla OSP – Dominik Surdel</title>
+  <meta name="description" content="Kompleksowa obsługa uzyskania statusu Organizacji Pożytku Publicznego dla Ochotniczych Straży Pożarnych. Zajmij się strażą – resztą zajmiemy się my." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red:     #C0392B;
+      --red-dark:#922B21;
+      --red-glow:rgba(192,57,43,.18);
+      --navy:    #0D1B2A;
+      --navy-2:  #162337;
+      --navy-3:  #1E2F45;
+      --cream:   #F5F0E8;
+      --cream-2: #EDE8DD;
+      --text:    #F0ECE4;
+      --muted:   #8FA3B8;
+      --border:  rgba(255,255,255,.07);
+      --r: 12px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 6vw;
+      background: rgba(13,27,42,.85);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 1.1rem;
+      color: var(--cream);
+      text-decoration: none;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nav-logo span {
+      background: var(--red);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: .85rem;
+    }
+    .nav-cta {
+      background: var(--red);
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: .9rem;
+      transition: background .2s, transform .15s;
+    }
+    .nav-cta:hover { background: var(--red-dark); transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 120px 6vw 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 70% 50%, rgba(192,57,43,.12) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 20% 80%, rgba(192,57,43,.07) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--red-glow);
+      border: 1px solid rgba(192,57,43,.3);
+      color: #e8786e;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: .8rem;
+      font-weight: 500;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .hero-badge::before {
+      content: '';
+      width: 7px; height: 7px;
+      background: var(--red);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .5; transform: scale(.7); }
+    }
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2.2rem, 4vw, 3.4rem);
+      line-height: 1.1;
+      color: var(--cream);
+      margin-bottom: 20px;
+    }
+    h1 em {
+      font-style: normal;
+      color: var(--red);
+    }
+    .hero-sub {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 480px;
+      margin-bottom: 36px;
+      font-weight: 300;
+      line-height: 1.7;
+    }
+    .hero-btns {
+      display: flex; gap: 14px; flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: var(--red);
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: var(--r);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1rem;
+      transition: all .2s;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-primary:hover { background: var(--red-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(192,57,43,.35); }
+    .btn-secondary {
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 14px 28px;
+      border-radius: var(--r);
+      text-decoration: none;
+      font-weight: 400;
+      font-size: 1rem;
+      transition: all .2s;
+      background: rgba(255,255,255,.04);
+    }
+    .btn-secondary:hover { border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.07); }
+
+    /* stat card */
+    .hero-stats {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    .stat-card {
+      background: var(--navy-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 24px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--red), transparent);
+    }
+    .stat-card.accent { background: var(--navy-3); border-color: rgba(192,57,43,.25); }
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--cream);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-num span { color: var(--red); }
+    .stat-label { font-size: .82rem; color: var(--muted); font-weight: 300; line-height: 1.4; }
+
+    /* ── SECTIONS ── */
+    section { padding: 90px 6vw; max-width: 1200px; margin: 0 auto; width: 100%; }
+    .section-wrap { max-width: 1200px; margin: 0 auto; padding: 90px 6vw; }
+
+    .label {
+      font-size: .75rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--red);
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    h2 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(1.8rem, 3vw, 2.6rem);
+      color: var(--cream);
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .section-sub {
+      color: var(--muted);
+      font-size: 1rem;
+      font-weight: 300;
+      max-width: 560px;
+      line-height: 1.7;
+      margin-bottom: 52px;
+    }
+
+    /* ── PROBLEM ── */
+    .problem-wrap { background: var(--navy-2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .problem-item {
+      padding: 32px 28px;
+      border-radius: var(--r);
+      background: var(--navy);
+      border: 1px solid var(--border);
+    }
+    .problem-icon {
+      width: 44px; height: 44px;
+      background: var(--red-glow);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 16px;
+    }
+    .problem-item h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--cream);
+      margin-bottom: 8px;
+    }
+    .problem-item p { font-size: .88rem; color: var(--muted); line-height: 1.6; font-weight: 300; }
+
+    /* ── HOW IT WORKS ── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      position: relative;
+    }
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 28px; left: calc(12.5% + 28px); right: calc(12.5% + 28px);
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--red), transparent);
+    }
+    .step {
+      text-align: center;
+      padding: 0 16px;
+    }
+    .step-num {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: var(--navy-2);
+      border: 2px solid var(--red);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--red);
+      margin: 0 auto 20px;
+      position: relative;
+      z-index: 1;
+    }
+    .step h3 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .95rem;
+      color: var(--cream);
+      margin-bottom: 8px;
+    }
+    .step p { font-size: .82rem; color: var(--muted); line-height: 1.55; font-weight: 300; }
+
+    /* ── PRICING ── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+    .plan {
+      background: var(--navy-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px 28px;
+      position: relative;
+      transition: transform .2s, border-color .2s;
+    }
+    .plan:hover { transform: translateY(-4px); border-color: rgba(255,255,255,.15); }
+    .plan.featured {
+      background: var(--navy-3);
+      border-color: rgba(192,57,43,.4);
+      transform: translateY(-8px);
+    }
+    .plan.featured:hover { transform: translateY(-12px); }
+    .plan-badge {
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: var(--red);
+      color: #fff;
+      padding: 4px 14px;
+      border-radius: 40px;
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .plan-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      font-size: .8rem;
+    }
+    .plan-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: var(--cream);
+      margin-bottom: 20px;
+    }
+    .plan-price {
+      margin-bottom: 28px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+    }
+    .plan-price strong {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: var(--cream);
+    }
+    .plan-price span { color: var(--muted); font-size: .9rem; }
+    .plan-features { list-style: none; margin-bottom: 32px; }
+    .plan-features li {
+      font-size: .88rem;
+      color: var(--muted);
+      padding: 7px 0;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+      display: flex; align-items: flex-start; gap: 10px;
+      font-weight: 300;
+    }
+    .plan-features li::before {
+      content: '✓';
+      color: var(--red);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .plan-btn {
+      display: block;
+      text-align: center;
+      padding: 13px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: .95rem;
+      transition: all .2s;
+    }
+    .plan-btn-outline {
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+    .plan-btn-outline:hover { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.2); }
+    .plan-btn-solid {
+      background: var(--red);
+      color: #fff;
+    }
+    .plan-btn-solid:hover { background: var(--red-dark); box-shadow: 0 6px 20px rgba(192,57,43,.35); }
+
+    /* ── ABOUT ── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 70px;
+      align-items: center;
+    }
+    .about-visual {
+      background: var(--navy-2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .about-visual::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, var(--red-glow), transparent 70%);
+    }
+    .about-avatar {
+      width: 96px; height: 96px;
+      background: linear-gradient(135deg, var(--red-dark), var(--red));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 2rem;
+      color: #fff;
+      margin: 0 auto 16px;
+      position: relative; z-index: 1;
+    }
+    .about-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--cream);
+      margin-bottom: 4px;
+      position: relative; z-index: 1;
+    }
+    .about-role { font-size: .85rem; color: var(--muted); position: relative; z-index: 1; }
+    .about-content h2 { margin-bottom: 20px; }
+    .about-content p {
+      color: var(--muted);
+      font-weight: 300;
+      line-height: 1.75;
+      margin-bottom: 16px;
+    }
+    .about-highlight {
+      background: var(--red-glow);
+      border-left: 3px solid var(--red);
+      padding: 16px 20px;
+      border-radius: 0 8px 8px 0;
+      font-size: .92rem;
+      color: var(--text);
+      margin-top: 24px;
+      font-style: italic;
+      font-weight: 300;
+    }
+
+    /* ── OPINION ── */
+    .opinions-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    .opinion {
+      background: var(--navy-2);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 28px;
+    }
+    .opinion-text {
+      font-size: .95rem;
+      color: var(--text);
+      line-height: 1.7;
+      font-weight: 300;
+      font-style: italic;
+      margin-bottom: 20px;
+    }
+    .opinion-author {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .opinion-avatar {
+      width: 40px; height: 40px;
+      background: var(--red-glow);
+      border: 1px solid rgba(192,57,43,.3);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .85rem;
+      color: var(--red);
+      flex-shrink: 0;
+    }
+    .opinion-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: .9rem;
+      color: var(--cream);
+    }
+    .opinion-org { font-size: .78rem; color: var(--muted); }
+
+    /* ── FAQ ── */
+    .faq-list { max-width: 720px; }
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+      padding: 20px 0;
+    }
+    .faq-q {
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--cream);
+      margin-bottom: 10px;
+    }
+    .faq-a { font-size: .9rem; color: var(--muted); font-weight: 300; line-height: 1.65; }
+
+    /* ── CTA BOTTOM ── */
+    .cta-section {
+      background: linear-gradient(135deg, var(--navy-2), var(--navy-3));
+      border: 1px solid rgba(192,57,43,.2);
+      border-radius: 20px;
+      padding: 70px 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 70% at 50% 50%, var(--red-glow), transparent);
+      pointer-events: none;
+    }
+    .cta-section h2 { margin-bottom: 16px; }
+    .cta-section p { color: var(--muted); margin-bottom: 36px; font-weight: 300; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 30px 6vw;
+      text-align: center;
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 300;
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .hero-grid, .about-grid { grid-template-columns: 1fr; }
+      .hero-stats { order: -1; }
+      .problem-grid { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .plan.featured { transform: none; }
+      .steps { grid-template-columns: repeat(2, 1fr); }
+      .steps::before { display: none; }
+      .opinions-grid { grid-template-columns: 1fr; }
+      .cta-section { padding: 50px 30px; }
+    }
+    @media (max-width: 600px) {
+      .steps { grid-template-columns: 1fr; }
+      nav { padding: 14px 4vw; }
+      section, .section-wrap { padding: 70px 4vw; }
+    }
+
+    /* ── ANIMATIONS ── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <span>OPP</span> dla OSP
+  </a>
+  <a href="#kontakt" class="nav-cta">Napisz do mnie →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="hero-badge">Dla Ochotniczych Straży Pożarnych</div>
+      <h1>Status OPP<br/>dla Twojej OSP —<br/><em>bez stresu i papierologii</em></h1>
+      <p class="hero-sub">Przeprowadzam Twoją jednostkę przez cały proces uzyskania statusu Organizacji Pożytku Publicznego. Od analizy statutu po wpis w KRS — Ty zajmujesz się strażą.</p>
+      <div class="hero-btns">
+        <a href="#pakiety" class="btn-primary">Zobacz pakiety →</a>
+        <a href="#jak-dzialamy" class="btn-secondary">Jak to działa?</a>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-card accent fade-up">
+        <div class="stat-num">~16<span>k</span></div>
+        <div class="stat-label">OSP w Polsce — zdecydowana większość bez statusu OPP</div>
+      </div>
+      <div class="stat-card fade-up" style="transition-delay:.1s">
+        <div class="stat-num">1<span>,5%</span></div>
+        <div class="stat-label">podatku trafia do OSP z własnym statusem OPP każdego roku</div>
+      </div>
+      <div class="stat-card fade-up" style="transition-delay:.2s">
+        <div class="stat-num"><span>od</span> 650<span>zł</span></div>
+        <div class="stat-label">koszt pełnej obsługi — zwraca się już w pierwszym roku</div>
+      </div>
+      <div class="stat-card accent fade-up" style="transition-delay:.3s">
+        <div class="stat-num">100<span>%</span></div>
+        <div class="stat-label">zdalnie — obsługuję OSP z całej Polski</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<div class="problem-wrap">
+  <div class="section-wrap">
+    <div class="label">Dlaczego to ważne</div>
+    <h2>Twoja OSP zasługuje<br/>na finansową niezależność</h2>
+    <div class="problem-grid">
+      <div class="problem-item fade-up">
+        <div class="problem-icon">💰</div>
+        <h3>Własne środki z 1,5% podatku</h3>
+        <p>Status OPP pozwala zbierać 1,5% podatku dochodowego bezpośrednio na konto jednostki — bez pośredników, bez podziału.</p>
+      </div>
+      <div class="problem-item fade-up" style="transition-delay:.1s">
+        <div class="problem-icon">🔓</div>
+        <h3>Niezależność finansowa</h3>
+        <p>Sama decydujesz jak wydajesz zebrane środki. Nowy sprzęt, szkolenia, wyposażenie — zgodnie z potrzebami Waszej jednostki.</p>
+      </div>
+      <div class="problem-item fade-up" style="transition-delay:.2s">
+        <div class="problem-icon">📋</div>
+        <h3>Skomplikowany proces?</h3>
+        <p>Zmiana statutu, walne zebranie, dokumenty do KRS — zajmuję się tym wszystkim za Ciebie. Ty tylko uzupełniasz dane w formularzu.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="jak-dzialamy">
+  <div class="label">Proces</div>
+  <h2>Jak wygląda współpraca?</h2>
+  <p class="section-sub">Cztery proste kroki — od pierwszego kontaktu do wpisu w KRS.</p>
+  <div class="steps">
+    <div class="step fade-up">
+      <div class="step-num">1</div>
+      <h3>Wypełniasz formularz</h3>
+      <p>Podajesz dane jednostki, zarządu i komisji rewizyjnej. Wgrywasz statut. Zajmuje to około 15 minut.</p>
+    </div>
+    <div class="step fade-up" style="transition-delay:.1s">
+      <div class="step-num">2</div>
+      <h3>Analizuję statut</h3>
+      <p>Sprawdzam czy spełnia wymogi OPP. W 99% przypadków wymaga zmian — przygotowuję wszystkie dokumenty za Ciebie.</p>
+    </div>
+    <div class="step fade-up" style="transition-delay:.2s">
+      <div class="step-num">3</div>
+      <h3>Walne zebranie OSP</h3>
+      <p>Dostajesz gotowe dokumenty do podpisania na walnym. Przeprowadzasz zebranie, odsyłasz skany.</p>
+    </div>
+    <div class="step fade-up" style="transition-delay:.3s">
+      <div class="step-num">4</div>
+      <h3>Wpis do KRS</h3>
+      <p>Składam wniosek do Krajowego Rejestru Sądowego. Po uzyskaniu wpisu Twoja OSP ma status OPP.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<div class="problem-wrap">
+  <div class="section-wrap" id="pakiety">
+    <div class="label">Cennik</div>
+    <h2>Wybierz pakiet<br/>dopasowany do potrzeb</h2>
+    <p class="section-sub">Każda OSP jest inna — dlatego mam trzy opcje współpracy.</p>
+    <div class="pricing-grid">
+
+      <div class="plan fade-up">
+        <div class="plan-name">Pakiet</div>
+        <div class="plan-title">Podstawowy</div>
+        <div class="plan-price">
+          <strong>179</strong><span> zł</span>
+        </div>
+        <ul class="plan-features">
+          <li>Analiza statutu pod kątem OPP</li>
+          <li>Szczegółowy raport PDF z listą braków</li>
+          <li>Wskazanie konkretnych zmian do wprowadzenia</li>
+          <li>Odpowiedzi na pytania e-mail (7 dni)</li>
+        </ul>
+        <a href="mailto:doradztwodlaosp@gmail.com?subject=Pakiet Podstawowy" class="plan-btn plan-btn-outline">Zamów analizę →</a>
+      </div>
+
+      <div class="plan featured fade-up" style="transition-delay:.1s">
+        <div class="plan-badge">Najpopularniejszy</div>
+        <div class="plan-name">Pakiet</div>
+        <div class="plan-title">Standardowy</div>
+        <div class="plan-price">
+          <strong>650</strong><span> zł</span>
+        </div>
+        <ul class="plan-features">
+          <li>Analiza statutu i identyfikacja braków</li>
+          <li>Przygotowanie wszystkich dokumentów</li>
+          <li>Uchwały, protokół, oświadczenia</li>
+          <li>Pismo przewodnie do KRS</li>
+          <li>Złożenie wniosku do KRS</li>
+          <li>Obsługa ewentualnych wezwań sądu</li>
+        </ul>
+        <a href="mailto:doradztwodlaosp@gmail.com?subject=Pakiet Standardowy" class="plan-btn plan-btn-solid">Zaczynam →</a>
+      </div>
+
+      <div class="plan fade-up" style="transition-delay:.2s">
+        <div class="plan-name">Pakiet</div>
+        <div class="plan-title">Premium</div>
+        <div class="plan-price">
+          <strong>990</strong><span> zł</span>
+        </div>
+        <ul class="plan-features">
+          <li>Wszystko z pakietu Standardowego</li>
+          <li>Wsparcie przez 12 miesięcy po uzyskaniu OPP</li>
+          <li>Przypomnienia o obowiązkach sprawozdawczych</li>
+          <li>Pomoc przy pierwszym sprawozdaniu</li>
+          <li>Odpowiedzi na pytania priorytetowo</li>
+        </ul>
+        <a href="mailto:doradztwodlaosp@gmail.com?subject=Pakiet Premium" class="plan-btn plan-btn-outline">Zamów →</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section>
+  <div class="about-grid">
+    <div class="about-visual">
+      <div class="about-avatar">DS</div>
+      <div class="about-name">Dominik Surdel</div>
+      <div class="about-role">Doradca ds. OPP dla OSP</div>
+    </div>
+    <div class="about-content fade-up">
+      <div class="label">O mnie</div>
+      <h2>Znam ten proces<br/>od środka</h2>
+      <p>Pomagam Ochotniczym Strażom Pożarnych uzyskać status Organizacji Pożytku Publicznego. Przeszedłem przez ten proces wielokrotnie — wiem co weryfikują sądy w różnych częściach Polski i jak unikać odrzucenia wniosku.</p>
+      <p>Dzięki własnym narzędziom i automatyzacji cały proces dokumentacyjny trwa sprawnie — a Ty dostajesz gotowe pliki do podpisania, bez zbędnych formalności po swojej stronie.</p>
+      <div class="about-highlight">
+        "Uzyskanie statusu OPP to jedna z lepszych decyzji finansowych jaką może podjąć zarząd OSP. Pomagam to zrobić szybko i bez stresu."
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OPINIE -->
+<div class="problem-wrap">
+  <div class="section-wrap">
+    <div class="label">Referencje</div>
+    <h2>Co mówią prezesi OSP</h2>
+    <div class="opinions-grid">
+      <div class="opinion fade-up">
+        <p class="opinion-text">„Całość przebiegła sprawnie i bez komplikacji. Dostałem gotowe dokumenty, podpisałem je na walnym zebraniu i po kilku tygodniach mieliśmy wpis w KRS. Polecam każdej jednostce która chce uzyskać niezależność finansową."</p>
+        <div class="opinion-author">
+          <div class="opinion-avatar">JK</div>
+          <div>
+            <div class="opinion-name">Jan Kowalski</div>
+            <div class="opinion-org">Prezes OSP — wkrótce tutaj pojawi się opinia Twojego klienta</div>
+          </div>
+        </div>
+      </div>
+      <div class="opinion fade-up" style="transition-delay:.1s">
+        <p class="opinion-text">„Nie wiedziałem od czego zacząć. Okazało się że wystarczyło wypełnić formularz i czekać na dokumenty. Cały proces trwał kilka tygodni. Teraz zbieramy 1,5% podatku i decydujemy sami jak to wydamy."</p>
+        <div class="opinion-author">
+          <div class="opinion-avatar">PW</div>
+          <div>
+            <div class="opinion-name">Piotr Wiśniewski</div>
+            <div class="opinion-org">Prezes OSP — wkrótce tutaj pojawi się opinia Twojego klienta</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<section>
+  <div class="label">Pytania i odpowiedzi</div>
+  <h2>Najczęstsze pytania</h2>
+  <div class="faq-list">
+    <div class="faq-item fade-up">
+      <div class="faq-q">Czy moja OSP może uzyskać status OPP?</div>
+      <div class="faq-a">Jeśli Twoja jednostka działa co najmniej 2 lata, ma komisję rewizyjną niezależną od zarządu i realizuje cele pożytku publicznego — najprawdopodobniej tak. Pakiet Podstawowy pozwala to sprawdzić bez ryzyka.</div>
+    </div>
+    <div class="faq-item fade-up">
+      <div class="faq-q">Ile trwa cały proces?</div>
+      <div class="faq-a">Od zebrania danych do złożenia wniosku w KRS — zwykle 2-4 tygodnie. Sam sąd ma 7 dni na rozpatrzenie wniosku, choć w praktyce może to trwać dłużej. Łącznie od 4 do 8 tygodni.</div>
+    </div>
+    <div class="faq-item fade-up">
+      <div class="faq-q">Co jeśli sąd odrzuci wniosek?</div>
+      <div class="faq-a">W pakietach Standardowym i Premium obsługuję wezwania sądu do uzupełnienia braków — bez dodatkowych opłat. Sąd zazwyczaj daje możliwość poprawienia dokumentów.</div>
+    </div>
+    <div class="faq-item fade-up">
+      <div class="faq-q">Co muszę zrobić po stronie jednostki?</div>
+      <div class="faq-a">Wypełnić formularz z danymi, dostarczyć aktualny statut i przeprowadzić Nadzwyczajne Walne Zebranie Członków. Wszystkie dokumenty na zebranie dostaniesz ode mnie gotowe do podpisania.</div>
+    </div>
+    <div class="faq-item fade-up">
+      <div class="faq-q">Obsługujesz OSP z całej Polski?</div>
+      <div class="faq-a">Tak — cały proces odbywa się zdalnie. Mam doświadczenie z różnymi wydziałami KRS w Polsce i znam specyfikę każdego z nich.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="section-wrap" id="kontakt">
+  <div class="cta-section">
+    <div class="label">Zaczynamy?</div>
+    <h2>Twoja OSP zasługuje<br/>na własne środki</h2>
+    <p>Napisz do mnie — odpiszę w ciągu 24 godzin i powiem czy i jak mogę pomóc Twojej jednostce.</p>
+    <a href="mailto:doradztwodlaosp@gmail.com?subject=Zapytanie o OPP dla OSP" class="btn-primary" style="display:inline-flex">
+      ✉ doradztwodlaosp@gmail.com
+    </a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2025 Dominik Surdel · OPP dla OSP · <a href="mailto:doradztwodlaosp@gmail.com">doradztwodlaosp@gmail.com</a></p>
+</footer>
+
+<script>
+  // Scroll animations
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
