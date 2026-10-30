@@ -19,7 +19,7 @@ export const MARKA = {
 export const USTAWIENIA = {
   // Napisy
   napisyOdGory: 260, // odległość napisów od górnej krawędzi (px)
-  napisyRozmiar: 58, // zwykłe słowa (px)
+  napisyRozmiar: 60, // zwykłe słowa (px)
   akcentRozmiar: 104, // wyróżnione, czerwone słowa (px)
   slowNaRaz: 4, // ile słów najwyżej widać naraz
 
@@ -36,26 +36,29 @@ export const USTAWIENIA = {
   // Znaczek z adresem strony
   pokazZnaczek: true, // false = bez znaczka
   znaczekOdDolu: 470, // odległość od dolnej krawędzi (px)
-  znaczekOdDoluZPostacia: 960, // to samo, gdy w rolce jest Pan Naczelnik (znaczek nad czapką)
+  znaczekOdGoryZPostacia: 170, // gdy w rolce jest Pan Naczelnik, znaczek jest u góry (px od górnej krawędzi)
 
   // Pan Naczelnik (gdy w odcinek.json jest "naczelnik": true)
-  naczelnikSzerokosc: 680, // szerokość postaci (px); wysokość dopasuje się sama
+  naczelnikSzerokosc: 640, // szerokość postaci (px); wysokość dopasuje się sama
+
+  // Karta z animowaną ilustracją (pole "ilustracja" w scenie)
+  kartaOdGory: 520, // odległość karty od górnej krawędzi (px)
+  kartaWysokosc: 520, // wysokość karty (px); szerokość dopasuje się sama
 
   // Przycisk na końcu rolki
   przyciskOdGory: 700, // odległość od górnej krawędzi (px)
-  przyciskRozmiar: 44, // wielkość tekstu (px)
+  przyciskRozmiar: 46, // wielkość tekstu (px)
+  przyciskOdGoryZPostacia: 880, // to samo, gdy w rolce jest Pan Naczelnik
 };
 
-export const FONT_NAGLOWEK = "Syne";
+export const FONT_NAGLOWEK = "DM Sans";
 export const FONT_TEKST = "DM Sans";
 
-// Fonty zapisane lokalnie w public/fonty (Google Fonts, licencja OFL), żeby render nie zależał od internetu
+// Font DM Sans (czytelny, z doradztwodlaosp.pl) zapisany lokalnie w public/fonty (Google Fonts, licencja OFL), żeby render nie zależał od internetu
 const LATIN = "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD";
 const LATIN_EXT = "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF";
 
 const FONTY = [
-  { rodzina: FONT_NAGLOWEK, plik: "syne-latin.woff2", zakres: LATIN },
-  { rodzina: FONT_NAGLOWEK, plik: "syne-latin-ext.woff2", zakres: LATIN_EXT },
   { rodzina: FONT_TEKST, plik: "dmsans-latin.woff2", zakres: LATIN },
   { rodzina: FONT_TEKST, plik: "dmsans-latin-ext.woff2", zakres: LATIN_EXT },
 ];
@@ -65,7 +68,7 @@ if (typeof document !== "undefined") {
   Promise.all(
     FONTY.map(async ({ rodzina, plik, zakres }) => {
       const font = new FontFace(rodzina, `url(${staticFile(`fonty/${plik}`)}) format("woff2")`, {
-        weight: "400 800",
+        weight: "100 1000",
         unicodeRange: zakres,
       });
       await font.load();

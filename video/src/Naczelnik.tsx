@@ -9,9 +9,9 @@ const SKORA = "#f1c7a3";
 const SKORA_CIEN = "#e0ab85";
 const SIWE = "#d9d9d9";
 const ZLOTY = "#e8b84a";
-const CZERWONY = "#c8102e";
 const SREBRNY = "#c9ced6";
 const NIEBIESKI = "#2f6fd0";
+const OTOK = "#2b5aa6";
 
 export const Naczelnik: React.FC<{
   usta: number;
@@ -138,13 +138,26 @@ export const Naczelnik: React.FC<{
         {/* Wąs */}
         <path d="M300 366 C270 356 230 362 218 388 C245 384 270 386 300 378 C330 386 355 384 382 388 C370 362 330 356 300 366 Z" fill={SIWE} />
 
-        {/* Czapka */}
-        <path d="M168 225 C170 140 230 110 300 110 C370 110 430 140 432 225 Z" fill={MUNDUR} />
-        <rect x="168" y="205" width="264" height="34" fill={MUNDUR_CIEMNY} />
-        <rect x="168" y="216" width="264" height="10" fill={CZERWONY} />
-        <path d="M175 238 Q300 280 425 238 L425 246 Q300 296 175 246 Z" fill="#0b0f1a" />
-        <circle cx="300" cy="170" r="24" fill={ZLOTY} />
-        <path d="M300 152 L306 166 L320 166 L309 175 L313 189 L300 180 L287 189 L291 175 L280 166 L294 166 Z" fill={CZERWONY} />
+        {/* Rogatywka OSP: kwadratowy denko, niebieski otok, czarny pasek, lakierowany daszek, srebrny orzeł */}
+        <path d="M172 174 L150 132 L450 132 L428 174 Z" fill={MUNDUR} />
+        <path d="M150 132 L300 92 L450 132 L300 168 Z" fill="#26345a" />
+        <path d="M150 132 L300 168 L450 132" stroke={MUNDUR_CIEMNY} strokeWidth="3" fill="none" />
+        <path d="M300 92 L300 168" stroke={MUNDUR_CIEMNY} strokeWidth="2" opacity="0.6" />
+        <rect x="172" y="172" width="256" height="62" fill={OTOK} />
+        <rect x="172" y="222" width="256" height="12" fill="#1f4785" />
+        <rect x="178" y="208" width="244" height="11" rx="4" fill="#111111" />
+        <circle cx="184" cy="213" r="7" fill={SREBRNY} stroke="#6f757d" strokeWidth="1.5" />
+        <circle cx="416" cy="213" r="7" fill={SREBRNY} stroke="#6f757d" strokeWidth="1.5" />
+        <path d="M172 232 Q300 286 428 232 L430 244 Q300 302 170 244 Z" fill="#0b0f1a" />
+        <path d="M200 246 Q300 284 400 246" stroke="#ffffff" strokeWidth="3" fill="none" opacity="0.35" strokeLinecap="round" />
+        <g transform="translate(300 158) scale(1.3)" fill={SREBRNY} stroke="#7d838c" strokeWidth="1.2">
+          <path d="M-2 -6 C-12 -14 -26 -12 -30 2 C-23 -1 -18 1 -16 8 C-12 3 -7 5 -4 12 Z" />
+          <path d="M2 -6 C12 -14 26 -12 30 2 C23 -1 18 1 16 8 C12 3 7 5 4 12 Z" />
+          <ellipse cx="0" cy="4" rx="6.5" ry="13" />
+          <circle cx="0" cy="-13" r="5.5" />
+          <path d="M-6 -20 L-6 -25 L-3 -22 L0 -26 L3 -22 L6 -25 L6 -20 Z" />
+          <path d="M-7 15 L0 26 L7 15 Z" />
+        </g>
       </g>
     </svg>
   );

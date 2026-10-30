@@ -13,6 +13,7 @@ import {
 } from "remotion";
 import { FONT_NAGLOWEK, FONT_TEKST, MARKA, USTAWIENIA as U } from "./marka";
 import { Naczelnik } from "./Naczelnik";
+import { Ilustracja } from "./Sceny";
 
 // Szablon rolki w stylu doradztwodlaosp.pl.
 // Dane odcinka: public/odcinki/<odcinek>/odcinek.json (opis formatu w .claude/skills/rolka/SKILL.md)
@@ -24,6 +25,7 @@ export type ScenaOSP = {
   lektor?: string;
   akcent?: string[];
   obraz?: string;
+  ilustracja?: string;
   prompt?: string;
   start: number;
   koniec: number;
@@ -151,12 +153,13 @@ const Napisy: React.FC<{ scena: ScenaOSP }> = ({ scena }) => {
             key={`${s.s}-${i}`}
             style={{
               fontFamily: wyrozniony ? FONT_NAGLOWEK : FONT_TEKST,
-              fontWeight: wyrozniony ? 800 : 500,
-              // Syne jest szeroki: długie wyróżnione słowa zmniejszamy, by mieściły się w kadrze
-              fontSize: wyrozniony ? Math.min(U.akcentRozmiar, Math.floor(1100 / s.w.length)) : U.napisyRozmiar,
+              fontWeight: wyrozniony ? 900 : 600,
+              // Długie wyróżnione słowa zmniejszamy, by mieściły się w kadrze
+              fontSize: wyrozniony ? Math.min(U.akcentRozmiar, Math.floor(1500 / s.w.length)) : U.napisyRozmiar,
               lineHeight: 1.15,
               color: wyrozniony ? MARKA.czerwony : MARKA.krem,
-              textShadow: "0 4px 24px rgba(0,0,0,0.55)",
+              textShadow: "0 2px 0 rgba(0,0,0,0.6), 0 4px 24px rgba(0,0,0,0.7)",
+              letterSpacing: wyrozniony ? -1 : 0,
               opacity: pojawienie,
               transform: `translateY(${(1 - pojawienie) * 24}px) scale(${0.9 + 0.1 * pojawienie})`,
               display: "inline-block",
@@ -170,11 +173,12 @@ const Napisy: React.FC<{ scena: ScenaOSP }> = ({ scena }) => {
   );
 };
 
-const Znaczek: React.FC<{ odDolu: number }> = ({ odDolu }) => (
+const Znaczek: React.FC<{ odDolu?: number; odGory?: number }> = ({ odDolu, odGory }) => (
   <div
     style={{
       position: "absolute",
       bottom: odDolu,
+      top: odGory,
       left: 0,
       right: 0,
       display: "flex",
@@ -198,12 +202,12 @@ const Znaczek: React.FC<{ odDolu: number }> = ({ odDolu }) => (
   </div>
 );
 
-const Wezwanie: React.FC<{ tekst: string }> = ({ tekst }) => {
+const Wezwanie: React.FC<{ tekst: string; odGory: number }> = ({ tekst, odGory }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const w = spring({ frame, fps, config: { damping: 12 } });
   return (
-    <div style={{ position: "absolute", top: U.przyciskOdGory, left: 0, right: 0, display: "flex", justifyContent: "center" }}>
+    <div style={{ position: "absolute", top: odGory, left: 0, right: 0, display: "flex", justifyContent: "center" }}>
       <div
         style={{
           transform: `scale(${w})`,
@@ -219,6 +223,34 @@ const Wezwanie: React.FC<{ tekst: string }> = ({ tekst }) => {
       >
         {tekst}
       </div>
+    </div>
+  );
+};
+
+const KartaIlustracji: React.FC<{ nazwa: string }> = ({ nazwa }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const wejscie = spring({ frame, fps, config: { damping: 13 } });
+  const unoszenie = Math.sin(frame / 20) * 6;
+  const wysokosc = U.kartaWysokosc;
+  const szerokosc = (wysokosc * 900) / 760;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: U.kartaOdGory + (1 - wejscie) * 80 + unoszenie,
+        left: (1080 - szerokosc) / 2,
+        width: szerokosc,
+        height: wysokosc,
+        borderRadius: 36,
+        background: MARKA.krem,
+        boxShadow: `0 24px 60px rgba(0,0,0,0.45), 0 0 0 4px ${MARKA.czerwony}33`,
+        overflow: "hidden",
+        opacity: wejscie,
+        transform: `scale(${0.85 + 0.15 * wejscie}) rotate(${(1 - wejscie) * -4}deg)`,
+      }}
+    >
+      <Ilustracja nazwa={nazwa} />
     </div>
   );
 };
@@ -290,13 +322,26 @@ export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [] })
         );
       })}
 
+      {dane.sceny.map((scena, i) => {
+        if (!scena.ilustracja) return null;
+        const od = klatka(scena.start);
+        const nastepna = dane.sceny[i + 1];
+        const doKlatki = nastepna ? klatka(nastepna.start) : durationInFrames;
+        return (
+          <Sequence key={i} from={od} durationInFrames={doKlatki - od} layout="none">
+            <KartaIlustracji nazwa={scena.ilustracja} />
+          </Sequence>
+        );
+      })}
+
       {dane.naczelnik && <PostacNaczelnika dane={dane} glosnosc={glosnosc} />}
 
-      {U.pokazZnaczek && <Znaczek odDolu={dane.naczelnik ? U.znaczekOdDoluZPostacia : U.znaczekOdDolu} />}
+      {U.pokazZnaczek &&
+        (dane.naczelnik ? <Znaczek odGory={U.znaczekOdGoryZPostacia} /> : <Znaczek odDolu={U.znaczekOdDolu} />)}
 
       {dane.cta && (
         <Sequence from={klatka(dane.sceny[dane.sceny.length - 1].start)} layout="none">
-          <Wezwanie tekst={dane.cta} />
+          <Wezwanie tekst={dane.cta} odGory={dane.naczelnik ? U.przyciskOdGoryZPostacia : U.przyciskOdGory} />
         </Sequence>
       )}
     </AbsoluteFill>

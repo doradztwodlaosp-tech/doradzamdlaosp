@@ -42,6 +42,10 @@ Zasady:
 - `lektor`: skróty i adresy zapisuj fonetycznie: KRS → "ka-er-es", doradztwodlaosp.pl → "doradztwo dla o-es-pe kropka pe-el".
 - `naczelnik`: `true` pokazuje rysowaną postać Pana Naczelnika (mundur galowy, medale) na dole kadru; usta ruszają się
   w rytm głosu, macha na powitanie i kiwa głową na końcu. Ustaw `false`, gdy obrazy same pokazują postać.
+- `ilustracja` (opcjonalnie): animowana ilustracja na karcie nad postacią. Dostępne: remiza, sala, koniec,
+  lista-do-sadu, odrzucenie, laptop-krs, teczka, brak-w-protokole, kalendarz-7-dni, plansza-zarzad-protokol-wpis, adres
+  (`video/src/Sceny.tsx`, mapa `ILUSTRACJE`). Gdy żadna nie pasuje do zdania, dopisz nową ilustrację w tym pliku
+  (prosty SVG w barwach marki, animacja od początku sceny) i dodaj ją do mapy.
 - `akcent`: 1–3 kluczowe słowa sceny, zapisane dokładnie jak w `tekst` (wielkość liter i interpunkcja nie mają znaczenia).
   Wyświetlą się duże i czerwone.
 - `prompt`: konkretna, realistyczna scena (miejsce, przedmiot, nastrój). Bez napisów na obrazie.
@@ -86,5 +90,5 @@ Jeśli wypchnięcie się nie uda, wyślij użytkownikowi kopię ZIP (`git archiv
 ## Uwagi techniczne
 
 - Sieć: skrypty łączą się z api.elevenlabs.io i api.openai.com (muszą być dozwolone w ustawieniach sieci środowiska).
-- Fonty Syne i DM Sans są w `video/public/fonty` (render nie potrzebuje internetu).
+- Font DM Sans jest w `video/public/fonty` (render nie potrzebuje internetu).
 - Pierwszy test z rysowaną postacią to kompozycja `NowyZarzad` (`video/src/Rolka.tsx`), nie używaj jej do nowych odcinków.

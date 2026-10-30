@@ -302,6 +302,31 @@ const Adres: React.FC = () => {
 
 const SCENY: React.FC[] = [Remiza, Sala, Koniec, ListaLeci, Odbicie, Laptop, Teczka, Brak, Kalendarz, Plansza, Adres];
 
+// Biblioteka ilustracji dla szablonu RolkaOSP (pole "ilustracja" w odcinek.json)
+export const ILUSTRACJE: Record<string, React.FC> = {
+  remiza: Remiza,
+  sala: Sala,
+  koniec: Koniec,
+  "lista-do-sadu": ListaLeci,
+  odrzucenie: Odbicie,
+  "laptop-krs": Laptop,
+  teczka: Teczka,
+  "brak-w-protokole": Brak,
+  "kalendarz-7-dni": Kalendarz,
+  "plansza-zarzad-protokol-wpis": Plansza,
+  adres: Adres,
+};
+
+export const Ilustracja: React.FC<{ nazwa: string }> = ({ nazwa }) => {
+  const Komponent = ILUSTRACJE[nazwa];
+  if (!Komponent) return null;
+  return (
+    <svg viewBox="0 0 900 760" width="100%" height="100%" style={{ fontFamily: "DM Sans, Arial, sans-serif", color: TEKST }}>
+      <Komponent />
+    </svg>
+  );
+};
+
 export const Scena: React.FC<{ numer: number }> = ({ numer }) => {
   const Komponent = SCENY[numer];
   return (

@@ -9,6 +9,7 @@
       "akcent": [
         "druhowie!"
       ],
+      "ilustracja": "remiza",
       "prompt": "Pan Naczelnik standing in front of a small rural Polish volunteer fire station with red garage doors, raising his hand in a friendly greeting.",
       "start": 0,
       "koniec": 1.205,
@@ -30,6 +31,7 @@
       "akcent": [
         "zarząd"
       ],
+      "ilustracja": "sala",
       "prompt": "Inside a modest Polish fire station common room after a general meeting, volunteer firefighters chatting around a long wooden table with coffee mugs and papers, warm cosy light.",
       "start": 1.588,
       "koniec": 5.367,
@@ -81,6 +83,7 @@
       "akcent": [
         "koniec."
       ],
+      "ilustracja": "koniec",
       "prompt": "Close-up of an empty wooden table in a fire station hall after a meeting, empty coffee mugs and a pen, lights dimming, sense of finality.",
       "start": 5.833,
       "koniec": 7.651,
@@ -127,6 +130,7 @@
       "akcent": [
         "sądu"
       ],
+      "ilustracja": "lista-do-sadu",
       "prompt": "A single sheet of paper with a typed list of names flying through the evening air towards a classic Polish district court building with columns.",
       "start": 8.145,
       "koniec": 10.985,
@@ -180,6 +184,7 @@
         "nie",
         "działa."
       ],
+      "ilustracja": "odrzucenie",
       "prompt": "A sheet of paper with a list of names lying on the stone steps in front of a closed court building door at night, rejected.",
       "start": 11.551,
       "koniec": 13.956,
@@ -223,6 +228,7 @@
         "KRS.",
         "internet,"
       ],
+      "ilustracja": "laptop-krs",
       "prompt": "A laptop on a desk in a fire station office showing a generic online form, glowing screen in a dark room, a firefighter helmet beside it.",
       "start": 14.49,
       "koniec": 20.498,
@@ -290,6 +296,7 @@
         "protokół",
         "uchwały."
       ],
+      "ilustracja": "teczka",
       "prompt": "An open document folder on a desk with neatly stacked papers - meeting minutes and resolutions - with an official stamp, warm desk lamp light.",
       "start": 21.191,
       "koniec": 26.432,
@@ -361,6 +368,7 @@
       "akcent": [
         "odrzuci."
       ],
+      "ilustracja": "brak-w-protokole",
       "prompt": "Close-up of a printed document with one line left visibly blank, a red pen lying on it, dramatic side light.",
       "start": 27.182,
       "koniec": 31.223,
@@ -413,6 +421,7 @@
         "siedem",
         "dni"
       ],
+      "ilustracja": "kalendarz-7-dni",
       "prompt": "A tear-off wall calendar in a fire station office with pages flying off, wall clock in the background, sense of urgency.",
       "start": 32.068,
       "koniec": 35.683,
@@ -482,6 +491,7 @@
         "protokół",
         "wpis"
       ],
+      "ilustracja": "plansza-zarzad-protokol-wpis",
       "prompt": "Pan Naczelnik sitting at a desk in the fire station office, holding a neat folder of documents and smiling with confidence.",
       "start": 36.267,
       "koniec": 42.098,
@@ -549,6 +559,7 @@
       "akcent": [
         "doradztwodlaosp.pl."
       ],
+      "ilustracja": "adres",
       "prompt": "Pan Naczelnik standing in front of the illuminated volunteer fire station at blue hour, nodding warmly towards the viewer.",
       "start": 42.517,
       "koniec": 48.921,
