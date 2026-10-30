@@ -21,6 +21,7 @@ Nazwa odcinka: krótki slug bez polskich znaków, np. `nowy-zarzad`. Utwórz
   "tytul": "Tytuł odcinka",
   "glos": "lektor.mp3",
   "cta": "Napiszcie w komentarzu",
+  "naczelnik": true,
   "sceny": [
     {
       "tekst": "Zdanie na ekranie (poprawna pisownia, np. KRS)",
@@ -39,6 +40,8 @@ Zasady:
   zanim wygenerujesz głos.
 - Treść prawną (terminy, przepisy) sprawdź z użytkownikiem; nie wymyślaj przepisów.
 - `lektor`: skróty i adresy zapisuj fonetycznie: KRS → "ka-er-es", doradztwodlaosp.pl → "doradztwo dla o-es-pe kropka pe-el".
+- `naczelnik`: `true` pokazuje rysowaną postać Pana Naczelnika (mundur galowy, medale) na dole kadru; usta ruszają się
+  w rytm głosu, macha na powitanie i kiwa głową na końcu. Ustaw `false`, gdy obrazy same pokazują postać.
 - `akcent`: 1–3 kluczowe słowa sceny, zapisane dokładnie jak w `tekst` (wielkość liter i interpunkcja nie mają znaczenia).
   Wyświetlą się duże i czerwone.
 - `prompt`: konkretna, realistyczna scena (miejsce, przedmiot, nastrój). Bez napisów na obrazie.

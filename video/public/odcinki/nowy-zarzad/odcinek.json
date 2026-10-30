@@ -2,6 +2,7 @@
   "tytul": "Nowy zarząd? Sąd sam się nie dowie",
   "glos": "lektor.mp3",
   "cta": "Napiszcie w komentarzu",
+  "naczelnik": true,
   "sceny": [
     {
       "tekst": "Czołem, druhowie!",

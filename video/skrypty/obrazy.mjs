@@ -18,7 +18,9 @@ const STYL =
 // Stały opis postaci, gdy pojawia się w scenie
 const NACZELNIK =
   "Pan Naczelnik: a kind, trustworthy Polish man about 65 years old, retired volunteer firefighter, grey hair and grey moustache, " +
-  "warm grandfatherly smile, wearing a dark navy Polish fire brigade (OSP) dress uniform with silver buttons and a peaked cap.";
+  "warm grandfatherly smile, wearing a dark navy Polish volunteer fire brigade (OSP) dress uniform: single-breasted jacket with notched lapels, " +
+  "four flap pockets and silver buttons, white shirt and black tie, a white and blue braided aiguillette on the right shoulder, " +
+  "a row of ribbon bars and several service medals on the left chest, navy peaked cap.";
 
 const katalog = katalogOdcinka(process.argv[2]);
 const dane = wczytajOdcinek(katalog);

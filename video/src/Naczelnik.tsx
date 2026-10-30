@@ -1,6 +1,6 @@
 import React from "react";
 
-// Tymczasowa postać Pana Naczelnika (rysunek wektorowy).
+// Postać Pana Naczelnika (rysunek wektorowy) w mundurze galowym OSP z medalami.
 // usta: 0 = zamknięte, 1 = szeroko otwarte; mrugniecie: 0..1; machanie/kiwanie: 0..1
 
 const MUNDUR = "#1f2a44";
@@ -10,38 +10,100 @@ const SKORA_CIEN = "#e0ab85";
 const SIWE = "#d9d9d9";
 const ZLOTY = "#e8b84a";
 const CZERWONY = "#c8102e";
+const SREBRNY = "#c9ced6";
+const NIEBIESKI = "#2f6fd0";
 
 export const Naczelnik: React.FC<{
   usta: number;
   mrugniecie: number;
   machanie: number;
   kiwanie: number;
-}> = ({ usta, mrugniecie, machanie, kiwanie }) => {
+  wysokosc?: number; // wysokość kadru postaci: 700 = do piersi, 900 = z kieszeniami
+}> = ({ usta, mrugniecie, machanie, kiwanie, wysokosc = 700 }) => {
   const otwarcie = 4 + usta * 34;
   const ramie = -machanie * 150;
   const glowa = kiwanie * 8;
 
   return (
-    <svg viewBox="0 0 600 700" width="100%" height="100%" style={{ overflow: "visible" }}>
-      {/* Tułów */}
-      <path d="M90 700 C100 540 170 470 300 470 C430 470 500 540 510 700 Z" fill={MUNDUR} />
-      <path d="M300 470 L250 470 L300 560 L350 470 Z" fill="#ffffff" />
-      <path d="M285 490 L315 490 L308 600 L300 615 L292 600 Z" fill={MUNDUR_CIEMNY} />
-      <path d="M250 470 L215 480 L300 590 Z" fill={MUNDUR_CIEMNY} />
-      <path d="M350 470 L385 480 L300 590 Z" fill={MUNDUR_CIEMNY} />
-      <rect x="215" y="520" width="34" height="16" rx="3" fill={CZERWONY} />
-      <rect x="351" y="520" width="34" height="16" rx="3" fill={CZERWONY} />
-      {[620, 670].map((y) => (
-        <circle key={y} cx="300" cy={y} r="9" fill={ZLOTY} />
+    <svg viewBox={`0 0 600 ${wysokosc}`} width="100%" height="100%" style={{ overflow: "visible" }}>
+      {/* Mundur galowy OSP: marynarka z wyłogami, biała koszula, krawat, srebrne guziki */}
+      <path d="M70 900 L85 600 C95 520 170 470 300 470 C430 470 505 520 515 600 L530 900 Z" fill={MUNDUR} />
+      <path d="M255 470 L300 600 L345 470 Z" fill="#ffffff" />
+      <path d="M290 488 L310 488 L306 590 L300 602 L294 590 Z" fill="#111111" />
+      <path d="M255 470 L205 486 L232 560 L212 574 L300 690 Z" fill={MUNDUR_CIEMNY} />
+      <path d="M345 470 L395 486 L368 560 L388 574 L300 690 Z" fill={MUNDUR_CIEMNY} />
+      {[720, 790, 860].map((y) => (
+        <circle key={y} cx="300" cy={y} r="9" fill={SREBRNY} />
       ))}
-      <rect x="120" y="500" width="70" height="14" rx="7" fill={ZLOTY} />
-      <rect x="410" y="500" width="70" height="14" rx="7" fill={ZLOTY} />
+
+      {/* Naramienniki */}
+      <rect x="112" y="500" width="78" height="22" rx="11" fill={MUNDUR_CIEMNY} transform="rotate(-18 151 511)" />
+      <circle cx="176" cy="502" r="6" fill={SREBRNY} />
+      <rect x="410" y="500" width="78" height="22" rx="11" fill={MUNDUR_CIEMNY} transform="rotate(18 449 511)" />
+      <circle cx="424" cy="502" r="6" fill={SREBRNY} />
+
+      {/* Kieszenie piersiowe i dolne z patkami */}
+      {[
+        [138, 650, 100, 80],
+        [362, 650, 100, 80],
+        [112, 820, 120, 80],
+        [368, 820, 120, 80],
+      ].map(([x, y, w, h]) => (
+        <g key={`${x}-${y}`}>
+          <rect x={x} y={y} width={w} height={h} rx="6" fill={MUNDUR} stroke={MUNDUR_CIEMNY} strokeWidth="4" />
+          <path d={`M${x - 4} ${y} L${x + w + 4} ${y} L${x + w + 4} ${y + 24} L${x + w / 2} ${y + 34} L${x - 4} ${y + 24} Z`} fill={MUNDUR_CIEMNY} />
+          <circle cx={x + w / 2} cy={y + 24} r="6" fill={SREBRNY} />
+        </g>
+      ))}
+
+      {/* Sznur galowy (biało-niebieski) z prawego ramienia */}
+      {[
+        "M150 505 C145 630 225 680 298 650",
+        "M168 505 C180 600 235 630 292 618",
+      ].map((d) => (
+        <g key={d}>
+          <path d={d} stroke="#ffffff" strokeWidth="13" fill="none" strokeLinecap="round" />
+          <path d={d} stroke={NIEBIESKI} strokeWidth="13" fill="none" strokeDasharray="7 9" />
+        </g>
+      ))}
+      <rect x="290" y="640" width="10" height="34" rx="4" fill={SREBRNY} transform="rotate(-20 295 657)" />
+
+      {/* Baretki i medale na lewej piersi */}
+      {[
+        ["#c8102e", "#ffffff"],
+        ["#1f4fa8", "#f2c230"],
+        ["#2e7d32", "#c8102e"],
+      ].map(([a, b], i) => (
+        <g key={i}>
+          <rect x={331 + i * 30} y="560" width="28" height="12" fill={a} />
+          <rect x={341 + i * 30} y="560" width="8" height="12" fill={b} />
+        </g>
+      ))}
+      {[
+        ["#c8102e", "#ffffff", ZLOTY],
+        ["#1f4fa8", "#ffffff", SREBRNY],
+        ["#c8102e", "#1f4fa8", "#c98a4b"],
+      ].map(([a, b, metal], i) => {
+        const x = 335 + i * 30;
+        return (
+          <g key={i}>
+            <path d={`M${x} 578 L${x + 22} 578 L${x + 20} 610 L${x + 2} 610 Z`} fill={a} />
+            <rect x={x + 8} y="578" width="6" height="32" fill={b} />
+            <circle cx={x + 11} cy="624" r="13" fill={metal} stroke="#00000033" strokeWidth="2" />
+            <path
+              d={`M${x + 11} 614 L${x + 14} 621 L${x + 21} 621 L${x + 15} 626 L${x + 17} 633 L${x + 11} 629 L${x + 5} 633 L${x + 7} 626 L${x + 1} 621 L${x + 8} 621 Z`}
+              fill="#ffffff"
+              opacity="0.55"
+            />
+          </g>
+        );
+      })}
 
       {/* Prawe ramię (macha) */}
       <g transform={`rotate(${ramie} 455 520)`}>
-        <rect x="425" y="505" width="62" height="200" rx="30" fill={MUNDUR} />
-        <rect x="425" y="680" width="62" height="14" fill={ZLOTY} />
-        <circle cx="456" cy="725" r="36" fill={SKORA} />
+        <rect x="425" y="505" width="62" height="330" rx="30" fill={MUNDUR} />
+        <rect x="425" y="800" width="62" height="12" fill={MUNDUR_CIEMNY} />
+        <circle cx="456" cy="860" r="36" fill={SKORA} />
       </g>
 
       {/* Głowa */}

@@ -36,6 +36,10 @@ export const USTAWIENIA = {
   // Znaczek z adresem strony
   pokazZnaczek: true, // false = bez znaczka
   znaczekOdDolu: 470, // odległość od dolnej krawędzi (px)
+  znaczekOdDoluZPostacia: 960, // to samo, gdy w rolce jest Pan Naczelnik (znaczek nad czapką)
+
+  // Pan Naczelnik (gdy w odcinek.json jest "naczelnik": true)
+  naczelnikSzerokosc: 680, // szerokość postaci (px); wysokość dopasuje się sama
 
   // Przycisk na końcu rolki
   przyciskOdGory: 700, // odległość od górnej krawędzi (px)

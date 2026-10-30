@@ -12,6 +12,7 @@ import {
   useVideoConfig,
 } from "remotion";
 import { FONT_NAGLOWEK, FONT_TEKST, MARKA, USTAWIENIA as U } from "./marka";
+import { Naczelnik } from "./Naczelnik";
 
 // Szablon rolki w stylu doradztwodlaosp.pl.
 // Dane odcinka: public/odcinki/<odcinek>/odcinek.json (opis formatu w .claude/skills/rolka/SKILL.md)
@@ -33,10 +34,11 @@ export type Odcinek = {
   tytul: string;
   glos: string;
   cta?: string;
+  naczelnik?: boolean;
   sceny: ScenaOSP[];
 };
 
-export type RolkaProps = { odcinek: string; dane?: Odcinek };
+export type RolkaProps = { odcinek: string; dane?: Odcinek; glosnosc?: number[] };
 
 const FPS = 30;
 const ZAKONCZENIE_S = 1.5;
@@ -47,9 +49,13 @@ export const obliczRolke: CalculateMetadataFunction<RolkaProps> = async ({ props
   const odp = await fetch(staticFile(`odcinki/${props.odcinek}/odcinek.json`));
   const dane: Odcinek = await odp.json();
   const koniec = dane.sceny[dane.sceny.length - 1].koniec;
+  // Głośność nagrania klatka po klatce (tworzy ją npm run render) – do ruchu ust postaci
+  const glosnosc: number[] = dane.naczelnik
+    ? await fetch(staticFile(`odcinki/${props.odcinek}/glosnosc.json`)).then((r) => (r.ok ? r.json() : []))
+    : [];
   return {
     durationInFrames: Math.ceil((koniec + ZAKONCZENIE_S) * FPS),
-    props: { ...props, dane },
+    props: { ...props, dane, glosnosc },
   };
 };
 
@@ -164,11 +170,11 @@ const Napisy: React.FC<{ scena: ScenaOSP }> = ({ scena }) => {
   );
 };
 
-const Znaczek: React.FC = () => (
+const Znaczek: React.FC<{ odDolu: number }> = ({ odDolu }) => (
   <div
     style={{
       position: "absolute",
-      bottom: U.znaczekOdDolu,
+      bottom: odDolu,
       left: 0,
       right: 0,
       display: "flex",
@@ -217,7 +223,43 @@ const Wezwanie: React.FC<{ tekst: string }> = ({ tekst }) => {
   );
 };
 
-export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane }) => {
+const PostacNaczelnika: React.FC<{ dane: Odcinek; glosnosc: number[] }> = ({ dane, glosnosc }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = frame / fps;
+  const pierwsza = dane.sceny[0];
+  const ostatnia = dane.sceny[dane.sceny.length - 1];
+  const usta = glosnosc[frame] ?? 0;
+  const mrugniecie = frame % 96 < 4 ? 1 - Math.abs((frame % 96) - 2) / 2 : 0;
+  // Machanie na powitanie: ręka szybko w górę, kilka machnięć, w dół
+  const koniecMachania = pierwsza.koniec + 0.5;
+  const uniesienie = interpolate(t, [0, 0.35, koniecMachania - 0.35, koniecMachania], [0, 1, 1, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+  const machanie = uniesienie * (0.97 + 0.07 * Math.sin(frame / 2.5));
+  const kiwanie = t > ostatnia.start ? Math.max(0, Math.sin((t - ostatnia.start) * 5)) : 0;
+  const oddech = Math.sin(frame / 25) * 4;
+  const wejscie = spring({ frame, fps, config: { damping: 14 } });
+  const szerokosc = U.naczelnikSzerokosc;
+  const wysokosc = (szerokosc * 900) / 600;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: (1080 - szerokosc) / 2,
+        top: 1920 - wysokosc + (1 - wejscie) * 300 + oddech,
+        width: szerokosc,
+        height: wysokosc,
+        filter: "drop-shadow(0 -10px 40px rgba(0,0,0,0.5))",
+      }}
+    >
+      <Naczelnik usta={usta} mrugniecie={mrugniecie} machanie={machanie} kiwanie={kiwanie} wysokosc={900} />
+    </div>
+  );
+};
+
+export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [] }) => {
   const { fps, durationInFrames } = useVideoConfig();
   if (!dane) return null;
   const klatka = (s: number) => Math.round(s * fps);
@@ -248,7 +290,9 @@ export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane }) => {
         );
       })}
 
-      {U.pokazZnaczek && <Znaczek />}
+      {dane.naczelnik && <PostacNaczelnika dane={dane} glosnosc={glosnosc} />}
+
+      {U.pokazZnaczek && <Znaczek odDolu={dane.naczelnik ? U.znaczekOdDoluZPostacia : U.znaczekOdDolu} />}
 
       {dane.cta && (
         <Sequence from={klatka(dane.sceny[dane.sceny.length - 1].start)} layout="none">

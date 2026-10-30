@@ -3,10 +3,13 @@
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
-import { KATALOG_VIDEO, katalogOdcinka } from "./wspolne.mjs";
+import { policzGlosnosc } from "./glosnosc.mjs";
+import { KATALOG_VIDEO, katalogOdcinka, wczytajOdcinek } from "./wspolne.mjs";
 
 const nazwa = process.argv[2];
-katalogOdcinka(nazwa);
+const katalog = katalogOdcinka(nazwa);
+const dane = wczytajOdcinek(katalog);
+if (dane.naczelnik) policzGlosnosc(katalog, dane.glos || "lektor.mp3");
 
 // W chmurze Claude Code używamy przeglądarki zainstalowanej w systemie (Remotion nie może pobrać własnej)
 const PRZEGLADARKA = "/opt/pw-browsers/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell";
