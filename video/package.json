@@ -10,6 +10,7 @@
   "private": true,
   "dependencies": {
     "@remotion/cli": "4.0.539",
+    "@remotion/transitions": "4.0.539",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "remotion": "4.0.539"
@@ -26,7 +27,11 @@
     "dev": "remotion studio",
     "build": "remotion bundle",
     "upgrade": "remotion upgrade",
-    "lint": "eslint src && tsc"
+    "lint": "eslint src && tsc",
+    "glos": "NODE_USE_ENV_PROXY=1 node skrypty/glos.mjs",
+    "obrazy": "NODE_USE_ENV_PROXY=1 node skrypty/obrazy.mjs",
+    "czasy": "node skrypty/czasy-z-nagrania.mjs",
+    "render": "node skrypty/render.mjs"
   },
   "allowScripts": {
     "esbuild": false
