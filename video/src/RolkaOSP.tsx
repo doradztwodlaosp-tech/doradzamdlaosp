@@ -11,7 +11,7 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { FONT_NAGLOWEK, FONT_TEKST, MARKA } from "./marka";
+import { FONT_NAGLOWEK, FONT_TEKST, MARKA, USTAWIENIA as U } from "./marka";
 
 // Szablon rolki w stylu doradztwodlaosp.pl.
 // Dane odcinka: public/odcinki/<odcinek>/odcinek.json (opis formatu w .claude/skills/rolka/SKILL.md)
@@ -40,7 +40,7 @@ export type RolkaProps = { odcinek: string; dane?: Odcinek };
 
 const FPS = 30;
 const ZAKONCZENIE_S = 1.5;
-const PRZENIKANIE = 8;
+const PRZENIKANIE = U.przenikanie;
 const zakres = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 
 export const obliczRolke: CalculateMetadataFunction<RolkaProps> = async ({ props }) => {
@@ -53,6 +53,10 @@ export const obliczRolke: CalculateMetadataFunction<RolkaProps> = async ({ props
   };
 };
 
+// Granat marki z zadaną nieprzezroczystością (0..1)
+const przezroczystosc = (a: number) =>
+  `${MARKA.granat}${Math.round(Math.min(1, Math.max(0, a)) * 255).toString(16).padStart(2, "0")}`;
+
 const normalizuj = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
 
 // Dzieli słowa sceny na krótkie porcje (2-4 słowa), łamiąc po przecinkach i kropkach
@@ -63,7 +67,7 @@ const porcje = (slowa: Slowo[]): Slowo[][] => {
     biezaca.push(s);
     const koniecZdania = /[.,:;!?]$/.test(s.w);
     const ostatnie = i === slowa.length - 1;
-    if (ostatnie || biezaca.length >= 4 || (koniecZdania && biezaca.length >= 2)) {
+    if (ostatnie || biezaca.length >= U.slowNaRaz || (koniecZdania && biezaca.length >= 2)) {
       wynik.push(biezaca);
       biezaca = [];
     }
@@ -75,9 +79,9 @@ const Tlo: React.FC<{ scena: ScenaOSP; numer: number; odcinek: string }> = ({ sc
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const dlugosc = (scena.koniec - scena.start + 1) * fps;
-  const zoom = interpolate(frame, [0, dlugosc], [1.04, 1.16], zakres);
+  const zoom = interpolate(frame, [0, dlugosc], [U.zoomStart, U.zoomKoniec], zakres);
   const kierunek = numer % 2 === 0 ? 1 : -1;
-  const przesuniecie = interpolate(frame, [0, dlugosc], [0, 30 * kierunek], zakres);
+  const przesuniecie = interpolate(frame, [0, dlugosc], [0, U.przesuniecie * kierunek], zakres);
   const wejscie = interpolate(frame, [0, PRZENIKANIE], [0, 1], zakres);
 
   return (
@@ -102,7 +106,7 @@ const Tlo: React.FC<{ scena: ScenaOSP; numer: number; odcinek: string }> = ({ sc
       {/* Przyciemnienie u góry i u dołu, żeby napisy były czytelne */}
       <AbsoluteFill
         style={{
-          background: `linear-gradient(180deg, ${MARKA.granat}ee 0%, ${MARKA.granat}88 22%, transparent 45%, transparent 70%, ${MARKA.granat}cc 100%)`,
+          background: `linear-gradient(180deg, ${przezroczystosc(U.przyciemnienieGora)} 0%, ${przezroczystosc(U.przyciemnienieGora / 2)} 22%, transparent 45%, transparent 70%, ${przezroczystosc(U.przyciemnienieDol)} 100%)`,
         }}
       />
     </AbsoluteFill>
@@ -123,7 +127,7 @@ const Napisy: React.FC<{ scena: ScenaOSP }> = ({ scena }) => {
         position: "absolute",
         left: 80,
         right: 80,
-        top: 260,
+        top: U.napisyOdGory,
         display: "flex",
         flexWrap: "wrap",
         justifyContent: "center",
@@ -143,7 +147,7 @@ const Napisy: React.FC<{ scena: ScenaOSP }> = ({ scena }) => {
               fontFamily: wyrozniony ? FONT_NAGLOWEK : FONT_TEKST,
               fontWeight: wyrozniony ? 800 : 500,
               // Syne jest szeroki: długie wyróżnione słowa zmniejszamy, by mieściły się w kadrze
-              fontSize: wyrozniony ? Math.min(104, Math.floor(1100 / s.w.length)) : 58,
+              fontSize: wyrozniony ? Math.min(U.akcentRozmiar, Math.floor(1100 / s.w.length)) : U.napisyRozmiar,
               lineHeight: 1.15,
               color: wyrozniony ? MARKA.czerwony : MARKA.krem,
               textShadow: "0 4px 24px rgba(0,0,0,0.55)",
@@ -164,7 +168,7 @@ const Znaczek: React.FC = () => (
   <div
     style={{
       position: "absolute",
-      bottom: 470,
+      bottom: U.znaczekOdDolu,
       left: 0,
       right: 0,
       display: "flex",
@@ -193,13 +197,13 @@ const Wezwanie: React.FC<{ tekst: string }> = ({ tekst }) => {
   const { fps } = useVideoConfig();
   const w = spring({ frame, fps, config: { damping: 12 } });
   return (
-    <div style={{ position: "absolute", top: 700, left: 0, right: 0, display: "flex", justifyContent: "center" }}>
+    <div style={{ position: "absolute", top: U.przyciskOdGory, left: 0, right: 0, display: "flex", justifyContent: "center" }}>
       <div
         style={{
           transform: `scale(${w})`,
           fontFamily: FONT_NAGLOWEK,
           fontWeight: 800,
-          fontSize: 44,
+          fontSize: U.przyciskRozmiar,
           color: "#ffffff",
           background: MARKA.czerwony,
           borderRadius: 999,
@@ -244,7 +248,7 @@ export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane }) => {
         );
       })}
 
-      <Znaczek />
+      {U.pokazZnaczek && <Znaczek />}
 
       {dane.cta && (
         <Sequence from={klatka(dane.sceny[dane.sceny.length - 1].start)} layout="none">

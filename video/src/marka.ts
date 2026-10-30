@@ -11,6 +11,37 @@ export const MARKA = {
   adres: "doradztwodlaosp.pl",
 };
 
+// ─────────────────────────────────────────────────────────────
+// USTAWIENIA SZABLONU – tu możesz bezpiecznie zmieniać liczby.
+// Kadr ma 1080 px szerokości i 1920 px wysokości.
+// Zmieniaj tylko wartości po dwukropku, zostaw przecinki na końcu linii.
+// ─────────────────────────────────────────────────────────────
+export const USTAWIENIA = {
+  // Napisy
+  napisyOdGory: 260, // odległość napisów od górnej krawędzi (px)
+  napisyRozmiar: 58, // zwykłe słowa (px)
+  akcentRozmiar: 104, // wyróżnione, czerwone słowa (px)
+  slowNaRaz: 4, // ile słów najwyżej widać naraz
+
+  // Ruch obrazu (powolne przybliżanie, jak "kamera")
+  zoomStart: 1.04, // 1 = bez przybliżenia
+  zoomKoniec: 1.16, // większa liczba = mocniejsze przybliżenie
+  przesuniecie: 30, // przesunięcie w bok w trakcie sceny (px)
+  przenikanie: 8, // długość przejścia między scenami (klatki; 30 klatek = 1 s)
+
+  // Przyciemnienie obrazu (0 = brak, 1 = całkiem ciemno)
+  przyciemnienieGora: 0.93,
+  przyciemnienieDol: 0.8,
+
+  // Znaczek z adresem strony
+  pokazZnaczek: true, // false = bez znaczka
+  znaczekOdDolu: 470, // odległość od dolnej krawędzi (px)
+
+  // Przycisk na końcu rolki
+  przyciskOdGory: 700, // odległość od górnej krawędzi (px)
+  przyciskRozmiar: 44, // wielkość tekstu (px)
+};
+
 export const FONT_NAGLOWEK = "Syne";
 export const FONT_TEKST = "DM Sans";
 
