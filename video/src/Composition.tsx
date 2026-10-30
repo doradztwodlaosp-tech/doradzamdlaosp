@@ -1,39 +1,17 @@
-import { CalculateMetadataFunction, Composition, AbsoluteFill } from "remotion";
+import { Composition } from "remotion";
+import { Rolka } from "./Rolka";
+import { DLUGOSC_S } from "./scenariusz";
 
-type Props = {};
-
-const calculateMetadata: CalculateMetadataFunction<Props> = () => {
-  return {};
-};
-
-// Pionowa rolka 9:16 (Facebook Reels): 1080x1920, 30 kl./s, 5 sekund
+// Pionowa rolka 9:16 (Facebook Reels): 1080x1920, 30 kl./s
 export const MyComposition = () => {
   return (
     <Composition
-      id="Rolka"
-      component={MyComponent}
-      durationInFrames={150}
+      id="NowyZarzad"
+      component={Rolka}
+      durationInFrames={DLUGOSC_S * 30}
       fps={30}
       width={1080}
       height={1920}
-      calculateMetadata={calculateMetadata}
     />
-  );
-};
-
-export const MyComponent: React.FC<Props> = () => {
-  return (
-    <AbsoluteFill
-      style={{
-        backgroundColor: "#ffffff",
-        justifyContent: "center",
-        alignItems: "center",
-        fontFamily: "sans-serif",
-        fontSize: 80,
-        color: "#1a1a1a",
-      }}
-    >
-      Pan Naczelnik
-    </AbsoluteFill>
   );
 };
