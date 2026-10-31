@@ -1,13 +1,13 @@
 // Generuje głos lektora w ElevenLabs i zapisuje czasy scen i słów do odcinek.json.
 // Użycie: npm run glos -- <odcinek>
-// Wymaga: ELEVENLABS_API_KEY; opcjonalnie ELEVENLABS_VOICE (nazwa lub ID głosu, domyślnie "Pan Prawnik OSP")
+// Wymaga: ELEVENLABS_API_KEY; opcjonalnie ELEVENLABS_VOICE (nazwa lub ID głosu, domyślnie "Pan Prawnik"; wystarczy fragment nazwy)
 import fs from "node:fs";
 import path from "node:path";
 import { katalogOdcinka, slowaZCzasow, wczytajOdcinek, wymagajKlucza, zapiszOdcinek } from "./wspolne.mjs";
 
 const API = "https://api.elevenlabs.io/v1";
 const klucz = wymagajKlucza("ELEVENLABS_API_KEY");
-const nazwaGlosu = process.env.ELEVENLABS_VOICE || "Pan Prawnik OSP";
+const nazwaGlosu = process.env.ELEVENLABS_VOICE || "Pan Prawnik";
 const model = process.env.ELEVENLABS_MODEL || "eleven_multilingual_v2";
 
 const katalog = katalogOdcinka(process.argv[2]);
@@ -21,7 +21,11 @@ const zapytanie = async (url, opcje = {}) => {
 
 const znajdzGlos = async () => {
   const { voices } = await zapytanie(`${API}/voices`);
-  const glos = voices.find((v) => v.voice_id === nazwaGlosu) ?? voices.find((v) => v.name === nazwaGlosu);
+  const szukana = nazwaGlosu.toLowerCase();
+  const glos =
+    voices.find((v) => v.voice_id === nazwaGlosu) ??
+    voices.find((v) => v.name === nazwaGlosu) ??
+    voices.find((v) => v.name.toLowerCase().includes(szukana));
   if (!glos) throw new Error(`Nie znaleziono głosu "${nazwaGlosu}". Dostępne: ${voices.map((v) => v.name).join(", ")}`);
   return glos.voice_id;
 };

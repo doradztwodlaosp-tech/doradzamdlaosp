@@ -17,7 +17,7 @@ const STYL =
 
 // Stały opis postaci, gdy pojawia się w scenie
 const NACZELNIK =
-  "Pan Naczelnik: an experienced Polish volunteer firefighter who is also a lawyer, about 45-50 years old, broad-shouldered, " +
+  "Pan Prawnik: an experienced Polish volunteer firefighter who is also a lawyer, about 45-50 years old, broad-shouldered, " +
   "strong athletic build, short dark hair greying at the temples, clean-shaven, strong jaw, calm, composed and confident expression, " +
   "trustworthy and authoritative. Wears a dark navy Polish volunteer fire brigade (OSP) dress uniform: single-breasted jacket with " +
   "notched lapels, four flap pockets and silver buttons, white shirt and black tie, a white and blue braided aiguillette on the right " +
@@ -34,7 +34,7 @@ for (const [i, scena] of dane.sceny.entries()) {
     scena.obraz = plik;
     continue;
   }
-  const prompt = [scena.prompt, /naczelnik/i.test(scena.prompt) ? NACZELNIK : "", STYL].filter(Boolean).join(" ");
+  const prompt = [scena.prompt, /prawnik|naczelnik/i.test(scena.prompt) ? NACZELNIK : "", STYL].filter(Boolean).join(" ");
   console.log(`Scena ${i + 1}: generuję ${plik}...`);
   const odp = await fetch("https://api.openai.com/v1/images/generations", {
     method: "POST",

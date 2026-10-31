@@ -1,6 +1,6 @@
 import React from "react";
 
-// Postać Pana Naczelnika (rysunek wektorowy): strażak OSP i prawnik, ok. 45–50 lat, mocnej budowy,
+// Postać Pana Prawnika (rysunek wektorowy; komponent nazywa się Naczelnik z pierwszej wersji): strażak OSP i prawnik, ok. 45–50 lat, mocnej budowy,
 // w mundurze galowym OSP z rogatywką i medalami.
 // usta: 0 = zamknięte, 1 = szeroko otwarte; mrugniecie: 0..1; machanie/kiwanie: 0..1
 

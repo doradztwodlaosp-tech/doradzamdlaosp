@@ -1,9 +1,9 @@
 ---
 name: rolka
-description: Tworzy pionową rolkę (9:16, Facebook Reels) z Panem Naczelnikiem w stylu doradztwodlaosp.pl na podstawie scenariusza lub tematu. Użyj, gdy użytkownik wkleja scenariusz rolki, podaje temat odcinka albo pisze /rolka.
+description: Tworzy pionową rolkę (9:16, Facebook Reels) z Panem Prawnikiem w stylu doradztwodlaosp.pl na podstawie scenariusza lub tematu. Użyj, gdy użytkownik wkleja scenariusz rolki, podaje temat odcinka albo pisze /rolka.
 ---
 
-# Rolka z Panem Naczelnikiem
+# Rolka z Panem Prawnikiem
 
 Użytkownik jest prawnikiem, nie informatykiem. Pisz po polsku, prostym językiem, krok po kroku.
 Pytaj o zgodę przed instalowaniem czegokolwiek nowego. Nie proś o wklejanie kluczy API do czatu.
@@ -35,12 +35,15 @@ Nazwa odcinka: krótki slug bez polskich znaków, np. `nowy-zarzad`. Utwórz
 
 Zasady:
 - Jedna scena = jedno zdanie lub krótka myśl (zwykle 8–12 scen, rolka 30–60 s).
-- Jeśli użytkownik podał tylko temat, napisz scenariusz w stylu Pana Naczelnika (ciepło, po druhowsku,
+- Postać: Pan Prawnik – doświadczony strażak OSP (ok. 45–50 lat) i prawnik od przepisów ochrony przeciwpożarowej,
+  działalności OSP i praw strażaków ochotników. Spokojny, opanowany, rzeczowy i konkretny; mówi wiedzą i argumentami,
+  nie emocjami. Tłumaczy prawo przystępnie, prostuje nieporozumienia, staje w obronie ochotników. Budzi zaufanie.
+- Jeśli użytkownik podał tylko temat, napisz scenariusz w stylu Pana Prawnika (rzeczowo, po druhowsku,
   zaczyna od "Czołem, druhowie!", kończy odesłaniem do doradztwodlaosp.pl) i pokaż go do akceptacji,
   zanim wygenerujesz głos.
 - Treść prawną (terminy, przepisy) sprawdź z użytkownikiem; nie wymyślaj przepisów.
 - `lektor`: skróty i adresy zapisuj fonetycznie: KRS → "ka-er-es", doradztwodlaosp.pl → "doradztwo dla o-es-pe kropka pe-el".
-- `naczelnik`: `true` pokazuje rysowaną postać Pana Naczelnika (mundur galowy, medale) na dole kadru; usta ruszają się
+- `naczelnik`: `true` pokazuje rysowaną postać Pana Prawnika (nazwa pola została z pierwszej wersji) (mundur galowy, medale) na dole kadru; usta ruszają się
   w rytm głosu, macha na powitanie i kiwa głową na końcu. Ustaw `false`, gdy obrazy same pokazują postać.
 - `ilustracja` (opcjonalnie): animowana ilustracja na karcie nad postacią. Dostępne: remiza, sala, koniec,
   lista-do-sadu, odrzucenie, laptop-krs, teczka, brak-w-protokole, kalendarz-7-dni, plansza-zarzad-protokol-wpis, adres
@@ -49,14 +52,14 @@ Zasady:
 - `akcent`: 1–3 kluczowe słowa sceny, zapisane dokładnie jak w `tekst` (wielkość liter i interpunkcja nie mają znaczenia).
   Wyświetlą się duże i czerwone.
 - `prompt`: konkretna, realistyczna scena (miejsce, przedmiot, nastrój). Bez napisów na obrazie.
-  Wpisz słowo "Naczelnik", gdy ma wystąpić postać – skrypt dołoży jej stały opis. Wspólny styl (granat, czerwień,
+  Zacznij prompt od "Pan Prawnik", gdy ma wystąpić postać – skrypt dołoży jej stały opis. Wspólny styl (granat, czerwień,
   zmierzch, kinowo) dokłada `video/skrypty/obrazy.mjs`.
 
 ## 2. Głos
 
 Uruchamiaj polecenia w folderze `video/`.
 
-- Jest `ELEVENLABS_API_KEY`: `npm run glos -- <slug>` (głos "Pan Naczelnik"; inny: zmienna `ELEVENLABS_VOICE`).
+- Jest `ELEVENLABS_API_KEY`: `npm run glos -- <slug>` (głos "Pan Prawnik" – wystarczy fragment nazwy; inny: zmienna `ELEVENLABS_VOICE`).
   Zapisuje `lektor.mp3` oraz dokładne czasy scen i słów.
 - Użytkownik przysłał gotowe MP3: skopiuj je jako `video/public/odcinki/<slug>/lektor.mp3`,
   potem `npm run czasy -- <slug>`. Sprawdź wypisane czasy: każda scena powinna zaczynać się od właściwego zdania.
