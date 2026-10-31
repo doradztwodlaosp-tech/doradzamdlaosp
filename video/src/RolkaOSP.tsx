@@ -37,6 +37,7 @@ export type Odcinek = {
   glos: string;
   cta?: string;
   naczelnik?: boolean;
+  szkic?: string; // odcinek bez nagrania: czasy szacunkowe, render bez dźwięku
   sceny: ScenaOSP[];
 };
 
@@ -52,7 +53,7 @@ export const obliczRolke: CalculateMetadataFunction<RolkaProps> = async ({ props
   const dane: Odcinek = await odp.json();
   const koniec = dane.sceny[dane.sceny.length - 1].koniec;
   // Głośność nagrania klatka po klatce (tworzy ją npm run render) – do ruchu ust postaci
-  const glosnosc: number[] = dane.naczelnik
+  const glosnosc: number[] = dane.naczelnik && !dane.szkic
     ? await fetch(staticFile(`odcinki/${props.odcinek}/glosnosc.json`)).then((r) => (r.ok ? r.json() : []))
     : [];
   return {
@@ -263,13 +264,13 @@ const PostacNaczelnika: React.FC<{ dane: Odcinek; glosnosc: number[] }> = ({ dan
   const ostatnia = dane.sceny[dane.sceny.length - 1];
   const usta = glosnosc[frame] ?? 0;
   const mrugniecie = frame % 96 < 4 ? 1 - Math.abs((frame % 96) - 2) / 2 : 0;
-  // Machanie na powitanie: ręka szybko w górę, kilka machnięć, w dół
   const koniecMachania = pierwsza.koniec + 0.5;
   const uniesienie = interpolate(t, [0, 0.35, koniecMachania - 0.35, koniecMachania], [0, 1, 1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  const machanie = uniesienie * (0.97 + 0.07 * Math.sin(frame / 2.5));
+  // Spokojne powitanie: uniesiona dłoń, bez energicznego machania
+  const machanie = uniesienie * (0.98 + 0.02 * Math.sin(frame / 4));
   const kiwanie = t > ostatnia.start ? Math.max(0, Math.sin((t - ostatnia.start) * 5)) : 0;
   const oddech = Math.sin(frame / 25) * 4;
   const wejscie = spring({ frame, fps, config: { damping: 14 } });
@@ -298,7 +299,7 @@ export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [] })
 
   return (
     <AbsoluteFill style={{ backgroundColor: MARKA.granat }}>
-      <Audio src={staticFile(`odcinki/${odcinek}/${dane.glos}`)} />
+      {!dane.szkic && <Audio src={staticFile(`odcinki/${odcinek}/${dane.glos}`)} />}
 
       {dane.sceny.map((scena, i) => {
         const od = i === 0 ? 0 : klatka(scena.start) - PRZENIKANIE;

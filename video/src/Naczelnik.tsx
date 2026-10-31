@@ -1,13 +1,15 @@
 import React from "react";
 
-// Postać Pana Naczelnika (rysunek wektorowy) w mundurze galowym OSP z medalami.
+// Postać Pana Naczelnika (rysunek wektorowy): strażak OSP i prawnik, ok. 45–50 lat, mocnej budowy,
+// w mundurze galowym OSP z rogatywką i medalami.
 // usta: 0 = zamknięte, 1 = szeroko otwarte; mrugniecie: 0..1; machanie/kiwanie: 0..1
 
 const MUNDUR = "#1f2a44";
 const MUNDUR_CIEMNY = "#151d31";
 const SKORA = "#f1c7a3";
 const SKORA_CIEN = "#e0ab85";
-const SIWE = "#d9d9d9";
+const SIWE = "#b9b9b9";
+const WLOSY = "#3b2f28";
 const ZLOTY = "#e8b84a";
 const SREBRNY = "#c9ced6";
 const NIEBIESKI = "#2f6fd0";
@@ -27,7 +29,7 @@ export const Naczelnik: React.FC<{
   return (
     <svg viewBox={`0 0 600 ${wysokosc}`} width="100%" height="100%" style={{ overflow: "visible" }}>
       {/* Mundur galowy OSP: marynarka z wyłogami, biała koszula, krawat, srebrne guziki */}
-      <path d="M70 900 L85 600 C95 520 170 470 300 470 C430 470 505 520 515 600 L530 900 Z" fill={MUNDUR} />
+      <path d="M38 900 L52 590 C68 505 165 466 300 466 C435 466 532 505 548 590 L562 900 Z" fill={MUNDUR} />
       <path d="M255 470 L300 600 L345 470 Z" fill="#ffffff" />
       <path d="M290 488 L310 488 L306 590 L300 602 L294 590 Z" fill="#111111" />
       <path d="M255 470 L205 486 L232 560 L212 574 L300 690 Z" fill={MUNDUR_CIEMNY} />
@@ -37,10 +39,10 @@ export const Naczelnik: React.FC<{
       ))}
 
       {/* Naramienniki */}
-      <rect x="112" y="500" width="78" height="22" rx="11" fill={MUNDUR_CIEMNY} transform="rotate(-18 151 511)" />
-      <circle cx="176" cy="502" r="6" fill={SREBRNY} />
-      <rect x="410" y="500" width="78" height="22" rx="11" fill={MUNDUR_CIEMNY} transform="rotate(18 449 511)" />
-      <circle cx="424" cy="502" r="6" fill={SREBRNY} />
+      <rect x="88" y="502" width="84" height="22" rx="11" fill={MUNDUR_CIEMNY} transform="rotate(-16 130 513)" />
+      <circle cx="160" cy="504" r="6" fill={SREBRNY} />
+      <rect x="428" y="502" width="84" height="22" rx="11" fill={MUNDUR_CIEMNY} transform="rotate(16 470 513)" />
+      <circle cx="440" cy="504" r="6" fill={SREBRNY} />
 
       {/* Kieszenie piersiowe i dolne z patkami */}
       {[
@@ -58,8 +60,8 @@ export const Naczelnik: React.FC<{
 
       {/* Sznur galowy (biało-niebieski) z prawego ramienia */}
       {[
-        "M150 505 C145 630 225 680 298 650",
-        "M168 505 C180 600 235 630 292 618",
+        "M132 508 C130 635 220 684 298 650",
+        "M152 506 C166 604 232 632 292 618",
       ].map((d) => (
         <g key={d}>
           <path d={d} stroke="#ffffff" strokeWidth="13" fill="none" strokeLinecap="round" />
@@ -100,43 +102,51 @@ export const Naczelnik: React.FC<{
       })}
 
       {/* Prawe ramię (macha) */}
-      <g transform={`rotate(${ramie} 455 520)`}>
-        <rect x="425" y="505" width="62" height="330" rx="30" fill={MUNDUR} />
-        <rect x="425" y="800" width="62" height="12" fill={MUNDUR_CIEMNY} />
-        <circle cx="456" cy="860" r="36" fill={SKORA} />
+      <g transform={`rotate(${ramie} 482 522)`}>
+        <rect x="448" y="505" width="70" height="330" rx="34" fill={MUNDUR} />
+        <rect x="448" y="800" width="70" height="12" fill={MUNDUR_CIEMNY} />
+        <circle cx="483" cy="862" r="38" fill={SKORA} />
       </g>
 
-      {/* Głowa */}
-      <g transform={`rotate(0) translate(0 ${glowa})`}>
-        <rect x="262" y="400" width="76" height="80" fill={SKORA_CIEN} />
-        <ellipse cx="300" cy="300" rx="125" ry="140" fill={SKORA} />
-        <ellipse cx="176" cy="310" rx="18" ry="30" fill={SKORA_CIEN} />
-        <ellipse cx="424" cy="310" rx="18" ry="30" fill={SKORA_CIEN} />
-        {/* Siwe skronie */}
-        <path d="M178 250 C180 300 185 320 192 340 L200 250 Z" fill={SIWE} />
-        <path d="M422 250 C420 300 415 320 408 340 L400 250 Z" fill={SIWE} />
+      {/* Głowa: mężczyzna ok. 45–50 lat, krótko ostrzyżony, ogolony, mocna szczęka, spokojny wyraz twarzy */}
+      <g transform={`translate(0 ${glowa})`}>
+        <path d="M242 388 L358 388 L366 482 L234 482 Z" fill={SKORA_CIEN} />
+        <ellipse cx="174" cy="306" rx="17" ry="30" fill={SKORA_CIEN} />
+        <ellipse cx="426" cy="306" rx="17" ry="30" fill={SKORA_CIEN} />
+        <path
+          d="M176 250 C176 178 230 148 300 148 C370 148 424 178 424 250 L424 332 C424 388 386 428 340 440 L260 440 C214 428 176 388 176 332 Z"
+          fill={SKORA}
+        />
+        {/* Krótkie ciemne włosy z siwiejącymi skroniami */}
+        <path d="M180 240 C180 214 186 200 198 192 L200 292 C190 286 182 276 180 262 Z" fill={WLOSY} />
+        <path d="M420 240 C420 214 414 200 402 192 L400 292 C410 286 418 276 420 262 Z" fill={WLOSY} />
+        <path d="M184 250 L198 250 L198 290 C190 284 185 274 184 262 Z" fill={SIWE} opacity="0.7" />
+        <path d="M416 250 L402 250 L402 290 C410 284 415 274 416 262 Z" fill={SIWE} opacity="0.7" />
+        {/* Cień zarostu */}
+        <path d="M188 338 C198 400 240 434 300 438 C360 434 402 400 412 338 C398 384 360 412 300 414 C240 412 202 384 188 338 Z" fill="#8a6a58" opacity="0.2" />
 
-        {/* Oczy */}
+        {/* Oczy i proste, ciemne brwi */}
         {[250, 350].map((x) => (
           <g key={x}>
-            <ellipse cx={x} cy="300" rx="16" ry={14 * (1 - mrugniecie) + 1} fill="#ffffff" />
-            <circle cx={x} cy="301" r={9 * (1 - mrugniecie)} fill="#2b2b2b" />
-            <path d={`M${x - 28} ${270} Q${x} ${258} ${x + 28} ${270}`} stroke={SIWE} strokeWidth="11" fill="none" strokeLinecap="round" />
+            <ellipse cx={x} cy="302" rx="15" ry={12 * (1 - mrugniecie) + 1} fill="#ffffff" />
+            <circle cx={x} cy="303" r={8 * (1 - mrugniecie)} fill="#3a2c22" />
+            <path
+              d={x < 300 ? `M${x - 28} 276 L${x + 24} 280` : `M${x - 24} 280 L${x + 28} 276`}
+              stroke={WLOSY}
+              strokeWidth="10"
+              fill="none"
+              strokeLinecap="round"
+            />
           </g>
         ))}
         {/* Nos */}
-        <path d="M300 300 Q318 345 300 358 Q288 360 284 352" stroke={SKORA_CIEN} strokeWidth="7" fill="none" strokeLinecap="round" />
-        {/* Rumieńce i zmarszczki od uśmiechu */}
-        <ellipse cx="225" cy="350" rx="26" ry="16" fill="#e89a8a" opacity="0.45" />
-        <ellipse cx="375" cy="350" rx="26" ry="16" fill="#e89a8a" opacity="0.45" />
-        <path d="M212 296 Q205 306 212 316" stroke={SKORA_CIEN} strokeWidth="4" fill="none" strokeLinecap="round" />
-        <path d="M388 296 Q395 306 388 316" stroke={SKORA_CIEN} strokeWidth="4" fill="none" strokeLinecap="round" />
-        <path d="M262 236 Q300 228 338 236" stroke={SKORA_CIEN} strokeWidth="4" fill="none" strokeLinecap="round" />
-        {/* Usta: uśmiech, otwierają się w rytm głosu */}
-        <path d={`M268 386 Q300 ${398 + otwarcie} 332 386 Q300 392 268 386 Z`} fill="#7a2e2e" />
-        <path d="M262 384 Q300 404 338 384" stroke="#a5523f" strokeWidth="5" fill="none" strokeLinecap="round" />
-        {/* Wąs */}
-        <path d="M300 366 C270 356 230 362 218 388 C245 384 270 386 300 378 C330 386 355 384 382 388 C370 362 330 356 300 366 Z" fill={SIWE} />
+        <path d="M300 304 Q318 348 302 360 Q290 362 286 354" stroke={SKORA_CIEN} strokeWidth="7" fill="none" strokeLinecap="round" />
+        {/* Bruzdy nosowo-wargowe */}
+        <path d="M258 362 Q250 386 260 406" stroke={SKORA_CIEN} strokeWidth="4" fill="none" strokeLinecap="round" opacity="0.7" />
+        <path d="M342 362 Q350 386 340 406" stroke={SKORA_CIEN} strokeWidth="4" fill="none" strokeLinecap="round" opacity="0.7" />
+        {/* Usta: spokojny, lekki uśmiech; otwierają się w rytm głosu */}
+        <path d={`M272 392 Q300 ${396 + otwarcie} 328 392 Q300 397 272 392 Z`} fill="#7a3a32" />
+        <path d="M268 390 Q300 400 332 390" stroke="#a8604f" strokeWidth="5" fill="none" strokeLinecap="round" />
 
         {/* Rogatywka OSP: kwadratowy denko, niebieski otok, czarny pasek, lakierowany daszek, srebrny orzeł */}
         <path d="M172 174 L150 132 L450 132 L428 174 Z" fill={MUNDUR} />

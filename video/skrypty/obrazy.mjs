@@ -17,10 +17,12 @@ const STYL =
 
 // Stały opis postaci, gdy pojawia się w scenie
 const NACZELNIK =
-  "Pan Naczelnik: a kind, trustworthy Polish man about 65 years old, retired volunteer firefighter, grey hair and grey moustache, " +
-  "warm grandfatherly smile, wearing a dark navy Polish volunteer fire brigade (OSP) dress uniform: single-breasted jacket with notched lapels, " +
-  "four flap pockets and silver buttons, white shirt and black tie, a white and blue braided aiguillette on the right shoulder, " +
-  "a row of ribbon bars and several service medals on the left chest, navy peaked cap.";
+  "Pan Naczelnik: an experienced Polish volunteer firefighter who is also a lawyer, about 45-50 years old, broad-shouldered, " +
+  "strong athletic build, short dark hair greying at the temples, clean-shaven, strong jaw, calm, composed and confident expression, " +
+  "trustworthy and authoritative. Wears a dark navy Polish volunteer fire brigade (OSP) dress uniform: single-breasted jacket with " +
+  "notched lapels, four flap pockets and silver buttons, white shirt and black tie, a white and blue braided aiguillette on the right " +
+  "shoulder, a row of ribbon bars and several service medals on the left chest, and a navy Polish four-cornered rogatywka cap with " +
+  "a blue band, black chin strap, black glossy visor and a silver eagle badge. Fictional person, not resembling any real public figure.";
 
 const katalog = katalogOdcinka(process.argv[2]);
 const dane = wczytajOdcinek(katalog);

@@ -60,5 +60,6 @@ dane.sceny = dane.sceny.map((scena, i) => {
   return { ...scena, start: Math.round(s * 1000) / 1000, koniec: Math.round(k * 1000) / 1000, slowa: slowaProporcjonalnie(scena.tekst, s, k) };
 });
 
+delete dane.szkic;
 zapiszOdcinek(katalog, dane);
 dane.sceny.forEach((s, i) => console.log(`${String(i + 1).padStart(2)}. ${s.start.toFixed(2)}–${s.koniec.toFixed(2)}  ${s.tekst}`));

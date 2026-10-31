@@ -1,13 +1,13 @@
 // Generuje głos lektora w ElevenLabs i zapisuje czasy scen i słów do odcinek.json.
 // Użycie: npm run glos -- <odcinek>
-// Wymaga: ELEVENLABS_API_KEY; opcjonalnie ELEVENLABS_VOICE (nazwa lub ID głosu, domyślnie "Pan Naczelnik")
+// Wymaga: ELEVENLABS_API_KEY; opcjonalnie ELEVENLABS_VOICE (nazwa lub ID głosu, domyślnie "Pan Prawnik OSP")
 import fs from "node:fs";
 import path from "node:path";
 import { katalogOdcinka, slowaZCzasow, wczytajOdcinek, wymagajKlucza, zapiszOdcinek } from "./wspolne.mjs";
 
 const API = "https://api.elevenlabs.io/v1";
 const klucz = wymagajKlucza("ELEVENLABS_API_KEY");
-const nazwaGlosu = process.env.ELEVENLABS_VOICE || "Pan Naczelnik";
+const nazwaGlosu = process.env.ELEVENLABS_VOICE || "Pan Prawnik OSP";
 const model = process.env.ELEVENLABS_MODEL || "eleven_multilingual_v2";
 
 const katalog = katalogOdcinka(process.argv[2]);
@@ -49,6 +49,7 @@ fs.writeFileSync(path.join(katalog, "lektor.mp3"), Buffer.from(wynik.audio_base6
 const { character_start_times_seconds: poczatki, character_end_times_seconds: konce } = wynik.alignment;
 
 dane.glos = "lektor.mp3";
+delete dane.szkic;
 dane.sceny = dane.sceny.map((scena, i) => {
   const { od, mowa } = zakresy[i];
   // Słowa wypowiedzi lektora z czasami pierwszego i ostatniego znaku
