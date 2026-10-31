@@ -10,7 +10,7 @@
         "druhowie!"
       ],
       "ilustracja": "remiza",
-      "prompt": "Pan Prawnik standing in front of a small rural Polish volunteer fire station with red garage doors, raising his hand in a friendly greeting.",
+      "prompt": "Pan Prawnik stoi przed małą wiejską remizą OSP z czerwonymi bramami garażowymi i spokojnie unosi dłoń na powitanie.",
       "start": 0,
       "koniec": 1.205,
       "slowa": [
@@ -32,7 +32,7 @@
         "zarząd"
       ],
       "ilustracja": "sala",
-      "prompt": "Inside a modest Polish fire station common room after a general meeting, volunteer firefighters chatting around a long wooden table with coffee mugs and papers, warm cosy light.",
+      "prompt": "Skromna świetlica w remizie po walnym zebraniu: strażacy ochotnicy rozmawiają przy długim drewnianym stole z kubkami kawy i papierami, ciepłe, przytulne światło.",
       "start": 1.588,
       "koniec": 5.367,
       "slowa": [
@@ -84,7 +84,7 @@
         "koniec."
       ],
       "ilustracja": "koniec",
-      "prompt": "Close-up of an empty wooden table in a fire station hall after a meeting, empty coffee mugs and a pen, lights dimming, sense of finality.",
+      "prompt": "Zbliżenie na pusty drewniany stół w sali remizy po zebraniu: puste kubki po kawie i długopis, światła przygasają, nastrój końca.",
       "start": 5.833,
       "koniec": 7.651,
       "slowa": [
@@ -131,7 +131,7 @@
         "sądu"
       ],
       "ilustracja": "lista-do-sadu",
-      "prompt": "A single sheet of paper with a typed list of names flying through the evening air towards a classic Polish district court building with columns.",
+      "prompt": "Pojedyncza kartka z wydrukowaną listą nazwisk leci w wieczornym powietrzu w stronę klasycznego budynku sądu rejonowego z kolumnami.",
       "start": 8.145,
       "koniec": 10.985,
       "slowa": [
@@ -185,7 +185,7 @@
         "działa."
       ],
       "ilustracja": "odrzucenie",
-      "prompt": "A sheet of paper with a list of names lying on the stone steps in front of a closed court building door at night, rejected.",
+      "prompt": "Kartka z listą nazwisk leży na kamiennych schodach przed zamkniętymi drzwiami sądu nocą, odrzucona.",
       "start": 11.551,
       "koniec": 13.956,
       "slowa": [
@@ -229,7 +229,7 @@
         "internet,"
       ],
       "ilustracja": "laptop-krs",
-      "prompt": "A laptop on a desk in a fire station office showing a generic online form, glowing screen in a dark room, a firefighter helmet beside it.",
+      "prompt": "Laptop na biurku w biurze remizy z ogólnym formularzem internetowym na ekranie, świecący ekran w ciemnym pokoju, obok hełm strażacki.",
       "start": 14.49,
       "koniec": 20.498,
       "slowa": [
@@ -297,7 +297,7 @@
         "uchwały."
       ],
       "ilustracja": "teczka",
-      "prompt": "An open document folder on a desk with neatly stacked papers - meeting minutes and resolutions - with an official stamp, warm desk lamp light.",
+      "prompt": "Otwarta teczka na biurku ze starannie ułożonymi dokumentami – protokołem i uchwałami – z pieczątką, ciepłe światło lampki biurowej.",
       "start": 21.191,
       "koniec": 26.432,
       "slowa": [
@@ -369,7 +369,7 @@
         "odrzuci."
       ],
       "ilustracja": "brak-w-protokole",
-      "prompt": "Close-up of a printed document with one line left visibly blank, a red pen lying on it, dramatic side light.",
+      "prompt": "Zbliżenie na wydrukowany dokument z jedną wyraźnie pustą linijką, na nim czerwony długopis, dramatyczne światło z boku.",
       "start": 27.182,
       "koniec": 31.223,
       "slowa": [
@@ -422,7 +422,7 @@
         "dni"
       ],
       "ilustracja": "kalendarz-7-dni",
-      "prompt": "A tear-off wall calendar in a fire station office with pages flying off, wall clock in the background, sense of urgency.",
+      "prompt": "Zrywany kalendarz ścienny w biurze remizy, z którego odlatują kartki, w tle zegar ścienny, poczucie pośpiechu.",
       "start": 32.068,
       "koniec": 35.683,
       "slowa": [
@@ -492,7 +492,7 @@
         "wpis"
       ],
       "ilustracja": "plansza-zarzad-protokol-wpis",
-      "prompt": "Pan Prawnik sitting at a desk in the fire station office, holding a neat folder of documents and smiling with confidence.",
+      "prompt": "Pan Prawnik siedzi przy biurku w biurze remizy, trzyma uporządkowaną teczkę dokumentów i pewnie się uśmiecha.",
       "start": 36.267,
       "koniec": 42.098,
       "slowa": [
@@ -560,7 +560,7 @@
         "doradztwodlaosp.pl."
       ],
       "ilustracja": "adres",
-      "prompt": "Pan Prawnik standing in front of the illuminated volunteer fire station at blue hour, nodding warmly towards the viewer.",
+      "prompt": "Pan Prawnik stoi przed oświetloną remizą OSP o niebieskiej godzinie i życzliwie kiwa głową w stronę widza.",
       "start": 42.517,
       "koniec": 48.921,
       "slowa": [

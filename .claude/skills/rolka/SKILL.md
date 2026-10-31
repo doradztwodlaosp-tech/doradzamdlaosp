@@ -11,6 +11,12 @@ Pytaj o zgodę przed instalowaniem czegokolwiek nowego. Nie proś o wklejanie kl
 Projekt Remotion jest w folderze `video/`. Szablon: kompozycja `RolkaOSP` (`video/src/RolkaOSP.tsx`),
 barwy i fonty marki: `video/src/marka.ts`. Szablonu nie zmieniaj dla pojedynczego odcinka.
 
+## 0. Przeczytaj wytyczne marki
+
+Zanim cokolwiek zrobisz, przeczytaj `video/marka/BRANDBOOK.md`, `video/marka/POSTAC.md`,
+`video/marka/MOODBOARD.md` (i obrazy w `video/marka/moodboard/`) oraz `video/marka/SLOWNIK-ANIMACJI.md`.
+Trzymaj się ich. Gdy użytkownik używa nazwy ze słownika (np. „najazd”, „przenikanie”), zrób dokładnie ten efekt.
+
 ## 1. Przygotuj odcinek
 
 Nazwa odcinka: krótki slug bez polskich znaków, np. `nowy-zarzad`. Utwórz
@@ -51,7 +57,7 @@ Zasady:
   (prosty SVG w barwach marki, animacja od początku sceny) i dodaj ją do mapy.
 - `akcent`: 1–3 kluczowe słowa sceny, zapisane dokładnie jak w `tekst` (wielkość liter i interpunkcja nie mają znaczenia).
   Wyświetlą się duże i czerwone.
-- `prompt`: konkretna, realistyczna scena (miejsce, przedmiot, nastrój). Bez napisów na obrazie.
+- `prompt` (po polsku): konkretna, realistyczna scena (miejsce, przedmiot, nastrój). Bez napisów na obrazie.
   Zacznij prompt od "Pan Prawnik", gdy ma wystąpić postać – skrypt dołoży jej stały opis. Wspólny styl (granat, czerwień,
   zmierzch, kinowo) dokłada `video/skrypty/obrazy.mjs`.
 

@@ -8,21 +8,21 @@ import { katalogOdcinka, wczytajOdcinek, wymagajKlucza, zapiszOdcinek } from "./
 const klucz = wymagajKlucza("OPENAI_API_KEY");
 const model = process.env.OBRAZY_MODEL || "gpt-image-1";
 
-// Wspólny styl wszystkich obrazów: spójny z barwami doradztwodlaosp.pl
+// Wspólny styl wszystkich obrazów: spójny z barwami doradztwodlaosp.pl (opisy po polsku – generator je rozumie)
 const STYL =
-  "Cinematic, photorealistic, vertical 2:3 composition, Polish countryside setting, dusk or night blue hour lighting, " +
-  "deep navy blue sky and shadows with warm accents and touches of fire-red, soft depth of field, " +
-  "important subject in the middle and lower part of the frame, empty calm space at the top for captions. " +
-  "No text, no letters, no logos, no watermarks.";
+  "Kinowe, fotorealistyczne zdjęcie w pionie (proporcje 2:3), polskie realia, światło zmierzchu lub niebieskiej godziny, " +
+  "głęboki granat nieba i cieni z ciepłymi akcentami i odrobiną strażackiej czerwieni, płytka głębia ostrości, " +
+  "najważniejszy element w środkowej i dolnej części kadru, spokojna pusta przestrzeń u góry na napisy. " +
+  "Bez napisów, liter, logo i znaków wodnych.";
 
 // Stały opis postaci, gdy pojawia się w scenie
 const NACZELNIK =
-  "Pan Prawnik: an experienced Polish volunteer firefighter who is also a lawyer, about 45-50 years old, broad-shouldered, " +
-  "strong athletic build, short dark hair greying at the temples, clean-shaven, strong jaw, calm, composed and confident expression, " +
-  "trustworthy and authoritative. Wears a dark navy Polish volunteer fire brigade (OSP) dress uniform: single-breasted jacket with " +
-  "notched lapels, four flap pockets and silver buttons, white shirt and black tie, a white and blue braided aiguillette on the right " +
-  "shoulder, a row of ribbon bars and several service medals on the left chest, and a navy Polish four-cornered rogatywka cap with " +
-  "a blue band, black chin strap, black glossy visor and a silver eagle badge. Fictional person, not resembling any real public figure.";
+  "Pan Prawnik: doświadczony polski strażak ochotnik, który jest też prawnikiem, 45–50 lat, szerokie barki, mocna, wysportowana budowa, " +
+  "krótkie ciemne włosy siwiejące na skroniach, gładko ogolony, mocna szczęka, spokojny i pewny siebie wyraz twarzy, budzi zaufanie. " +
+  "Ma na sobie granatowy mundur galowy polskiej Ochotniczej Straży Pożarnej: jednorzędową marynarkę z wyłogami, czterema kieszeniami " +
+  "z patkami i srebrnymi guzikami, białą koszulę, czarny krawat, biało-niebieski pleciony sznur galowy na prawym ramieniu, baretki " +
+  "i medale na lewej piersi oraz granatową czapkę z kwadratowym denkiem (polska rogatywka) z niebieskim otokiem, czarnym paskiem, " +
+  "lakierowanym czarnym daszkiem i srebrnym orłem z przodu. Postać fikcyjna, nie przypomina żadnej znanej osoby publicznej.";
 
 const katalog = katalogOdcinka(process.argv[2]);
 const dane = wczytajOdcinek(katalog);
