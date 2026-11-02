@@ -1,13 +1,14 @@
 import { continueRender, delayRender, staticFile } from "remotion";
 
-// Barwy i fonty z doradztwodlaosp.pl (index.html)
+// Barwy marki doradztwodlaosp.pl (wersja „grafit i złoto”)
 export const MARKA = {
-  granat: "#0D1B2A",
-  granatJasny: "#1E2F45",
-  czerwony: "#C0392B",
-  czerwonyJasny: "#e8786e",
-  krem: "#F5F0E8",
-  szary: "#8FA3B8",
+  tlo: "#15161B", // grafitowe tło
+  tloJasne: "#20222A", // karty i panele na tle
+  zloto: "#DAA73C", // wszystkie akcenty
+  bialy: "#FFFFFF", // tekst główny
+  tekstPomocniczy: "#CBCBD3",
+  nadtytul: "#C5AB6E", // małe nadtytuły
+  czerwony: "#C0392B", // tylko znaki ostrzeżenia (przekreślenie, „!”)
   adres: "doradztwodlaosp.pl",
 };
 
@@ -17,58 +18,56 @@ export const MARKA = {
 // Zmieniaj tylko wartości po dwukropku, zostaw przecinki na końcu linii.
 // ─────────────────────────────────────────────────────────────
 export const USTAWIENIA = {
+  // Bezpieczna strefa (Facebook, Instagram): nic ważnego niżej ani bardziej w prawo
+  strefaDol: 1440, // dolne 25% ekranu zasłaniają opisy i przyciski
+  strefaPrawo: 918, // prawy pas ok. 15% zasłaniają polubienia i komentarze
+
+  // Nadtytuł u góry
+  nadtytulOdGory: 100, // odległość od górnej krawędzi (px)
+  nadtytulRozmiar: 30, // wielkość liter (px)
+
+  // Ilustracja sceny (pionowy panel)
+  ilustracjaOdGory: 160, // górna krawędź panelu (px)
+  ilustracjaWysokosc: 1130, // wysokość panelu (px) – ok. 60% ekranu
+
   // Napisy
-  napisyOdGory: 260, // odległość napisów od górnej krawędzi (px)
-  napisyRozmiar: 60, // zwykłe słowa (px)
-  akcentRozmiar: 104, // wyróżnione, czerwone słowa (px)
+  napisySrodek: 1200, // środek napisów od górnej krawędzi (px) – ok. 62% wysokości
+  napisyRozmiar: 72, // zwykłe słowa (px)
+  akcentRozmiar: 92, // słowa kluczowe (px)
   slowNaRaz: 4, // ile słów najwyżej widać naraz
 
-  // Ruch obrazu (powolne przybliżanie, jak "kamera")
+  // Ruch obrazu (gdy scena ma zdjęcie)
   zoomStart: 1.04, // 1 = bez przybliżenia
-  zoomKoniec: 1.16, // większa liczba = mocniejsze przybliżenie
+  zoomKoniec: 1.12,
   przesuniecie: 30, // przesunięcie w bok w trakcie sceny (px)
   przenikanie: 8, // długość przejścia między scenami (klatki; 30 klatek = 1 s)
 
-  // Przyciemnienie obrazu (0 = brak, 1 = całkiem ciemno)
-  przyciemnienieGora: 0.93,
-  przyciemnienieDol: 0.8,
-
-  // Znaczek z adresem strony
-  pokazZnaczek: true, // false = bez znaczka
-  znaczekOdDolu: 470, // odległość od dolnej krawędzi (px)
-  znaczekOdGoryZPostacia: 170, // gdy w rolce jest Pan Naczelnik, znaczek jest u góry (px od górnej krawędzi)
-
   // Pan Naczelnik (gdy w odcinek.json jest "naczelnik": true)
-  naczelnikSzerokosc: 640, // szerokość postaci (px); wysokość dopasuje się sama
-
-  // Karta z animowaną ilustracją (pole "ilustracja" w scenie)
-  kartaOdGory: 520, // odległość karty od górnej krawędzi (px)
-  kartaWysokosc: 520, // wysokość karty (px); szerokość dopasuje się sama
+  naczelnikSzerokosc: 300, // szerokość postaci (px); wysokość dopasuje się sama
+  naczelnikOdLewej: 10, // odległość od lewej krawędzi (px)
 
   // Przycisk na końcu rolki
-  przyciskOdGory: 700, // odległość od górnej krawędzi (px)
-  przyciskRozmiar: 46, // wielkość tekstu (px)
-  przyciskOdGoryZPostacia: 880, // to samo, gdy w rolce jest Pan Naczelnik
+  przyciskSrodek: 1345, // środek przycisku od górnej krawędzi (px)
+  przyciskRozmiar: 42, // wielkość tekstu (px)
 };
 
-export const FONT_NAGLOWEK = "DM Sans";
-export const FONT_TEKST = "DM Sans";
+export const FONT = "Montserrat";
 
-// Font DM Sans (czytelny, z doradztwodlaosp.pl) zapisany lokalnie w public/fonty (Google Fonts, licencja OFL), żeby render nie zależał od internetu
+// Montserrat (Google Fonts, licencja OFL) zapisany lokalnie w public/fonty, żeby render nie zależał od internetu
 const LATIN = "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD";
 const LATIN_EXT = "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF";
 
 const FONTY = [
-  { rodzina: FONT_TEKST, plik: "dmsans-latin.woff2", zakres: LATIN },
-  { rodzina: FONT_TEKST, plik: "dmsans-latin-ext.woff2", zakres: LATIN_EXT },
+  { plik: "montserrat-latin.woff2", zakres: LATIN },
+  { plik: "montserrat-latin-ext.woff2", zakres: LATIN_EXT },
 ];
 
 if (typeof document !== "undefined") {
-  const uchwyt = delayRender("Ładowanie fontów marki");
+  const uchwyt = delayRender("Ładowanie czcionki marki");
   Promise.all(
-    FONTY.map(async ({ rodzina, plik, zakres }) => {
-      const font = new FontFace(rodzina, `url(${staticFile(`fonty/${plik}`)}) format("woff2")`, {
-        weight: "100 1000",
+    FONTY.map(async ({ plik, zakres }) => {
+      const font = new FontFace(FONT, `url(${staticFile(`fonty/${plik}`)}) format("woff2")`, {
+        weight: "100 900",
         unicodeRange: zakres,
       });
       await font.load();
@@ -77,7 +76,7 @@ if (typeof document !== "undefined") {
   )
     .then(() => continueRender(uchwyt))
     .catch((err) => {
-      console.error("Nie udało się wczytać fontów", err);
+      console.error("Nie udało się wczytać czcionki", err);
       continueRender(uchwyt);
     });
 }

@@ -11,11 +11,12 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { FONT_NAGLOWEK, FONT_TEKST, MARKA, USTAWIENIA as U } from "./marka";
+import { FONT, MARKA, USTAWIENIA as U } from "./marka";
 import { Naczelnik } from "./Naczelnik";
 import { Ilustracja } from "./Sceny";
+import { ILUSTRACJE_PION } from "./ScenyPion";
 
-// Szablon rolki w stylu doradztwodlaosp.pl.
+// Szablon rolki w stylu doradztwodlaosp.pl (grafit i złoto).
 // Dane odcinka: public/odcinki/<odcinek>/odcinek.json (opis formatu w .claude/skills/rolka/SKILL.md)
 
 export type Slowo = { w: string; s: number; e: number };
@@ -34,6 +35,7 @@ export type ScenaOSP = {
 
 export type Odcinek = {
   tytul: string;
+  nadtytul?: string;
   glos: string;
   cta?: string;
   naczelnik?: boolean;
@@ -41,30 +43,31 @@ export type Odcinek = {
   sceny: ScenaOSP[];
 };
 
-export type RolkaProps = { odcinek: string; dane?: Odcinek; glosnosc?: number[] };
+export type RolkaProps = { odcinek: string; dane?: Odcinek; glosnosc?: number[]; strefy?: boolean };
 
 const FPS = 30;
 const ZAKONCZENIE_S = 1.5;
 const PRZENIKANIE = U.przenikanie;
 const zakres = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 
+// Środek bezpiecznej strefy w poziomie – treść centrujemy względem niej, nie całego ekranu
+const SRODEK_X = U.strefaPrawo / 2;
+const SZEROKOSC_TRESCI = U.strefaPrawo - 100;
+
 export const obliczRolke: CalculateMetadataFunction<RolkaProps> = async ({ props }) => {
   const odp = await fetch(staticFile(`odcinki/${props.odcinek}/odcinek.json`));
   const dane: Odcinek = await odp.json();
   const koniec = dane.sceny[dane.sceny.length - 1].koniec;
   // Głośność nagrania klatka po klatce (tworzy ją npm run render) – do ruchu ust postaci
-  const glosnosc: number[] = dane.naczelnik && !dane.szkic
-    ? await fetch(staticFile(`odcinki/${props.odcinek}/glosnosc.json`)).then((r) => (r.ok ? r.json() : []))
-    : [];
+  const glosnosc: number[] =
+    dane.naczelnik && !dane.szkic
+      ? await fetch(staticFile(`odcinki/${props.odcinek}/glosnosc.json`)).then((r) => (r.ok ? r.json() : []))
+      : [];
   return {
     durationInFrames: Math.ceil((koniec + ZAKONCZENIE_S) * FPS),
     props: { ...props, dane, glosnosc },
   };
 };
-
-// Granat marki z zadaną nieprzezroczystością (0..1)
-const przezroczystosc = (a: number) =>
-  `${MARKA.granat}${Math.round(Math.min(1, Math.max(0, a)) * 255).toString(16).padStart(2, "0")}`;
 
 const normalizuj = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
 
@@ -84,6 +87,7 @@ const porcje = (slowa: Slowo[]): Slowo[][] => {
   return wynik;
 };
 
+// Tło sceny: zdjęcie z powolnym najazdem albo nic (jednolity grafit)
 const Tlo: React.FC<{ scena: ScenaOSP; numer: number; odcinek: string }> = ({ scena, numer, odcinek }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -92,36 +96,51 @@ const Tlo: React.FC<{ scena: ScenaOSP; numer: number; odcinek: string }> = ({ sc
   const kierunek = numer % 2 === 0 ? 1 : -1;
   const przesuniecie = interpolate(frame, [0, dlugosc], [0, U.przesuniecie * kierunek], zakres);
   const wejscie = interpolate(frame, [0, PRZENIKANIE], [0, 1], zakres);
-
+  if (!scena.obraz) return null;
   return (
     <AbsoluteFill style={{ opacity: numer === 0 ? 1 : wejscie }}>
-      {scena.obraz ? (
-        <Img
-          src={staticFile(`odcinki/${odcinek}/${scena.obraz}`)}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            transform: `scale(${zoom}) translateX(${przesuniecie}px)`,
-          }}
-        />
-      ) : (
-        <AbsoluteFill
-          style={{
-            background: `radial-gradient(circle at ${50 + przesuniecie}% 60%, ${MARKA.czerwony}55 0%, transparent 45%), linear-gradient(180deg, ${MARKA.granatJasny} 0%, ${MARKA.granat} 100%)`,
-          }}
-        />
-      )}
-      {/* Przyciemnienie u góry i u dołu, żeby napisy były czytelne */}
-      <AbsoluteFill
-        style={{
-          background: `linear-gradient(180deg, ${przezroczystosc(U.przyciemnienieGora)} 0%, ${przezroczystosc(U.przyciemnienieGora / 2)} 22%, transparent 45%, transparent 70%, ${przezroczystosc(U.przyciemnienieDol)} 100%)`,
-        }}
+      <Img
+        src={staticFile(`odcinki/${odcinek}/${scena.obraz}`)}
+        style={{ width: "100%", height: "100%", objectFit: "cover", transform: `scale(${zoom}) translateX(${przesuniecie}px)` }}
       />
+      <AbsoluteFill style={{ background: `linear-gradient(180deg, ${MARKA.tlo}cc 0%, transparent 30%, transparent 55%, ${MARKA.tlo}ee 75%)` }} />
     </AbsoluteFill>
   );
 };
 
+// Duży pionowy panel z ilustracją (ok. 60% wysokości ekranu, w bezpiecznej strefie)
+const PanelIlustracji: React.FC<{ nazwa: string; dlugosc: number }> = ({ nazwa, dlugosc }) => {
+  const frame = useCurrentFrame();
+  const wejscie = interpolate(frame, [0, PRZENIKANIE], [0, 1], zakres);
+  const Pion = ILUSTRACJE_PION[nazwa];
+  const wysokosc = U.ilustracjaWysokosc;
+  const szerokosc = (wysokosc * 900) / 1200;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: U.ilustracjaOdGory,
+        left: SRODEK_X - szerokosc / 2,
+        width: szerokosc,
+        height: wysokosc,
+        opacity: wejscie,
+      }}
+    >
+      {Pion ? (
+        <svg viewBox="0 0 900 1200" width="100%" height="100%" style={{ fontFamily: `${FONT}, Arial, sans-serif` }}>
+          <Pion dlugosc={dlugosc} />
+        </svg>
+      ) : (
+        // Starsze, poziome ilustracje: na jasnej karcie w górnej części panelu
+        <div style={{ marginTop: 40, width: "100%", height: (szerokosc * 760) / 900, borderRadius: 32, background: "#F4F1EA", overflow: "hidden" }}>
+          <Ilustracja nazwa={nazwa} />
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Napisy słowo po słowie; słowo wypowiadane w tej chwili świeci na złoto
 const Napisy: React.FC<{ scena: ScenaOSP }> = ({ scena }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -134,35 +153,38 @@ const Napisy: React.FC<{ scena: ScenaOSP }> = ({ scena }) => {
     <div
       style={{
         position: "absolute",
-        left: 80,
-        right: 80,
-        top: U.napisyOdGory,
+        left: SRODEK_X - SZEROKOSC_TRESCI / 2,
+        width: SZEROKOSC_TRESCI,
+        top: U.napisySrodek - 130,
+        height: 260,
         display: "flex",
         flexWrap: "wrap",
         justifyContent: "center",
+        alignContent: "center",
         alignItems: "baseline",
-        columnGap: 20,
-        rowGap: 4,
+        columnGap: 22,
+        rowGap: 0,
         textAlign: "center",
       }}
     >
       {aktywna.map((s, i) => {
         const wyrozniony = akcent.has(normalizuj(s.w));
+        const mowione = t >= s.s && t < s.e + 0.08;
         const pojawienie = spring({ frame: frame - Math.round((s.s - scena.start) * fps), fps, config: { damping: 16, mass: 0.6 } });
+        const rozmiar = wyrozniony ? U.akcentRozmiar : U.napisyRozmiar;
         return (
           <span
             key={`${s.s}-${i}`}
             style={{
-              fontFamily: wyrozniony ? FONT_NAGLOWEK : FONT_TEKST,
-              fontWeight: wyrozniony ? 900 : 600,
-              // Długie wyróżnione słowa zmniejszamy, by mieściły się w kadrze
-              fontSize: wyrozniony ? Math.min(U.akcentRozmiar, Math.floor(1500 / s.w.length)) : U.napisyRozmiar,
-              lineHeight: 1.15,
-              color: wyrozniony ? MARKA.czerwony : MARKA.krem,
-              textShadow: "0 2px 0 rgba(0,0,0,0.6), 0 4px 24px rgba(0,0,0,0.7)",
-              letterSpacing: wyrozniony ? -1 : 0,
+              fontFamily: FONT,
+              fontWeight: wyrozniony ? 800 : 700,
+              // Długie słowa zmniejszamy, by mieściły się w bezpiecznej strefie
+              fontSize: Math.min(rozmiar, Math.floor((SZEROKOSC_TRESCI * 1.55) / s.w.length)),
+              lineHeight: 1.18,
+              color: mowione ? MARKA.zloto : MARKA.bialy,
+              textShadow: "0 3px 0 rgba(0,0,0,0.55), 0 6px 22px rgba(0,0,0,0.85)",
               opacity: pojawienie,
-              transform: `translateY(${(1 - pojawienie) * 24}px) scale(${0.9 + 0.1 * pojawienie})`,
+              transform: `translateY(${(1 - pojawienie) * 22}px) scale(${0.92 + 0.08 * pojawienie})`,
               display: "inline-block",
             }}
           >
@@ -174,84 +196,46 @@ const Napisy: React.FC<{ scena: ScenaOSP }> = ({ scena }) => {
   );
 };
 
-const Znaczek: React.FC<{ odDolu?: number; odGory?: number }> = ({ odDolu, odGory }) => (
+const Nadtytul: React.FC<{ tekst: string }> = ({ tekst }) => (
   <div
     style={{
       position: "absolute",
-      bottom: odDolu,
-      top: odGory,
-      left: 0,
-      right: 0,
-      display: "flex",
-      justifyContent: "center",
+      top: U.nadtytulOdGory,
+      left: SRODEK_X - SZEROKOSC_TRESCI / 2,
+      width: SZEROKOSC_TRESCI,
+      textAlign: "center",
+      fontFamily: FONT,
+      fontWeight: 700,
+      fontSize: U.nadtytulRozmiar,
+      letterSpacing: 5,
+      color: MARKA.nadtytul,
+      textTransform: "uppercase",
     }}
   >
-    <div
-      style={{
-        fontFamily: FONT_NAGLOWEK,
-        fontWeight: 700,
-        fontSize: 30,
-        color: MARKA.krem,
-        background: `${MARKA.granat}cc`,
-        border: `2px solid ${MARKA.czerwony}`,
-        borderRadius: 999,
-        padding: "10px 28px",
-      }}
-    >
-      {MARKA.adres}
-    </div>
+    {tekst}
   </div>
 );
 
-const Wezwanie: React.FC<{ tekst: string; odGory: number }> = ({ tekst, odGory }) => {
+const Wezwanie: React.FC<{ tekst: string }> = ({ tekst }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const w = spring({ frame, fps, config: { damping: 12 } });
   return (
-    <div style={{ position: "absolute", top: odGory, left: 0, right: 0, display: "flex", justifyContent: "center" }}>
+    <div style={{ position: "absolute", top: U.przyciskSrodek - 45, left: 0, width: U.strefaPrawo, display: "flex", justifyContent: "center" }}>
       <div
         style={{
           transform: `scale(${w})`,
-          fontFamily: FONT_NAGLOWEK,
+          fontFamily: FONT,
           fontWeight: 800,
           fontSize: U.przyciskRozmiar,
-          color: "#ffffff",
-          background: MARKA.czerwony,
+          color: MARKA.tlo,
+          background: MARKA.zloto,
           borderRadius: 999,
-          padding: "22px 48px",
-          boxShadow: `0 10px 40px ${MARKA.czerwony}88`,
+          padding: "18px 44px",
         }}
       >
         {tekst}
       </div>
-    </div>
-  );
-};
-
-const KartaIlustracji: React.FC<{ nazwa: string }> = ({ nazwa }) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const wejscie = spring({ frame, fps, config: { damping: 13 } });
-  const unoszenie = Math.sin(frame / 20) * 6;
-  const wysokosc = U.kartaWysokosc;
-  const szerokosc = (wysokosc * 900) / 760;
-  return (
-    <div
-      style={{
-        position: "absolute",
-        top: U.kartaOdGory + (1 - wejscie) * 80 + unoszenie,
-        left: (1080 - szerokosc) / 2,
-        width: szerokosc,
-        height: wysokosc,
-        borderRadius: 36,
-        background: MARKA.krem,
-        boxShadow: `0 24px 60px rgba(0,0,0,0.45), 0 0 0 4px ${MARKA.czerwony}33`,
-        overflow: "hidden",
-        opacity: wejscie,
-        transform: `scale(${0.85 + 0.15 * wejscie}) rotate(${(1 - wejscie) * -4}deg)`,
-      }}
-    >
-      <Ilustracja nazwa={nazwa} />
     </div>
   );
 };
@@ -264,15 +248,12 @@ const PostacNaczelnika: React.FC<{ dane: Odcinek; glosnosc: number[] }> = ({ dan
   const ostatnia = dane.sceny[dane.sceny.length - 1];
   const usta = glosnosc[frame] ?? 0;
   const mrugniecie = frame % 96 < 4 ? 1 - Math.abs((frame % 96) - 2) / 2 : 0;
-  const koniecMachania = pierwsza.koniec + 0.5;
-  const uniesienie = interpolate(t, [0, 0.35, koniecMachania - 0.35, koniecMachania], [0, 1, 1, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
   // Spokojne powitanie: uniesiona dłoń, bez energicznego machania
+  const koniecMachania = pierwsza.koniec + 0.5;
+  const uniesienie = interpolate(t, [0, 0.35, koniecMachania - 0.35, koniecMachania], [0, 1, 1, 0], zakres);
   const machanie = uniesienie * (0.98 + 0.02 * Math.sin(frame / 4));
   const kiwanie = t > ostatnia.start ? Math.max(0, Math.sin((t - ostatnia.start) * 5)) : 0;
-  const oddech = Math.sin(frame / 25) * 4;
+  const oddech = Math.sin(frame / 25) * 3;
   const wejscie = spring({ frame, fps, config: { damping: 14 } });
   const szerokosc = U.naczelnikSzerokosc;
   const wysokosc = (szerokosc * 900) / 600;
@@ -280,11 +261,11 @@ const PostacNaczelnika: React.FC<{ dane: Odcinek; glosnosc: number[] }> = ({ dan
     <div
       style={{
         position: "absolute",
-        left: (1080 - szerokosc) / 2,
-        top: 1920 - wysokosc + (1 - wejscie) * 300 + oddech,
+        left: U.naczelnikOdLewej,
+        top: 1920 - wysokosc + (1 - wejscie) * 200 + oddech,
         width: szerokosc,
         height: wysokosc,
-        filter: "drop-shadow(0 -10px 40px rgba(0,0,0,0.5))",
+        filter: "drop-shadow(0 -6px 24px rgba(0,0,0,0.5))",
       }}
     >
       <Naczelnik usta={usta} mrugniecie={mrugniecie} machanie={machanie} kiwanie={kiwanie} wysokosc={900} />
@@ -292,30 +273,62 @@ const PostacNaczelnika: React.FC<{ dane: Odcinek; glosnosc: number[] }> = ({ dan
   );
 };
 
-export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [] }) => {
+// Linie bezpiecznych stref – tylko do podglądu (props "strefy": true)
+const Strefy: React.FC = () => (
+  <>
+    <div style={{ position: "absolute", left: 0, top: U.strefaDol, width: 1080, height: 1920 - U.strefaDol, background: "rgba(192,57,43,0.28)", borderTop: "4px dashed #ff5a4a" }} />
+    <div style={{ position: "absolute", left: U.strefaPrawo, top: 0, width: 1080 - U.strefaPrawo, height: 1920, background: "rgba(192,57,43,0.28)", borderLeft: "4px dashed #ff5a4a" }} />
+  </>
+);
+
+export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [], strefy = false }) => {
   const { fps, durationInFrames } = useVideoConfig();
   if (!dane) return null;
   const klatka = (s: number) => Math.round(s * fps);
+  const zakresSceny = (i: number) => {
+    const od = klatka(dane.sceny[i].start);
+    const nastepna = dane.sceny[i + 1];
+    return { od, doKlatki: nastepna ? klatka(nastepna.start) : durationInFrames };
+  };
 
   return (
-    <AbsoluteFill style={{ backgroundColor: MARKA.granat }}>
+    <AbsoluteFill style={{ backgroundColor: MARKA.tlo }}>
       {!dane.szkic && <Audio src={staticFile(`odcinki/${odcinek}/${dane.glos}`)} />}
 
       {dane.sceny.map((scena, i) => {
-        const od = i === 0 ? 0 : klatka(scena.start) - PRZENIKANIE;
-        const nastepna = dane.sceny[i + 1];
-        const doKlatki = nastepna ? klatka(nastepna.start) : durationInFrames;
+        const { od, doKlatki } = zakresSceny(i);
+        const start = i === 0 ? 0 : od - PRZENIKANIE;
         return (
-          <Sequence key={i} from={od} durationInFrames={doKlatki - od} layout="none">
+          <Sequence key={i} from={start} durationInFrames={doKlatki - start} layout="none">
             <Tlo scena={scena} numer={i} odcinek={odcinek} />
           </Sequence>
         );
       })}
 
       {dane.sceny.map((scena, i) => {
-        const od = klatka(scena.start);
-        const nastepna = dane.sceny[i + 1];
-        const doKlatki = nastepna ? klatka(nastepna.start) : durationInFrames;
+        if (!scena.ilustracja) return null;
+        const { od, doKlatki } = zakresSceny(i);
+        return (
+          <Sequence key={i} from={od} durationInFrames={doKlatki - od} layout="none">
+            <PanelIlustracji nazwa={scena.ilustracja} dlugosc={doKlatki - od} />
+          </Sequence>
+        );
+      })}
+
+      {/* Przyciemnienie pod napisami, żeby były czytelne na każdej ilustracji */}
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          width: 1080,
+          top: U.napisySrodek - 200,
+          height: 400,
+          background: `linear-gradient(180deg, transparent 0%, ${MARKA.tlo}d9 35%, ${MARKA.tlo}d9 65%, transparent 100%)`,
+        }}
+      />
+
+      {dane.sceny.map((scena, i) => {
+        const { od, doKlatki } = zakresSceny(i);
         return (
           <Sequence key={i} from={od} durationInFrames={doKlatki - od} layout="none">
             <Napisy scena={scena} />
@@ -323,28 +336,17 @@ export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [] })
         );
       })}
 
-      {dane.sceny.map((scena, i) => {
-        if (!scena.ilustracja) return null;
-        const od = klatka(scena.start);
-        const nastepna = dane.sceny[i + 1];
-        const doKlatki = nastepna ? klatka(nastepna.start) : durationInFrames;
-        return (
-          <Sequence key={i} from={od} durationInFrames={doKlatki - od} layout="none">
-            <KartaIlustracji nazwa={scena.ilustracja} />
-          </Sequence>
-        );
-      })}
+      {dane.nadtytul && <Nadtytul tekst={dane.nadtytul} />}
 
       {dane.naczelnik && <PostacNaczelnika dane={dane} glosnosc={glosnosc} />}
 
-      {U.pokazZnaczek &&
-        (dane.naczelnik ? <Znaczek odGory={U.znaczekOdGoryZPostacia} /> : <Znaczek odDolu={U.znaczekOdDolu} />)}
-
       {dane.cta && (
         <Sequence from={klatka(dane.sceny[dane.sceny.length - 1].start)} layout="none">
-          <Wezwanie tekst={dane.cta} odGory={dane.naczelnik ? U.przyciskOdGoryZPostacia : U.przyciskOdGory} />
+          <Wezwanie tekst={dane.cta} />
         </Sequence>
       )}
+
+      {strefy && <Strefy />}
     </AbsoluteFill>
   );
 };

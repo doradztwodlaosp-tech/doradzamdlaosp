@@ -605,7 +605,7 @@ export const Ilustracja: React.FC<{ nazwa: string }> = ({ nazwa }) => {
   const Komponent = ILUSTRACJE[nazwa];
   if (!Komponent) return null;
   return (
-    <svg viewBox="0 0 900 760" width="100%" height="100%" style={{ fontFamily: "DM Sans, Arial, sans-serif", color: TEKST }}>
+    <svg viewBox="0 0 900 760" width="100%" height="100%" style={{ fontFamily: "Montserrat, Arial, sans-serif", color: TEKST }}>
       <Komponent />
     </svg>
   );
@@ -614,7 +614,7 @@ export const Ilustracja: React.FC<{ nazwa: string }> = ({ nazwa }) => {
 export const Scena: React.FC<{ numer: number }> = ({ numer }) => {
   const Komponent = SCENY[numer];
   return (
-    <svg viewBox="0 0 900 760" width="100%" height="100%" style={{ fontFamily: "Inter, Arial, sans-serif", color: TEKST }}>
+    <svg viewBox="0 0 900 760" width="100%" height="100%" style={{ fontFamily: "Montserrat, Arial, sans-serif", color: TEKST }}>
       <Komponent />
     </svg>
   );

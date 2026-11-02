@@ -5,18 +5,24 @@ Ten dokument czyta Claude przed każdą rolką. Możesz go edytować na GitHubie
 ## Kim jesteśmy
 Doradztwo prawne dla Ochotniczych Straży Pożarnych. Tłumaczymy przepisy prosto, rzeczowo i po druhowsku.
 
-## Barwy
+## Barwy (wersja „grafit i złoto”)
 | Nazwa | Kod | Do czego |
 |---|---|---|
-| Granat | `#0D1B2A` | tło, cienie, główny nastrój |
-| Granat jasny | `#1E2F45` | drugie tło, karty |
-| Czerwień strażacka | `#C0392B` | wyróżnione słowa, przyciski, akcenty |
-| Krem | `#F5F0E8` | tekst na ciemnym tle, karty z ilustracjami |
-| Szary niebieski | `#8FA3B8` | tekst pomocniczy |
-| Złoto (tylko jako materiał) | – | metalowe elementy na zdjęciach: § , guziki, odznaki |
+| Grafit | `#15161B` | tło (jednolite, bez gradientów) |
+| Grafit jasny | `#20222A` | karty i panele |
+| Złoto | `#DAA73C` | wszystkie akcenty, słowo wypowiadane w napisach, przyciski |
+| Biel | `#FFFFFF` | tekst główny |
+| Szary jasny | `#CBCBD3` | tekst pomocniczy |
+| Złoto przygaszone | `#C5AB6E` | małe nadtytuły |
+| Czerwień | `#C0392B` | tylko znaki ostrzeżenia: przekreślenie, „!”, pieczęć ODRZUCONO |
 
 ## Czcionka
-- **DM Sans** – cała rolka. Zwykłe słowa: półgrube (600). Wyróżnione słowa: bardzo grube (900), czerwone, większe.
+- **Montserrat** – Bold (700) dla zwykłych słów, ExtraBold (800) dla słów kluczowych i nagłówków.
+
+## Układ i bezpieczne strefy
+- Nic ważnego w dolnych 25% ekranu (poniżej 1440 px) ani w prawym pasie ok. 15% (od 918 px) – tam są przyciski Facebooka i Instagrama.
+- Ilustracja sceny: duży pionowy panel, ok. 60% wysokości ekranu.
+- Napisy: ok. 60–65% wysokości ekranu, z ciemnym cieniem.
 
 ## Ton
 - Spokojnie, rzeczowo, z autorytetem. Mówimy wiedzą i argumentami, nie emocjami.
