@@ -1,3 +1,17 @@
+# Maskotka – złoty paragraf w strażackim hełmie
+
+Główna postać rolek (od listopada 2026). Łączy prawo (§) i straż (czerwony hełm). 3D, czarne rękawiczki i buty.
+Arkusze wzorcowe: `video/marka/postac/arkusz-pozy.jpg` (6 min i gestów) i `arkusz-widoki.jpg` (widoki z każdej strony).
+Wycięte pozy (PNG z przezroczystym tłem): `video/public/postac/` – stoi, tlumaczy, cieszy-sie, zaskoczony, ostrzega, mysli, wskazuje.
+Nowe pozy wycina skrypt `video/skrypty/wytnij-postac.py` (arkusz na białym tle).
+
+## Do zrobienia, żeby postać „mówiła” i mrugała
+Ta sama poza w kilku wersjach: usta zamknięte / lekko otwarte / szeroko otwarte oraz oczy zamknięte.
+
+---
+
+## Wcześniejsza koncepcja (archiwum)
+
 # Pan Prawnik – karta postaci
 
 ## Kim jest

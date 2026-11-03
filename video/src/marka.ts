@@ -42,6 +42,13 @@ export const USTAWIENIA = {
   przesuniecie: 30, // przesunięcie w bok w trakcie sceny (px)
   przenikanie: 8, // długość przejścia między scenami (klatki; 30 klatek = 1 s)
 
+  // Maskotka – złoty paragraf (gdy w odcinek.json jest "maskotka": true)
+  maskotkaPelnyWysokosc: 860, // wysokość na pełnym planie (px)
+  maskotkaPelnyOdGory: 230, // górna krawędź na pełnym planie (px)
+  maskotkaMalyWysokosc: 430, // wysokość w rogu (px)
+  maskotkaMalyOdLewej: 10, // odległość od lewej krawędzi w rogu (px)
+  ilustracjaPrzyMaskotce: 0.22, // jasność ilustracji za maskotką na pełnym planie (0–1)
+
   // Pan Naczelnik (gdy w odcinek.json jest "naczelnik": true)
   naczelnikSzerokosc: 300, // szerokość postaci (px); wysokość dopasuje się sama
   naczelnikOdLewej: 10, // odległość od lewej krawędzi (px)

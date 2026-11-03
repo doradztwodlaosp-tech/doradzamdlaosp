@@ -55,6 +55,11 @@ Zasady:
   lista-do-sadu, odrzucenie, laptop-krs, teczka, brak-w-protokole, kalendarz-7-dni, plansza-zarzad-protokol-wpis, adres
   (`video/src/Sceny.tsx`, mapa `ILUSTRACJE`). Gdy żadna nie pasuje do zdania, dopisz nową ilustrację w tym pliku
   (prosty SVG w barwach marki, animacja od początku sceny) i dodaj ją do mapy.
+- `maskotka`: `true` (na poziomie odcinka) pokazuje maskotkę – złoty paragraf w hełmie (pozy w `video/public/postac`:
+  stoi, tlumaczy, cieszy-sie, zaskoczony, ostrzega, mysli, wskazuje). W każdej scenie pole `postac`:
+  `{"plan": "pelny" | "maly" | "brak", "poza": "...", "gest": {"slowo": "siedem", "poza": "ostrzega", "ruch": "kreci" | "kiwa" | "podskok"}}`.
+  Pełny plan tylko w kluczowych scenach (powitanie, ostrzeżenie, zakończenie); poza dopasowana do treści zdania.
+  `etykieta` – złota pigułka nad maskotką na pełnym planie (np. adres strony).
 - `akcent`: 1–3 kluczowe słowa sceny, zapisane dokładnie jak w `tekst` (wielkość liter i interpunkcja nie mają znaczenia).
   Wyświetlą się duże i czerwone.
 - `prompt` (po polsku): konkretna, realistyczna scena (miejsce, przedmiot, nastrój). Bez napisów na obrazie.

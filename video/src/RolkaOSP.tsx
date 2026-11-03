@@ -15,6 +15,7 @@ import { FONT, MARKA, USTAWIENIA as U } from "./marka";
 import { Naczelnik } from "./Naczelnik";
 import { Ilustracja } from "./Sceny";
 import { ILUSTRACJE_PION } from "./ScenyPion";
+import { Maskotka, type UstawieniaPostaci } from "./Maskotka";
 
 // Szablon rolki w stylu doradztwodlaosp.pl (grafit i złoto).
 // Dane odcinka: public/odcinki/<odcinek>/odcinek.json (opis formatu w .claude/skills/rolka/SKILL.md)
@@ -28,6 +29,8 @@ export type ScenaOSP = {
   obraz?: string;
   ilustracja?: string;
   prompt?: string;
+  postac?: UstawieniaPostaci; // maskotka w tej scenie
+  etykieta?: string; // złota pigułka nad maskotką na pełnym planie
   start: number;
   koniec: number;
   slowa: Slowo[];
@@ -39,6 +42,7 @@ export type Odcinek = {
   glos: string;
   cta?: string;
   naczelnik?: boolean;
+  maskotka?: boolean;
   szkic?: string; // odcinek bez nagrania: czasy szacunkowe, render bez dźwięku
   sceny: ScenaOSP[];
 };
@@ -60,7 +64,7 @@ export const obliczRolke: CalculateMetadataFunction<RolkaProps> = async ({ props
   const koniec = dane.sceny[dane.sceny.length - 1].koniec;
   // Głośność nagrania klatka po klatce (tworzy ją npm run render) – do ruchu ust postaci
   const glosnosc: number[] =
-    dane.naczelnik && !dane.szkic
+    (dane.naczelnik || dane.maskotka) && !dane.szkic
       ? await fetch(staticFile(`odcinki/${props.odcinek}/glosnosc.json`)).then((r) => (r.ok ? r.json() : []))
       : [];
   return {
@@ -109,9 +113,9 @@ const Tlo: React.FC<{ scena: ScenaOSP; numer: number; odcinek: string }> = ({ sc
 };
 
 // Duży pionowy panel z ilustracją (ok. 60% wysokości ekranu, w bezpiecznej strefie)
-const PanelIlustracji: React.FC<{ nazwa: string; dlugosc: number }> = ({ nazwa, dlugosc }) => {
+const PanelIlustracji: React.FC<{ nazwa: string; dlugosc: number; jasnosc?: number }> = ({ nazwa, dlugosc, jasnosc = 1 }) => {
   const frame = useCurrentFrame();
-  const wejscie = interpolate(frame, [0, PRZENIKANIE], [0, 1], zakres);
+  const wejscie = interpolate(frame, [0, PRZENIKANIE], [0, 1], zakres) * jasnosc;
   const Pion = ILUSTRACJE_PION[nazwa];
   const wysokosc = U.ilustracjaWysokosc;
   const szerokosc = (wysokosc * 900) / 1200;
@@ -216,6 +220,30 @@ const Nadtytul: React.FC<{ tekst: string }> = ({ tekst }) => (
   </div>
 );
 
+const Etykieta: React.FC<{ tekst: string }> = ({ tekst }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const w = spring({ frame: frame - 6, fps, config: { damping: 12 } });
+  return (
+    <div style={{ position: "absolute", top: U.nadtytulOdGory + 60, left: 0, width: U.strefaPrawo, display: "flex", justifyContent: "center" }}>
+      <div
+        style={{
+          transform: `scale(${w})`,
+          fontFamily: FONT,
+          fontWeight: 800,
+          fontSize: 46,
+          color: MARKA.tlo,
+          background: MARKA.zloto,
+          borderRadius: 999,
+          padding: "14px 40px",
+        }}
+      >
+        {tekst}
+      </div>
+    </div>
+  );
+};
+
 const Wezwanie: React.FC<{ tekst: string }> = ({ tekst }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -310,7 +338,11 @@ export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [], s
         const { od, doKlatki } = zakresSceny(i);
         return (
           <Sequence key={i} from={od} durationInFrames={doKlatki - od} layout="none">
-            <PanelIlustracji nazwa={scena.ilustracja} dlugosc={doKlatki - od} />
+            <PanelIlustracji
+              nazwa={scena.ilustracja}
+              dlugosc={doKlatki - od}
+              jasnosc={dane.maskotka && scena.postac?.plan === "pelny" ? U.ilustracjaPrzyMaskotce : 1}
+            />
           </Sequence>
         );
       })}
@@ -339,6 +371,18 @@ export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [], s
       {dane.nadtytul && <Nadtytul tekst={dane.nadtytul} />}
 
       {dane.naczelnik && <PostacNaczelnika dane={dane} glosnosc={glosnosc} />}
+
+      {dane.maskotka && <Maskotka dane={dane} glosnosc={glosnosc} />}
+
+      {dane.sceny.map((scena, i) => {
+        if (!scena.etykieta) return null;
+        const { od, doKlatki } = zakresSceny(i);
+        return (
+          <Sequence key={i} from={od} durationInFrames={doKlatki - od} layout="none">
+            <Etykieta tekst={scena.etykieta} />
+          </Sequence>
+        );
+      })}
 
       {dane.cta && (
         <Sequence from={klatka(dane.sceny[dane.sceny.length - 1].start)} layout="none">

@@ -3,7 +3,7 @@
   "nadtytul": "PORADNIK OSP • NOWY ZARZĄD",
   "glos": "lektor.mp3",
   "cta": "Napiszcie w komentarzu",
-  "naczelnik": true,
+  "maskotka": true,
   "sceny": [
     {
       "tekst": "Czołem, druhowie!",
@@ -25,7 +25,15 @@
           "s": 0.556,
           "e": 1.205
         }
-      ]
+      ],
+      "postac": {
+        "plan": "pelny",
+        "poza": "cieszy-sie",
+        "gest": {
+          "slowo": "Czołem",
+          "ruch": "podskok"
+        }
+      }
     },
     {
       "tekst": "Walne za wami, nowy zarząd wybrany, kawa wypita.",
@@ -77,7 +85,11 @@
           "s": 4.68,
           "e": 5.367
         }
-      ]
+      ],
+      "postac": {
+        "plan": "maly",
+        "poza": "tlumaczy"
+      }
     },
     {
       "tekst": "I wielu myśli, że na tym koniec.",
@@ -124,7 +136,11 @@
           "s": 7.177,
           "e": 7.651
         }
-      ]
+      ],
+      "postac": {
+        "plan": "maly",
+        "poza": "mysli"
+      }
     },
     {
       "tekst": "Że wystarczy wysłać do sądu listę nowych nazwisk.",
@@ -176,7 +192,11 @@
           "s": 10.38,
           "e": 10.985
         }
-      ]
+      ],
+      "postac": {
+        "plan": "maly",
+        "poza": "tlumaczy"
+      }
     },
     {
       "tekst": "Niestety, druhu. Tak to nie działa.",
@@ -220,7 +240,15 @@
           "s": 13.39,
           "e": 13.956
         }
-      ]
+      ],
+      "postac": {
+        "plan": "pelny",
+        "poza": "ostrzega",
+        "gest": {
+          "slowo": "Niestety",
+          "ruch": "kreci"
+        }
+      }
     },
     {
       "tekst": "Zmianę zarządu zgłaszacie wnioskiem do KRS. Przez internet, nie na papierze.",
@@ -289,7 +317,11 @@
           "s": 19.63,
           "e": 20.497
         }
-      ]
+      ],
+      "postac": {
+        "plan": "maly",
+        "poza": "tlumaczy"
+      }
     },
     {
       "tekst": "A do wniosku dołączacie dokumenty z walnego, przede wszystkim protokół i uchwały.",
@@ -362,7 +394,11 @@
           "s": 25.75,
           "e": 26.432
         }
-      ]
+      ],
+      "postac": {
+        "plan": "maly",
+        "poza": "wskazuje"
+      }
     },
     {
       "tekst": "Jeśli w protokole czegoś brakuje, sąd wniosek odrzuci.",
@@ -414,7 +450,11 @@
           "s": 30.462,
           "e": 31.223
         }
-      ]
+      ],
+      "postac": {
+        "plan": "maly",
+        "poza": "zaskoczony"
+      }
     },
     {
       "tekst": "I jeszcze jedno: macie na to tylko siedem dni od zmiany.",
@@ -482,7 +522,16 @@
           "s": 35.096,
           "e": 35.683
         }
-      ]
+      ],
+      "postac": {
+        "plan": "maly",
+        "poza": "tlumaczy",
+        "gest": {
+          "slowo": "siedem",
+          "poza": "ostrzega",
+          "ruch": "kiwa"
+        }
+      }
     },
     {
       "tekst": "Pamiętajcie: nowy zarząd plus dobry protokół równa się wpis w KRS.",
@@ -552,7 +601,15 @@
           "s": 41.474,
           "e": 42.098
         }
-      ]
+      ],
+      "postac": {
+        "plan": "maly",
+        "poza": "wskazuje",
+        "gest": {
+          "slowo": "Pamiętajcie",
+          "ruch": "kiwa"
+        }
+      }
     },
     {
       "tekst": "A jak nie wiecie, od czego zacząć, zajrzyjcie na doradztwodlaosp.pl.",
@@ -560,7 +617,6 @@
       "akcent": [
         "doradztwodlaosp.pl."
       ],
-      "ilustracja": "adres",
       "prompt": "Pan Prawnik stoi przed oświetloną remizą OSP o niebieskiej godzinie i życzliwie kiwa głową w stronę widza.",
       "start": 42.517,
       "koniec": 48.921,
@@ -615,7 +671,12 @@
           "s": 47.174,
           "e": 48.921
         }
-      ]
+      ],
+      "postac": {
+        "plan": "pelny",
+        "poza": "tlumaczy"
+      },
+      "etykieta": "doradztwodlaosp.pl"
     }
   ]
 }
