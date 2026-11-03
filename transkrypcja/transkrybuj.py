@@ -29,8 +29,12 @@ import subprocess
 import sys
 import tempfile
 import time
+import wave
 from dataclasses import dataclass, field
 from pathlib import Path
+
+# Na Windows bez trybu dewelopera huggingface_hub wypisuje mylące ostrzeżenia o symlinkach.
+os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
 
 
 # --------------------------------------------------------------------------- #
@@ -140,8 +144,16 @@ def transkrybuj(
     if slownik:
         podpowiedz += f" Występujące nazwy i terminy: {slownik}."
 
+    # Wczytujemy WAV samodzielnie (16 kHz, mono, 16 bit) zamiast przez bibliotekę "av",
+    # bo niektóre jej wersje są niezgodne z faster-whisper (błąd "metadata_errors").
+    import numpy as np
+
+    with wave.open(str(plik_wav), "rb") as w:
+        probki = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16)
+    audio = probki.astype(np.float32) / 32768.0
+
     segmenty_gen, info = model.transcribe(
-        str(plik_wav),
+        audio,
         language=jezyk,
         task="transcribe",
         beam_size=5,                    # dokładniej niż wyszukiwanie zachłanne
