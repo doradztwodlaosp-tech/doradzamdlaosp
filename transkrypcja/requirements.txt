@@ -1,0 +1,3 @@
+faster-whisper>=1.1.0
+# Opcjonalnie – rozpoznawanie mówców (--mowcy):
+# pyannote.audio>=3.3
