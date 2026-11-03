@@ -1,4 +1,4 @@
-# Maskotka – złoty paragraf w strażackim hełmie
+# Druh Paragraf – maskotka (złoty paragraf w strażackim hełmie)
 
 Główna postać rolek (od listopada 2026). Łączy prawo (§) i straż (czerwony hełm). 3D, czarne rękawiczki i buty.
 Arkusze wzorcowe: `video/marka/postac/arkusz-pozy.jpg` (6 min i gestów) i `arkusz-widoki.jpg` (widoki z każdej strony).
