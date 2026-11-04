@@ -25,3 +25,15 @@ Przydatne opcje:
 | `--mowcy --liczba-mowcow 2 --hf-token hf_...` | rozmowa kilku osób (wymaga `pip install pyannote.audio`) |
 | `--model large-v3-turbo` | ok. 5x szybciej, minimalnie słabsza jakość |
 | `--bez-czasow` | czysty tekst bez znaczników czasu |
+
+## Automatyczna transkrypcja nowych nagrań
+
+`obserwuj.py` co 30 s sprawdza folder `Nagranie` (obok skryptu) i transkrybuje każde nagranie,
+które nie ma jeszcze pliku `.txt`. Dziennik: `Nagranie/obserwator.log`.
+
+```bash
+python obserwuj.py
+```
+
+Opcje: `--folder "C:\Inny\Folder"`, `--co 60`, a także opcje transkrypcji, np. `--slownik "..."`.
+Uruchamianie z Windows: skrót do `pythonw.exe obserwuj.py` w folderze `shell:startup`.
