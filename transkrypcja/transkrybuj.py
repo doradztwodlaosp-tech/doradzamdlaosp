@@ -13,6 +13,7 @@ Co robi skrypt:
      .srt (napisy) oraz .json (pełne dane, także czasy słów).
 
 Przykłady:
+  python transkrybuj.py                (wszystkie nowe nagrania z folderu "Nagranie")
   python transkrybuj.py nagranie.mp3
   python transkrybuj.py nagranie.mp3 --odszum
   python transkrybuj.py nagranie.mp3 --slownik "OPP, KRS, sprawozdanie merytoryczne"
@@ -35,6 +36,10 @@ from pathlib import Path
 
 # Na Windows bez trybu dewelopera huggingface_hub wypisuje mylące ostrzeżenia o symlinkach.
 os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
+
+
+ROZSZERZENIA_AUDIO = {".mp3", ".m4a", ".wav", ".aac", ".ogg", ".opus", ".flac",
+                      ".wma", ".amr", ".3gp", ".mp4"}
 
 
 # --------------------------------------------------------------------------- #
@@ -362,7 +367,9 @@ def main() -> None:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=__doc__,
     )
-    p.add_argument("plik", type=Path, help="plik audio (mp3, m4a, wav, ogg, ...)")
+    p.add_argument("plik", type=Path, nargs="?",
+                   help="plik audio (mp3, m4a, wav, ...). Bez tego: wszystkie nowe nagrania "
+                        "z folderu Nagranie obok skryptu")
     p.add_argument("--model", default="large-v3",
                    help="model Whisper (domyślnie large-v3 – najlepsza jakość; "
                         "szybciej: large-v3-turbo, medium)")
@@ -382,12 +389,35 @@ def main() -> None:
                    help="zapisz też przetworzony plik WAV (do odsłuchu)")
     a = p.parse_args()
 
-    if not a.plik.is_file():
-        sys.exit(f"Nie znaleziono pliku: {a.plik}")
+    if a.plik:
+        if not a.plik.is_file():
+            sys.exit(f"Nie znaleziono pliku: {a.plik}")
+        przetworz(a.plik, a)
+        return
 
-    katalog = a.wyjscie or a.plik.parent
+    # Bez podanego pliku: wszystkie nowe nagrania z folderu "Nagranie" obok skryptu.
+    folder = Path(__file__).resolve().parent / "Nagranie"
+    if not folder.is_dir():
+        sys.exit(f"Nie podano pliku, a folder {folder} nie istnieje.")
+    nowe = [
+        f for f in sorted(folder.iterdir())
+        if f.is_file() and f.suffix.lower() in ROZSZERZENIA_AUDIO
+        and not f.name.endswith("_przetworzony.wav")
+        and not ((a.wyjscie or folder) / f.stem).with_suffix(".txt").exists()
+    ]
+    if not nowe:
+        print(f"Brak nowych nagrań w {folder} (wszystkie mają już transkrypcję .txt).")
+        return
+    print(f"Nowe nagrania do transkrypcji ({len(nowe)}): " + ", ".join(f.name for f in nowe))
+    for i, f in enumerate(nowe, 1):
+        print(f"\n=== [{i}/{len(nowe)}] {f.name} ===")
+        przetworz(f, a)
+
+
+def przetworz(plik: Path, a: argparse.Namespace) -> None:
+    katalog = a.wyjscie or plik.parent
     katalog.mkdir(parents=True, exist_ok=True)
-    baza = katalog / a.plik.stem
+    baza = katalog / plik.stem
     t0 = time.time()
 
     with tempfile.TemporaryDirectory() as tmp:
@@ -395,12 +425,12 @@ def main() -> None:
         print("→ Przygotowuję audio (ffmpeg)...")
         if a.bez_przetwarzania:
             subprocess.run(
-                ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(a.plik),
+                ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(plik),
                  "-vn", "-ac", "1", "-ar", "16000", "-c:a", "pcm_s16le", str(wav)],
                 check=True,
             )
         else:
-            przygotuj_audio(a.plik, wav, a.odszum)
+            przygotuj_audio(plik, wav, a.odszum)
         if a.zachowaj_wav:
             shutil.copy(wav, baza.with_name(baza.name + "_przetworzony.wav"))
 

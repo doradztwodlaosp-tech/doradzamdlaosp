@@ -26,14 +26,14 @@ Przydatne opcje:
 | `--model large-v3-turbo` | ok. 5x szybciej, minimalnie słabsza jakość |
 | `--bez-czasow` | czysty tekst bez znaczników czasu |
 
-## Automatyczna transkrypcja nowych nagrań
 
-`obserwuj.py` co 30 s sprawdza folder `Nagranie` (obok skryptu) i transkrybuje każde nagranie,
-które nie ma jeszcze pliku `.txt`. Dziennik: `Nagranie/obserwator.log`.
+## Szybkie uruchamianie
+
+Wrzuć nagranie do podfolderu `Nagranie` (obok skryptu) i kliknij dwukrotnie `Transkrybuj.bat`
+albo uruchom skrypt bez nazwy pliku:
 
 ```bash
-python obserwuj.py
+python transkrybuj.py
 ```
 
-Opcje: `--folder "C:\Inny\Folder"`, `--co 60`, a także opcje transkrypcji, np. `--slownik "..."`.
-Uruchamianie z Windows: skrót do `pythonw.exe obserwuj.py` w folderze `shell:startup`.
+Skrypt przetworzy wszystkie nagrania z folderu `Nagranie`, które nie mają jeszcze pliku `.txt`.
