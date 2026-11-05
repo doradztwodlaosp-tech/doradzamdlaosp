@@ -5,7 +5,9 @@ import { USTAWIENIA as U } from "./marka";
 
 // Maskotka: złoty paragraf w strażackim hełmie (pozy wycięte z arkusza, pliki w public/postac).
 // Ustawienia sceny w odcinek.json, pole "postac":
-//   { "plan": "pelny" | "maly" | "brak", "poza": "tlumaczy", "gest": { "slowo": "siedem", "poza": "ostrzega", "ruch": "kiwa" } }
+//   { "plan": "pelny" | "obok" | "maly" | "brak", "poza": "tlumaczy",
+//     "gest": { "slowo": "siedem", "plan": "obok", "poza": "ostrzega", "ruch": "kiwa" } }
+// Gest z planem: postać wchodzi dokładnie na tym słowie (np. żeby wskazać coś na obrazie).
 
 export const POZY = {
   stoi: { szer: 269, wys: 644 },
@@ -19,26 +21,35 @@ export const POZY = {
 
 export type Poza = keyof typeof POZY;
 export type Ruch = "kreci" | "kiwa" | "podskok";
+export type Plan = "pelny" | "obok" | "maly" | "brak";
 export type UstawieniaPostaci = {
-  plan?: "pelny" | "maly" | "brak";
+  plan?: Plan;
   poza?: Poza;
-  gest?: { slowo: string; poza?: Poza; ruch?: Ruch };
+  gest?: { slowo: string; plan?: Plan; poza?: Poza; ruch?: Ruch };
 };
 
 const zakres = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 const normalizuj = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
 
 // Położenie i wielkość postaci w danym planie (wysokość obrazka, środek w poziomie, górna krawędź)
-const uklad = (plan: UstawieniaPostaci["plan"], poza: Poza) => {
+const uklad = (plan: Plan, poza: Poza) => {
   const proporcja = POZY[poza].szer / POZY[poza].wys;
   if (plan === "pelny") {
     const wys = U.maskotkaPelnyWysokosc;
     return { wys, szer: wys * proporcja, srodekX: U.strefaPrawo / 2, gora: U.maskotkaPelnyOdGory };
   }
+  if (plan === "obok") {
+    const wys = U.maskotkaObokWysokosc;
+    const szer = wys * proporcja;
+    return { wys, szer, srodekX: 20 + szer / 2, gora: U.maskotkaObokOdGory };
+  }
   const wys = U.maskotkaMalyWysokosc;
   const szer = wys * proporcja;
   return { wys, szer, srodekX: U.maskotkaMalyOdLewej + szer / 2, gora: 1920 - wys + (plan === "brak" ? wys + 60 : 0) };
 };
+
+// Plan, w jakim postać kończy scenę (po ewentualnym geście)
+const koncowyPlan = (u: UstawieniaPostaci): Plan => u.gest?.plan ?? u.plan ?? "brak";
 
 const czasSlowa = (scena: ScenaOSP, slowo: string) => {
   const szukane = normalizuj(slowo);
@@ -54,8 +65,8 @@ export const Maskotka: React.FC<{ dane: Odcinek; glosnosc: number[] }> = ({ dane
   const scena = dane.sceny[indeks];
   const ust: UstawieniaPostaci = scena.postac ?? {};
   const poprzednie: UstawieniaPostaci = dane.sceny[indeks - 1]?.postac ?? {};
-  const plan = ust.plan ?? "maly";
-  const planPoprzedni = indeks === 0 ? "brak" : poprzednie.plan ?? "maly";
+  const planSceny: Plan = ust.plan ?? "brak";
+  const planPoprzedniejSceny: Plan = indeks === 0 ? "brak" : koncowyPlan(poprzednie);
 
   // Gest przypięty do słowa: zmiana pozy i ruch od chwili, gdy pada to słowo
   const czasGestu = ust.gest ? czasSlowa(scena, ust.gest.slowo) : undefined;
@@ -64,8 +75,12 @@ export const Maskotka: React.FC<{ dane: Odcinek; glosnosc: number[] }> = ({ dane
   const pozaPoprzednia: Poza = poprzednie.poza ?? "tlumaczy";
   const zmianaPozy = poGescie && ust.gest?.poza ? czasGestu! : scena.start;
 
-  // Przejście między planami (mały ↔ pełny) na początku sceny
-  const przejscie = plan === planPoprzedni ? 1 : spring({ frame: frame - Math.round(scena.start * fps), fps, config: { damping: 15 } });
+  // Plan może się zmienić na słowie gestu (postać wchodzi, żeby coś wskazać)
+  const zmianaPlanu = poGescie && ust.gest?.plan !== undefined;
+  const plan: Plan = zmianaPlanu ? ust.gest!.plan! : planSceny;
+  const planPoprzedni: Plan = zmianaPlanu ? planSceny : planPoprzedniejSceny;
+  const momentZmiany = zmianaPlanu ? czasGestu! : scena.start;
+  const przejscie = plan === planPoprzedni ? 1 : spring({ frame: frame - Math.round(momentZmiany * fps), fps, config: { damping: 15 } });
   const a = uklad(planPoprzedni, pozaPoprzednia);
   const b = uklad(plan, poza);
   const wys = interpolate(przejscie, [0, 1], [a.wys, b.wys]);

@@ -22,3 +22,15 @@
 
 ## Później (automatyzacja, płatne za użycie)
 Klucze API OpenAI (obrazy) i ElevenLabs (głos) w ustawieniach środowiska – wtedy kroki 4 i 5 robi Claude sam.
+
+## Decyzje strategiczne (listopad 2026)
+| Pytanie | Decyzja |
+|---|---|
+| Cel rolek | zasięg i obserwujący najpierw, potem zapytania o usługę |
+| Widzowie | zarządy OSP (walne, KRS, sprawozdania) oraz strażacy (ich prawa) – osobne rolki dla każdej grupy |
+| Ton | poważny ekspert: spokojnie, rzeczowo, konkretnie |
+| Druh Paragraf | gospodarz na wejściu i wyjściu (A) + wskazówka w 1–2 kluczowych momentach, pokazuje coś na obrazie (B) + stała „Porada Druha Paragrafa” przed końcem (C). W pozostałych scenach go nie ma – bohaterem jest treść |
+| Wygląd | ciemne grafitowe tło, złoto jako akcent, realne obrazy w scenach |
+| Napisy | mniejsze, eleganckie, u góry; słowo wypowiadane na złoto |
+| Budżet | do ok. 100 zł/mies. (ElevenLabs z licencją komercyjną albo ChatGPT Plus) |
+| Rytm | 2–3 rolki tygodniowo |

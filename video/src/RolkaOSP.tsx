@@ -31,6 +31,7 @@ export type ScenaOSP = {
   prompt?: string;
   postac?: UstawieniaPostaci; // maskotka w tej scenie
   etykieta?: string; // złota pigułka nad maskotką na pełnym planie
+  porada?: { tekst: string; zlote?: string[] }; // karta „Porada Druha Paragrafa”
   start: number;
   koniec: number;
   slowa: Slowo[];
@@ -177,14 +178,14 @@ const Napisy: React.FC<{ scena: ScenaOSP }> = ({ scena }) => {
         position: "absolute",
         left: SRODEK_X - SZEROKOSC_TRESCI / 2,
         width: SZEROKOSC_TRESCI,
-        top: U.napisySrodek - 130,
-        height: 260,
+        top: U.napisyOdGory,
+        height: U.napisyWysokosc,
         display: "flex",
         flexWrap: "wrap",
         justifyContent: "center",
         alignContent: "center",
         alignItems: "baseline",
-        columnGap: 22,
+        columnGap: 16,
         rowGap: 0,
         textAlign: "center",
       }}
@@ -199,12 +200,12 @@ const Napisy: React.FC<{ scena: ScenaOSP }> = ({ scena }) => {
             key={`${s.s}-${i}`}
             style={{
               fontFamily: FONT,
-              fontWeight: wyrozniony ? 800 : 700,
+              fontWeight: wyrozniony || mowione ? 800 : 500,
               // Długie słowa zmniejszamy, by mieściły się w bezpiecznej strefie
               fontSize: Math.min(rozmiar, Math.floor((SZEROKOSC_TRESCI * 1.55) / s.w.length)),
-              lineHeight: 1.18,
+              lineHeight: 1.22,
               color: mowione ? MARKA.zloto : MARKA.bialy,
-              textShadow: "0 3px 0 rgba(0,0,0,0.55), 0 6px 22px rgba(0,0,0,0.85)",
+              textShadow: "0 2px 14px rgba(0,0,0,0.85)",
               opacity: pojawienie,
               transform: `translateY(${(1 - pojawienie) * 22}px) scale(${0.92 + 0.08 * pojawienie})`,
               display: "inline-block",
@@ -243,7 +244,7 @@ const Etykieta: React.FC<{ tekst: string }> = ({ tekst }) => {
   const { fps } = useVideoConfig();
   const w = spring({ frame: frame - 6, fps, config: { damping: 12 } });
   return (
-    <div style={{ position: "absolute", top: U.nadtytulOdGory + 60, left: 0, width: U.strefaPrawo, display: "flex", justifyContent: "center" }}>
+    <div style={{ position: "absolute", top: U.maskotkaPelnyOdGory - 90, left: 0, width: U.strefaPrawo, display: "flex", justifyContent: "center" }}>
       <div
         style={{
           transform: `scale(${w})`,
@@ -257,6 +258,48 @@ const Etykieta: React.FC<{ tekst: string }> = ({ tekst }) => {
         }}
       >
         {tekst}
+      </div>
+    </div>
+  );
+};
+
+// Karta „Porada Druha Paragrafa” – stały, rozpoznawalny moment w każdej rolce
+const Porada: React.FC<{ tekst: string; zlote?: string[] }> = ({ tekst, zlote = [] }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const w = spring({ frame: frame - 4, fps, config: { damping: 14 } });
+  const ikona = spring({ frame: frame - 12, fps, config: { damping: 10 } });
+  const zloteSet = new Set(zlote.map(normalizuj));
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 50,
+        width: U.strefaPrawo - 100,
+        top: 640,
+        borderRadius: 36,
+        background: `${MARKA.tloJasne}f2`,
+        border: `3px solid ${MARKA.zloto}`,
+        boxShadow: "0 30px 80px rgba(0,0,0,0.6)",
+        padding: "150px 56px 60px",
+        fontFamily: FONT,
+        opacity: w,
+        transform: `translateY(${(1 - w) * 60}px)`,
+      }}
+    >
+      <Img
+        src={staticFile("postac/wskazuje.png")}
+        style={{ position: "absolute", top: -150, left: 30, height: 260, transform: `scale(${ikona})`, transformOrigin: "50% 100%" }}
+      />
+      <div style={{ position: "absolute", top: 58, left: 236, right: 30, fontSize: 26, fontWeight: 800, letterSpacing: 3, whiteSpace: "nowrap", color: MARKA.nadtytul }}>
+        PORADA DRUHA PARAGRAFA
+      </div>
+      <div style={{ fontSize: 58, fontWeight: 800, lineHeight: 1.18, color: MARKA.bialy }}>
+        {tekst.split(" ").map((slowo, i) => (
+          <span key={i} style={{ color: zloteSet.has(normalizuj(slowo)) ? MARKA.zloto : MARKA.bialy }}>
+            {slowo}{" "}
+          </span>
+        ))}
       </div>
     </div>
   );
@@ -454,9 +497,9 @@ export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [], s
           position: "absolute",
           left: 0,
           width: 1080,
-          top: U.napisySrodek - 200,
-          height: 400,
-          background: `linear-gradient(180deg, transparent 0%, ${MARKA.tlo}d9 35%, ${MARKA.tlo}d9 65%, transparent 100%)`,
+          top: 0,
+          height: U.ilustracjaOdGory + 80,
+          background: `linear-gradient(180deg, ${MARKA.tlo}f2 0%, ${MARKA.tlo}e0 70%, transparent 100%)`,
         }}
       />
 
@@ -472,6 +515,16 @@ export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [], s
       {dane.nadtytul && <Nadtytul tekst={dane.nadtytul} />}
 
       {dane.naczelnik && <PostacNaczelnika dane={dane} glosnosc={glosnosc} />}
+
+      {dane.sceny.map((scena, i) => {
+        if (!scena.porada) return null;
+        const { od, doKlatki } = zakresSceny(i);
+        return (
+          <Sequence key={i} from={od} durationInFrames={doKlatki - od} layout="none">
+            <Porada {...scena.porada} />
+          </Sequence>
+        );
+      })}
 
       {dane.maskotka && <Maskotka dane={dane} glosnosc={glosnosc} />}
 

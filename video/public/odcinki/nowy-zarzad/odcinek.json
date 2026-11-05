@@ -114,8 +114,7 @@
         }
       ],
       "postac": {
-        "plan": "maly",
-        "poza": "tlumaczy"
+        "plan": "brak"
       }
     },
     {
@@ -165,8 +164,7 @@
         }
       ],
       "postac": {
-        "plan": "maly",
-        "poza": "mysli"
+        "plan": "brak"
       }
     },
     {
@@ -221,8 +219,7 @@
         }
       ],
       "postac": {
-        "plan": "maly",
-        "poza": "tlumaczy"
+        "plan": "brak"
       }
     },
     {
@@ -269,7 +266,7 @@
         }
       ],
       "postac": {
-        "plan": "pelny",
+        "plan": "obok",
         "poza": "ostrzega",
         "gest": {
           "slowo": "Niestety",
@@ -346,8 +343,7 @@
         }
       ],
       "postac": {
-        "plan": "maly",
-        "poza": "tlumaczy"
+        "plan": "brak"
       }
     },
     {
@@ -423,8 +419,7 @@
         }
       ],
       "postac": {
-        "plan": "maly",
-        "poza": "wskazuje"
+        "plan": "brak"
       }
     },
     {
@@ -479,8 +474,12 @@
         }
       ],
       "postac": {
-        "plan": "maly",
-        "poza": "zaskoczony"
+        "plan": "brak",
+        "gest": {
+          "slowo": "brakuje",
+          "plan": "obok",
+          "poza": "wskazuje"
+        }
       }
     },
     {
@@ -551,10 +550,10 @@
         }
       ],
       "postac": {
-        "plan": "maly",
-        "poza": "tlumaczy",
+        "plan": "brak",
         "gest": {
           "slowo": "siedem",
+          "plan": "obok",
           "poza": "ostrzega",
           "ruch": "kiwa"
         }
@@ -568,7 +567,6 @@
         "protokół",
         "wpis"
       ],
-      "ilustracja": "plansza-zarzad-protokol-wpis",
       "prompt": "Pan Prawnik siedzi przy biurku w biurze remizy, trzyma uporządkowaną teczkę dokumentów i pewnie się uśmiecha.",
       "start": 36.267,
       "koniec": 42.098,
@@ -630,12 +628,15 @@
         }
       ],
       "postac": {
-        "plan": "maly",
-        "poza": "wskazuje",
-        "gest": {
-          "slowo": "Pamiętajcie",
-          "ruch": "kiwa"
-        }
+        "plan": "brak"
+      },
+      "obraz": "porada-tlo.webp",
+      "porada": {
+        "tekst": "Nowy zarząd + dobry protokół = wpis w KRS.",
+        "zlote": [
+          "wpis",
+          "KRS."
+        ]
       }
     },
     {

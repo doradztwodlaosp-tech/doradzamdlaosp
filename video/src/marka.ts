@@ -27,13 +27,14 @@ export const USTAWIENIA = {
   nadtytulRozmiar: 30, // wielkość liter (px)
 
   // Ilustracja sceny (pionowy panel)
-  ilustracjaOdGory: 160, // górna krawędź panelu (px)
-  ilustracjaWysokosc: 1130, // wysokość panelu (px) – ok. 60% ekranu
+  ilustracjaOdGory: 430, // górna krawędź panelu (px) – pod napisami
+  ilustracjaWysokosc: 1010, // wysokość panelu (px) – do granicy bezpiecznej strefy
 
   // Napisy
-  napisySrodek: 1200, // środek napisów od górnej krawędzi (px) – ok. 62% wysokości
-  napisyRozmiar: 72, // zwykłe słowa (px)
-  akcentRozmiar: 92, // słowa kluczowe (px)
+  napisyOdGory: 190, // górna krawędź bloku napisów (px) – napisy są u góry, jak we wzorach
+  napisyWysokosc: 220, // wysokość bloku napisów (px)
+  napisyRozmiar: 54, // zwykłe słowa (px)
+  akcentRozmiar: 64, // słowa kluczowe (px)
   slowNaRaz: 4, // ile słów najwyżej widać naraz
 
   // Ruch obrazu (gdy scena ma zdjęcie)
@@ -44,9 +45,11 @@ export const USTAWIENIA = {
 
   // Maskotka – złoty paragraf (gdy w odcinek.json jest "maskotka": true)
   maskotkaPelnyWysokosc: 860, // wysokość na pełnym planie (px)
-  maskotkaPelnyOdGory: 230, // górna krawędź na pełnym planie (px)
+  maskotkaPelnyOdGory: 470, // górna krawędź na pełnym planie (px)
   maskotkaMalyWysokosc: 430, // wysokość w rogu (px)
   maskotkaMalyOdLewej: 10, // odległość od lewej krawędzi w rogu (px)
+  maskotkaObokWysokosc: 560, // wysokość, gdy wchodzi obok obrazu, żeby coś wskazać (px)
+  maskotkaObokOdGory: 820, // górna krawędź w tym planie (px)
   ilustracjaPrzyMaskotce: 0.22, // jasność ilustracji za maskotką na pełnym planie (0–1)
 
   // Pan Naczelnik (gdy w odcinek.json jest "naczelnik": true)
