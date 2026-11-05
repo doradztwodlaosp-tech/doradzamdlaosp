@@ -1,0 +1,808 @@
+{
+  "tytul": "Nowy zarząd? Sąd sam się nie dowie",
+  "nadtytul": "PORADNIK OSP • NOWY ZARZĄD",
+  "glos": "lektor.mp3",
+  "cta": "Czy Wasz zarząd zdążył w 7 dni?",
+  "wstep": 1.8,
+  "hak": [
+    {
+      "tekst": "NOWY ZARZĄD?",
+      "zloty": true
+    },
+    {
+      "tekst": "SĄD SAM SIĘ"
+    },
+    {
+      "tekst": "NIE DOWIE."
+    }
+  ],
+  "plansza": {
+    "haslo": [
+      {
+        "tekst": "MY ZAWSZE",
+        "zloty": true
+      },
+      {
+        "tekst": "PO STRONIE OSP."
+      }
+    ],
+    "pigulka": "Obserwuj nas • doradztwodlaosp.pl",
+    "kontakt": "WhatsApp: 720 868 902",
+    "stopka": "Materiał informacyjny. Nie zastępuje indywidualnej analizy."
+  },
+  "maskotka": true,
+  "sceny": [
+    {
+      "tekst": "Czołem, druhowie!",
+      "akcent": [
+        "druhowie!"
+      ],
+      "prompt": "Pan Prawnik stoi przed małą wiejską remizą OSP z czerwonymi bramami garażowymi i spokojnie unosi dłoń na powitanie.",
+      "start": 0,
+      "koniec": 1.205,
+      "slowa": [
+        {
+          "w": "Czołem,",
+          "s": 0,
+          "e": 0.556
+        },
+        {
+          "w": "druhowie!",
+          "s": 0.556,
+          "e": 1.205
+        }
+      ],
+      "postac": {
+        "plan": "pelny",
+        "poza": "cieszy-sie",
+        "gest": {
+          "slowo": "Czołem",
+          "ruch": "podskok"
+        }
+      },
+      "obraz": "s01-remiza.jpg",
+      "wymiary": [
+        1672,
+        941
+      ],
+      "kadr": {
+        "od": [
+          0.35,
+          0.55
+        ],
+        "do": [
+          0.66,
+          0.5
+        ],
+        "zoomOd": 1.0,
+        "zoomDo": 1.06
+      }
+    },
+    {
+      "tekst": "Walne za wami, nowy zarząd wybrany, kawa wypita.",
+      "akcent": [
+        "zarząd"
+      ],
+      "ilustracja": "sala",
+      "prompt": "Skromna świetlica w remizie po walnym zebraniu: strażacy ochotnicy rozmawiają przy długim drewnianym stole z kubkami kawy i papierami, ciepłe, przytulne światło.",
+      "start": 1.588,
+      "koniec": 5.367,
+      "slowa": [
+        {
+          "w": "Walne",
+          "s": 1.588,
+          "e": 1.989
+        },
+        {
+          "w": "za",
+          "s": 1.989,
+          "e": 2.218
+        },
+        {
+          "w": "wami,",
+          "s": 2.218,
+          "e": 2.79
+        },
+        {
+          "w": "nowy",
+          "s": 2.79,
+          "e": 3.134
+        },
+        {
+          "w": "zarząd",
+          "s": 3.134,
+          "e": 3.592
+        },
+        {
+          "w": "wybrany,",
+          "s": 3.592,
+          "e": 4.336
+        },
+        {
+          "w": "kawa",
+          "s": 4.336,
+          "e": 4.68
+        },
+        {
+          "w": "wypita.",
+          "s": 4.68,
+          "e": 5.367
+        }
+      ],
+      "postac": {
+        "plan": "brak"
+      }
+    },
+    {
+      "tekst": "I wielu myśli, że na tym koniec.",
+      "akcent": [
+        "koniec."
+      ],
+      "ilustracja": "koniec",
+      "prompt": "Zbliżenie na pusty drewniany stół w sali remizy po zebraniu: puste kubki po kawie i długopis, światła przygasają, nastrój końca.",
+      "start": 5.833,
+      "koniec": 7.651,
+      "slowa": [
+        {
+          "w": "I",
+          "s": 5.833,
+          "e": 5.952
+        },
+        {
+          "w": "wielu",
+          "s": 5.952,
+          "e": 6.229
+        },
+        {
+          "w": "myśli,",
+          "s": 6.229,
+          "e": 6.663
+        },
+        {
+          "w": "że",
+          "s": 6.663,
+          "e": 6.821
+        },
+        {
+          "w": "na",
+          "s": 6.821,
+          "e": 6.979
+        },
+        {
+          "w": "tym",
+          "s": 6.979,
+          "e": 7.177
+        },
+        {
+          "w": "koniec.",
+          "s": 7.177,
+          "e": 7.651
+        }
+      ],
+      "postac": {
+        "plan": "brak"
+      }
+    },
+    {
+      "tekst": "Że wystarczy wysłać do sądu listę nowych nazwisk.",
+      "akcent": [
+        "sądu"
+      ],
+      "ilustracja": "lista-do-drzwi",
+      "prompt": "Pojedyncza kartka z wydrukowaną listą nazwisk leci w wieczornym powietrzu w stronę klasycznego budynku sądu rejonowego z kolumnami.",
+      "start": 8.145,
+      "koniec": 10.985,
+      "slowa": [
+        {
+          "w": "Że",
+          "s": 8.145,
+          "e": 8.332
+        },
+        {
+          "w": "wystarczy",
+          "s": 8.332,
+          "e": 8.844
+        },
+        {
+          "w": "wysłać",
+          "s": 8.844,
+          "e": 9.216
+        },
+        {
+          "w": "do",
+          "s": 9.216,
+          "e": 9.402
+        },
+        {
+          "w": "sądu",
+          "s": 9.402,
+          "e": 9.681
+        },
+        {
+          "w": "listę",
+          "s": 9.681,
+          "e": 10.007
+        },
+        {
+          "w": "nowych",
+          "s": 10.007,
+          "e": 10.38
+        },
+        {
+          "w": "nazwisk.",
+          "s": 10.38,
+          "e": 10.985
+        }
+      ],
+      "postac": {
+        "plan": "brak"
+      },
+      "obraz": "s04-sad.jpg",
+      "wymiary": [
+        1672,
+        941
+      ],
+      "kadr": {
+        "od": [
+          0.53,
+          0.56
+        ],
+        "do": [
+          0.53,
+          0.56
+        ],
+        "zoomOd": 1.0,
+        "zoomDo": 1.05
+      }
+    },
+    {
+      "tekst": "Niestety, druhu. Tak to nie działa.",
+      "lektor": "Niestety, druhu. Tak to nie działa.",
+      "akcent": [
+        "nie",
+        "działa."
+      ],
+      "ilustracja": "lista-odbita",
+      "prompt": "Kartka z listą nazwisk leży na kamiennych schodach przed zamkniętymi drzwiami sądu nocą, odrzucona.",
+      "start": 11.551,
+      "koniec": 13.956,
+      "slowa": [
+        {
+          "w": "Niestety,",
+          "s": 11.551,
+          "e": 12.211
+        },
+        {
+          "w": "druhu.",
+          "s": 12.211,
+          "e": 12.73
+        },
+        {
+          "w": "Tak",
+          "s": 12.73,
+          "e": 12.966
+        },
+        {
+          "w": "to",
+          "s": 12.966,
+          "e": 13.154
+        },
+        {
+          "w": "nie",
+          "s": 13.154,
+          "e": 13.39
+        },
+        {
+          "w": "działa.",
+          "s": 13.39,
+          "e": 13.956
+        }
+      ],
+      "postac": {
+        "plan": "obok",
+        "poza": "ostrzega",
+        "gest": {
+          "slowo": "Niestety",
+          "ruch": "kreci"
+        }
+      },
+      "obraz": "s04-sad.jpg",
+      "wymiary": [
+        1672,
+        941
+      ],
+      "kadr": {
+        "od": [
+          0.53,
+          0.56
+        ],
+        "do": [
+          0.5,
+          0.56
+        ],
+        "zoomOd": 1.05,
+        "zoomDo": 1.1
+      }
+    },
+    {
+      "tekst": "Zmianę zarządu zgłaszacie wnioskiem do KRS. Przez internet, nie na papierze.",
+      "lektor": "Zmianę zarządu zgłaszacie wnioskiem do ka-er-esu. Przez internet, nie na papierze.",
+      "akcent": [
+        "KRS.",
+        "internet,"
+      ],
+      "ilustracja": "laptop-krs",
+      "prompt": "Laptop na biurku w biurze remizy z ogólnym formularzem internetowym na ekranie, świecący ekran w ciemnym pokoju, obok hełm strażacki.",
+      "start": 14.49,
+      "koniec": 20.498,
+      "slowa": [
+        {
+          "w": "Zmianę",
+          "s": 14.49,
+          "e": 14.986
+        },
+        {
+          "w": "zarządu",
+          "s": 14.986,
+          "e": 15.543
+        },
+        {
+          "w": "zgłaszacie",
+          "s": 15.543,
+          "e": 16.286
+        },
+        {
+          "w": "wnioskiem",
+          "s": 16.286,
+          "e": 16.967
+        },
+        {
+          "w": "do",
+          "s": 16.967,
+          "e": 17.215
+        },
+        {
+          "w": "KRS.",
+          "s": 17.215,
+          "e": 17.772
+        },
+        {
+          "w": "Przez",
+          "s": 17.772,
+          "e": 18.206
+        },
+        {
+          "w": "internet,",
+          "s": 18.206,
+          "e": 19.073
+        },
+        {
+          "w": "nie",
+          "s": 19.073,
+          "e": 19.383
+        },
+        {
+          "w": "na",
+          "s": 19.383,
+          "e": 19.63
+        },
+        {
+          "w": "papierze.",
+          "s": 19.63,
+          "e": 20.497
+        }
+      ],
+      "postac": {
+        "plan": "brak"
+      }
+    },
+    {
+      "tekst": "A do wniosku dołączacie dokumenty z walnego, przede wszystkim protokół i uchwały.",
+      "akcent": [
+        "protokół",
+        "uchwały."
+      ],
+      "prompt": "Otwarta teczka na biurku ze starannie ułożonymi dokumentami – protokołem i uchwałami – z pieczątką, ciepłe światło lampki biurowej.",
+      "start": 21.191,
+      "koniec": 26.432,
+      "slowa": [
+        {
+          "w": "A",
+          "s": 21.191,
+          "e": 21.348
+        },
+        {
+          "w": "do",
+          "s": 21.348,
+          "e": 21.558
+        },
+        {
+          "w": "wniosku",
+          "s": 21.558,
+          "e": 22.03
+        },
+        {
+          "w": "dołączacie",
+          "s": 22.03,
+          "e": 22.659
+        },
+        {
+          "w": "dokumenty",
+          "s": 22.659,
+          "e": 23.235
+        },
+        {
+          "w": "z",
+          "s": 23.235,
+          "e": 23.392
+        },
+        {
+          "w": "walnego,",
+          "s": 23.392,
+          "e": 24.073
+        },
+        {
+          "w": "przede",
+          "s": 24.073,
+          "e": 24.493
+        },
+        {
+          "w": "wszystkim",
+          "s": 24.493,
+          "e": 25.069
+        },
+        {
+          "w": "protokół",
+          "s": 25.069,
+          "e": 25.593
+        },
+        {
+          "w": "i",
+          "s": 25.593,
+          "e": 25.75
+        },
+        {
+          "w": "uchwały.",
+          "s": 25.75,
+          "e": 26.432
+        }
+      ],
+      "postac": {
+        "plan": "brak"
+      },
+      "obraz": "s07-teczka.jpg",
+      "wymiary": [
+        1672,
+        941
+      ],
+      "kadr": {
+        "od": [
+          0.45,
+          0.65
+        ],
+        "do": [
+          0.58,
+          0.72
+        ],
+        "zoomOd": 1.1,
+        "zoomDo": 1.25
+      },
+      "znacznik": {
+        "x": 0.59,
+        "y": 0.74,
+        "slowo": "protokół",
+        "tekst": "Protokół i uchwały"
+      }
+    },
+    {
+      "tekst": "Jeśli w protokole czegoś brakuje, sąd wniosek odrzuci.",
+      "akcent": [
+        "odrzuci."
+      ],
+      "ilustracja": "brak-w-protokole",
+      "prompt": "Zbliżenie na wydrukowany dokument z jedną wyraźnie pustą linijką, na nim czerwony długopis, dramatyczne światło z boku.",
+      "start": 27.182,
+      "koniec": 31.223,
+      "slowa": [
+        {
+          "w": "Jeśli",
+          "s": 27.182,
+          "e": 27.592
+        },
+        {
+          "w": "w",
+          "s": 27.592,
+          "e": 27.768
+        },
+        {
+          "w": "protokole",
+          "s": 27.768,
+          "e": 28.412
+        },
+        {
+          "w": "czegoś",
+          "s": 28.412,
+          "e": 28.881
+        },
+        {
+          "w": "brakuje,",
+          "s": 28.881,
+          "e": 29.642
+        },
+        {
+          "w": "sąd",
+          "s": 29.642,
+          "e": 29.935
+        },
+        {
+          "w": "wniosek",
+          "s": 29.935,
+          "e": 30.462
+        },
+        {
+          "w": "odrzuci.",
+          "s": 30.462,
+          "e": 31.223
+        }
+      ],
+      "postac": {
+        "plan": "brak",
+        "gest": {
+          "slowo": "brakuje",
+          "plan": "obok",
+          "poza": "wskazuje"
+        }
+      }
+    },
+    {
+      "tekst": "I jeszcze jedno: macie na to tylko siedem dni od zmiany.",
+      "akcent": [
+        "siedem",
+        "dni"
+      ],
+      "prompt": "Zrywany kalendarz ścienny w biurze remizy, z którego odlatują kartki, w tle zegar ścienny, poczucie pośpiechu.",
+      "start": 32.068,
+      "koniec": 35.683,
+      "slowa": [
+        {
+          "w": "I",
+          "s": 32.068,
+          "e": 32.214
+        },
+        {
+          "w": "jeszcze",
+          "s": 32.214,
+          "e": 32.654
+        },
+        {
+          "w": "jedno:",
+          "s": 32.654,
+          "e": 33.191
+        },
+        {
+          "w": "macie",
+          "s": 33.191,
+          "e": 33.533
+        },
+        {
+          "w": "na",
+          "s": 33.533,
+          "e": 33.728
+        },
+        {
+          "w": "to",
+          "s": 33.728,
+          "e": 33.924
+        },
+        {
+          "w": "tylko",
+          "s": 33.924,
+          "e": 34.266
+        },
+        {
+          "w": "siedem",
+          "s": 34.266,
+          "e": 34.657
+        },
+        {
+          "w": "dni",
+          "s": 34.657,
+          "e": 34.901
+        },
+        {
+          "w": "od",
+          "s": 34.901,
+          "e": 35.096
+        },
+        {
+          "w": "zmiany.",
+          "s": 35.096,
+          "e": 35.683
+        }
+      ],
+      "postac": {
+        "plan": "brak",
+        "gest": {
+          "slowo": "siedem",
+          "plan": "obok",
+          "poza": "ostrzega",
+          "ruch": "kiwa"
+        }
+      },
+      "obraz": "s09-biuro.jpg",
+      "wymiary": [
+        1024,
+        1536
+      ],
+      "kadr": {
+        "od": [
+          0.5,
+          0.45
+        ],
+        "do": [
+          0.62,
+          0.3
+        ],
+        "zoomOd": 1.0,
+        "zoomDo": 1.45
+      },
+      "znacznik": {
+        "x": 0.62,
+        "y": 0.34,
+        "slowo": "siedem",
+        "tekst": "7 dni od zmiany"
+      }
+    },
+    {
+      "tekst": "Pamiętajcie: nowy zarząd plus dobry protokół równa się wpis w KRS.",
+      "lektor": "Pamiętajcie: nowy zarząd plus dobry protokół równa się wpis w ka-er-esie.",
+      "akcent": [
+        "zarząd",
+        "protokół",
+        "wpis"
+      ],
+      "prompt": "Pan Prawnik siedzi przy biurku w biurze remizy, trzyma uporządkowaną teczkę dokumentów i pewnie się uśmiecha.",
+      "start": 36.267,
+      "koniec": 42.098,
+      "slowa": [
+        {
+          "w": "Pamiętajcie:",
+          "s": 36.267,
+          "e": 37.447
+        },
+        {
+          "w": "nowy",
+          "s": 37.447,
+          "e": 37.864
+        },
+        {
+          "w": "zarząd",
+          "s": 37.864,
+          "e": 38.419
+        },
+        {
+          "w": "plus",
+          "s": 38.419,
+          "e": 38.836
+        },
+        {
+          "w": "dobry",
+          "s": 38.836,
+          "e": 39.322
+        },
+        {
+          "w": "protokół",
+          "s": 39.322,
+          "e": 40.016
+        },
+        {
+          "w": "równa",
+          "s": 40.016,
+          "e": 40.502
+        },
+        {
+          "w": "się",
+          "s": 40.502,
+          "e": 40.849
+        },
+        {
+          "w": "wpis",
+          "s": 40.849,
+          "e": 41.265
+        },
+        {
+          "w": "w",
+          "s": 41.265,
+          "e": 41.474
+        },
+        {
+          "w": "KRS.",
+          "s": 41.474,
+          "e": 42.098
+        }
+      ],
+      "postac": {
+        "plan": "brak"
+      },
+      "obraz": "porada-tlo.webp",
+      "porada": {
+        "tekst": "Nowy zarząd + dobry protokół = wpis w KRS.",
+        "zlote": [
+          "wpis",
+          "KRS."
+        ]
+      },
+      "wymiary": [
+        1530,
+        1015
+      ]
+    },
+    {
+      "tekst": "A jak nie wiecie, od czego zacząć, zajrzyjcie na doradztwodlaosp.pl.",
+      "lektor": "A jak nie wiecie, od czego zacząć, zajrzyjcie na doradztwo dla o-es-pe kropka pe-el.",
+      "akcent": [
+        "doradztwodlaosp.pl."
+      ],
+      "prompt": "Pan Prawnik stoi przed oświetloną remizą OSP o niebieskiej godzinie i życzliwie kiwa głową w stronę widza.",
+      "start": 42.517,
+      "koniec": 48.921,
+      "slowa": [
+        {
+          "w": "A",
+          "s": 42.517,
+          "e": 42.736
+        },
+        {
+          "w": "jak",
+          "s": 42.736,
+          "e": 43.099
+        },
+        {
+          "w": "nie",
+          "s": 43.099,
+          "e": 43.463
+        },
+        {
+          "w": "wiecie,",
+          "s": 43.463,
+          "e": 44.337
+        },
+        {
+          "w": "od",
+          "s": 44.337,
+          "e": 44.628
+        },
+        {
+          "w": "czego",
+          "s": 44.628,
+          "e": 45.137
+        },
+        {
+          "w": "zacząć,",
+          "s": 45.137,
+          "e": 46.01
+        },
+        {
+          "w": "zajrzyjcie",
+          "s": 46.01,
+          "e": 46.883
+        },
+        {
+          "w": "na",
+          "s": 46.883,
+          "e": 47.174
+        },
+        {
+          "w": "doradztwodlaosp.pl.",
+          "s": 47.174,
+          "e": 48.921
+        }
+      ],
+      "postac": {
+        "plan": "pelny",
+        "poza": "tlumaczy"
+      },
+      "etykieta": "doradztwodlaosp.pl"
+    }
+  ]
+}

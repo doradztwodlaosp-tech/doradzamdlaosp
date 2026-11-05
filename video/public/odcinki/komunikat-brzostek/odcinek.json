@@ -1,0 +1,561 @@
+{
+  "tytul": "Komunikat z Brzostku",
+  "nadtytul": "KOMUNIKAT Z BRZOSTKU",
+  "glos": "lektor.mp3",
+  "cta": "Pogratulujcie w komentarzu",
+  "naczelnik": true,
+  "szkic": "Czasy szacunkowe – po dodaniu lektor.mp3 uruchom: npm run czasy -- komunikat-brzostek",
+  "sceny": [
+    {
+      "tekst": "Czołem, druhowie!",
+      "akcent": [
+        "druhowie!"
+      ],
+      "ilustracja": "remiza",
+      "prompt": "Pan Prawnik stoi przed małą wiejską remizą OSP o niebieskiej godzinie i spokojnie unosi dłoń na powitanie.",
+      "start": 0.0,
+      "koniec": 1.133,
+      "slowa": [
+        {
+          "w": "Czołem,",
+          "s": 0.0,
+          "e": 0.523
+        },
+        {
+          "w": "druhowie!",
+          "s": 0.523,
+          "e": 1.133
+        }
+      ]
+    },
+    {
+      "tekst": "Dziś krótki komunikat z Brzostku.",
+      "akcent": [
+        "komunikat",
+        "Brzostku."
+      ],
+      "ilustracja": "komunikat",
+      "prompt": "Korkowa tablica ogłoszeń w korytarzu remizy z jednym przypiętym oficjalnym komunikatem, ciepłe światło.",
+      "start": 1.733,
+      "koniec": 3.933,
+      "slowa": [
+        {
+          "w": "Dziś",
+          "s": 1.733,
+          "e": 2.048
+        },
+        {
+          "w": "krótki",
+          "s": 2.048,
+          "e": 2.467
+        },
+        {
+          "w": "komunikat",
+          "s": 2.467,
+          "e": 3.043
+        },
+        {
+          "w": "z",
+          "s": 3.043,
+          "e": 3.2
+        },
+        {
+          "w": "Brzostku.",
+          "s": 3.2,
+          "e": 3.933
+        }
+      ]
+    },
+    {
+      "tekst": "Widziałem w życiu wiele: pożary, powodzie, walne zebrania do trzeciej w nocy.",
+      "akcent": [
+        "pożary,",
+        "powodzie,"
+      ],
+      "ilustracja": "doswiadczenie",
+      "prompt": "Podzielony nastrój: odległy pożar stodoły nocą i zalana wiejska droga, sylwetki strażaków, dramatyczne światło.",
+      "start": 4.533,
+      "koniec": 9.667,
+      "slowa": [
+        {
+          "w": "Widziałem",
+          "s": 4.533,
+          "e": 5.087
+        },
+        {
+          "w": "w",
+          "s": 5.087,
+          "e": 5.238
+        },
+        {
+          "w": "życiu",
+          "s": 5.238,
+          "e": 5.59
+        },
+        {
+          "w": "wiele:",
+          "s": 5.59,
+          "e": 6.144
+        },
+        {
+          "w": "pożary,",
+          "s": 6.144,
+          "e": 6.748
+        },
+        {
+          "w": "powodzie,",
+          "s": 6.748,
+          "e": 7.452
+        },
+        {
+          "w": "walne",
+          "s": 7.452,
+          "e": 7.805
+        },
+        {
+          "w": "zebrania",
+          "s": 7.805,
+          "e": 8.308
+        },
+        {
+          "w": "do",
+          "s": 8.308,
+          "e": 8.509
+        },
+        {
+          "w": "trzeciej",
+          "s": 8.509,
+          "e": 9.012
+        },
+        {
+          "w": "w",
+          "s": 9.012,
+          "e": 9.163
+        },
+        {
+          "w": "nocy.",
+          "s": 9.163,
+          "e": 9.667
+        }
+      ]
+    },
+    {
+      "tekst": "Ale prezesa Zakładu Komunalnego, Mateusza Domaradzkiego, którego bilans zgadza się co do grosza, widzę pierwszy raz.",
+      "akcent": [
+        "grosza,"
+      ],
+      "ilustracja": "bilans",
+      "prompt": "Zbliżenie na starannie wydrukowany bilans na biurku z kalkulatorem i długopisem, wszystko równo ułożone, miękkie światło lampki.",
+      "start": 10.267,
+      "koniec": 18.0,
+      "slowa": [
+        {
+          "w": "Ale",
+          "s": 10.267,
+          "e": 10.533
+        },
+        {
+          "w": "prezesa",
+          "s": 10.533,
+          "e": 11.013
+        },
+        {
+          "w": "Zakładu",
+          "s": 11.013,
+          "e": 11.493
+        },
+        {
+          "w": "Komunalnego,",
+          "s": 11.493,
+          "e": 12.4
+        },
+        {
+          "w": "Mateusza",
+          "s": 12.4,
+          "e": 12.933
+        },
+        {
+          "w": "Domaradzkiego,",
+          "s": 12.933,
+          "e": 13.947
+        },
+        {
+          "w": "którego",
+          "s": 13.947,
+          "e": 14.427
+        },
+        {
+          "w": "bilans",
+          "s": 14.427,
+          "e": 14.853
+        },
+        {
+          "w": "zgadza",
+          "s": 14.853,
+          "e": 15.28
+        },
+        {
+          "w": "się",
+          "s": 15.28,
+          "e": 15.547
+        },
+        {
+          "w": "co",
+          "s": 15.547,
+          "e": 15.76
+        },
+        {
+          "w": "do",
+          "s": 15.76,
+          "e": 15.973
+        },
+        {
+          "w": "grosza,",
+          "s": 15.973,
+          "e": 16.613
+        },
+        {
+          "w": "widzę",
+          "s": 16.613,
+          "e": 16.987
+        },
+        {
+          "w": "pierwszy",
+          "s": 16.987,
+          "e": 17.52
+        },
+        {
+          "w": "raz.",
+          "s": 17.52,
+          "e": 18.0
+        }
+      ]
+    },
+    {
+      "tekst": "Ja ostatnio półkę w remizie jego bilansem poziomowałem.",
+      "akcent": [
+        "półkę",
+        "poziomowałem."
+      ],
+      "ilustracja": "poziomica",
+      "prompt": "Drewniana półka w remizie z grubym segregatorem podłożonym pod jedną nogę, żeby była równo, na półce żółta poziomica.",
+      "start": 18.6,
+      "koniec": 22.267,
+      "slowa": [
+        {
+          "w": "Ja",
+          "s": 18.6,
+          "e": 18.819
+        },
+        {
+          "w": "ostatnio",
+          "s": 18.819,
+          "e": 19.366
+        },
+        {
+          "w": "półkę",
+          "s": 19.366,
+          "e": 19.749
+        },
+        {
+          "w": "w",
+          "s": 19.749,
+          "e": 19.913
+        },
+        {
+          "w": "remizie",
+          "s": 19.913,
+          "e": 20.406
+        },
+        {
+          "w": "jego",
+          "s": 20.406,
+          "e": 20.734
+        },
+        {
+          "w": "bilansem",
+          "s": 20.734,
+          "e": 21.282
+        },
+        {
+          "w": "poziomowałem.",
+          "s": 21.282,
+          "e": 22.267
+        }
+      ]
+    },
+    {
+      "tekst": "Lepszy niż poziomica.",
+      "akcent": [
+        "poziomica."
+      ],
+      "ilustracja": "poziomica",
+      "prompt": "Makro: pęcherzyk poziomicy idealnie na środku, ciepłe światło.",
+      "start": 22.867,
+      "koniec": 24.267,
+      "slowa": [
+        {
+          "w": "Lepszy",
+          "s": 22.867,
+          "e": 23.267
+        },
+        {
+          "w": "niż",
+          "s": 23.267,
+          "e": 23.517
+        },
+        {
+          "w": "poziomica.",
+          "s": 23.517,
+          "e": 24.267
+        }
+      ]
+    },
+    {
+      "tekst": "Biegły rewident podobno przejrzał, popłakał się ze wzruszenia i poprosił o kawę.",
+      "akcent": [
+        "popłakał",
+        "kawę."
+      ],
+      "ilustracja": "rewident",
+      "prompt": "Biurko biegłego rewidenta z otwartym raportem, pudełkiem chusteczek i parującym kubkiem kawy, przytulne biuro wieczorem.",
+      "start": 24.867,
+      "koniec": 30.2,
+      "slowa": [
+        {
+          "w": "Biegły",
+          "s": 24.867,
+          "e": 25.298
+        },
+        {
+          "w": "rewident",
+          "s": 25.298,
+          "e": 25.836
+        },
+        {
+          "w": "podobno",
+          "s": 25.836,
+          "e": 26.321
+        },
+        {
+          "w": "przejrzał,",
+          "s": 26.321,
+          "e": 27.129
+        },
+        {
+          "w": "popłakał",
+          "s": 27.129,
+          "e": 27.668
+        },
+        {
+          "w": "się",
+          "s": 27.668,
+          "e": 27.937
+        },
+        {
+          "w": "ze",
+          "s": 27.937,
+          "e": 28.153
+        },
+        {
+          "w": "wzruszenia",
+          "s": 28.153,
+          "e": 28.799
+        },
+        {
+          "w": "i",
+          "s": 28.799,
+          "e": 28.961
+        },
+        {
+          "w": "poprosił",
+          "s": 28.961,
+          "e": 29.5
+        },
+        {
+          "w": "o",
+          "s": 29.5,
+          "e": 29.661
+        },
+        {
+          "w": "kawę.",
+          "s": 29.661,
+          "e": 30.2
+        }
+      ]
+    },
+    {
+      "tekst": "U Mateusza nie zgadza się tylko jedno: bilans kalorii po festynie.",
+      "akcent": [
+        "kalorii"
+      ],
+      "ilustracja": "festyn",
+      "prompt": "Stół na wiejskim festynie z kiełbaskami z grilla, ciastami i biało-czerwonymi chorągiewkami, wieczorne światła.",
+      "start": 30.8,
+      "koniec": 35.2,
+      "slowa": [
+        {
+          "w": "U",
+          "s": 30.8,
+          "e": 30.957
+        },
+        {
+          "w": "Mateusza",
+          "s": 30.957,
+          "e": 31.481
+        },
+        {
+          "w": "nie",
+          "s": 31.481,
+          "e": 31.743
+        },
+        {
+          "w": "zgadza",
+          "s": 31.743,
+          "e": 32.162
+        },
+        {
+          "w": "się",
+          "s": 32.162,
+          "e": 32.424
+        },
+        {
+          "w": "tylko",
+          "s": 32.424,
+          "e": 32.79
+        },
+        {
+          "w": "jedno:",
+          "s": 32.79,
+          "e": 33.367
+        },
+        {
+          "w": "bilans",
+          "s": 33.367,
+          "e": 33.786
+        },
+        {
+          "w": "kalorii",
+          "s": 33.786,
+          "e": 34.257
+        },
+        {
+          "w": "po",
+          "s": 34.257,
+          "e": 34.467
+        },
+        {
+          "w": "festynie.",
+          "s": 34.467,
+          "e": 35.2
+        }
+      ]
+    },
+    {
+      "tekst": "Tu nawet on jest bezradny.",
+      "akcent": [
+        "bezradny."
+      ],
+      "ilustracja": "festyn",
+      "prompt": "Pusty papierowy talerzyk z okruszkami i plastikowym widelcem po festynie, w tle girlandy żarówek.",
+      "start": 35.8,
+      "koniec": 37.533,
+      "slowa": [
+        {
+          "w": "Tu",
+          "s": 35.8,
+          "e": 35.998
+        },
+        {
+          "w": "nawet",
+          "s": 35.998,
+          "e": 36.345
+        },
+        {
+          "w": "on",
+          "s": 36.345,
+          "e": 36.543
+        },
+        {
+          "w": "jest",
+          "s": 36.543,
+          "e": 36.84
+        },
+        {
+          "w": "bezradny.",
+          "s": 36.84,
+          "e": 37.533
+        }
+      ]
+    },
+    {
+      "tekst": "Woda płynie, śmieci jadą, bilans się zgadza.",
+      "akcent": [
+        "zgadza."
+      ],
+      "ilustracja": "gmina",
+      "prompt": "Małe polskie miasteczko o świcie: wieża ciśnień i zielona śmieciarka na czystej ulicy.",
+      "start": 38.133,
+      "koniec": 41.067,
+      "slowa": [
+        {
+          "w": "Woda",
+          "s": 38.133,
+          "e": 38.422
+        },
+        {
+          "w": "płynie,",
+          "s": 38.422,
+          "e": 38.999
+        },
+        {
+          "w": "śmieci",
+          "s": 38.999,
+          "e": 39.384
+        },
+        {
+          "w": "jadą,",
+          "s": 39.384,
+          "e": 39.864
+        },
+        {
+          "w": "bilans",
+          "s": 39.864,
+          "e": 40.249
+        },
+        {
+          "w": "się",
+          "s": 40.249,
+          "e": 40.49
+        },
+        {
+          "w": "zgadza.",
+          "s": 40.49,
+          "e": 41.067
+        }
+      ]
+    },
+    {
+      "tekst": "Czołem, Mateuszu!",
+      "akcent": [
+        "Mateuszu!"
+      ],
+      "ilustracja": "medal",
+      "prompt": "Pan Prawnik salutuje przed oświetloną remizą OSP o niebieskiej godzinie, dumny i spokojny.",
+      "start": 41.667,
+      "koniec": 42.8,
+      "slowa": [
+        {
+          "w": "Czołem,",
+          "s": 41.667,
+          "e": 42.19
+        },
+        {
+          "w": "Mateuszu!",
+          "s": 42.19,
+          "e": 42.8
+        }
+      ]
+    }
+  ]
+}
