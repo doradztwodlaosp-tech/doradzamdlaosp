@@ -3,20 +3,19 @@ import { Img, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig }
 import type { Odcinek, ScenaOSP } from "./RolkaOSP";
 import { USTAWIENIA as U } from "./marka";
 
-// Maskotka: złoty paragraf w strażackim hełmie (pozy wycięte z arkusza, pliki w public/postac).
+// Maskotka Druh Paragraf: złoty paragraf w strażackim hełmie z § (cała sylwetka; pozy wycięte z arkusza, pliki w public/postac).
 // Ustawienia sceny w odcinek.json, pole "postac":
 //   { "plan": "pelny" | "obok" | "maly" | "brak", "poza": "tlumaczy",
 //     "gest": { "slowo": "siedem", "plan": "obok", "poza": "ostrzega", "ruch": "kiwa" } }
 // Gest z planem: postać wchodzi dokładnie na tym słowie (np. żeby wskazać coś na obrazie).
 
 export const POZY = {
-  stoi: { szer: 269, wys: 644 },
-  tlumaczy: { szer: 478, wys: 494 },
-  "cieszy-sie": { szer: 305, wys: 493 },
-  zaskoczony: { szer: 374, wys: 492 },
-  ostrzega: { szer: 324, wys: 494 },
-  mysli: { szer: 292, wys: 494 },
-  wskazuje: { szer: 301, wys: 496 },
+  tlumaczy: { szer: 418, wys: 495 },
+  "cieszy-sie": { szer: 280, wys: 496 },
+  zaskoczony: { szer: 350, wys: 495 },
+  ostrzega: { szer: 309, wys: 499 },
+  mysli: { szer: 278, wys: 499 },
+  wskazuje: { szer: 295, wys: 504 },
 } as const;
 
 export type Poza = keyof typeof POZY;
@@ -115,9 +114,6 @@ export const Maskotka: React.FC<{ dane: Odcinek; glosnosc: number[] }> = ({ dane
         transformOrigin: "50% 100%",
         transform: `rotate(${obrot}deg) scale(${(0.94 + 0.06 * pop) * (1 + oddech)}, ${(0.94 + 0.06 * pop) * (1 + oddech + usta * 0.025)})`,
         filter: "drop-shadow(0 18px 30px rgba(0,0,0,0.55))",
-        // Dolna krawędź wycięcia łagodnie znika w tle
-        WebkitMaskImage: "linear-gradient(180deg, #000 82%, transparent 100%)",
-        maskImage: "linear-gradient(180deg, #000 82%, transparent 100%)",
       }}
     >
       <Img src={staticFile(`postac/${poza}.png`)} style={{ width: "100%", height: "100%" }} />

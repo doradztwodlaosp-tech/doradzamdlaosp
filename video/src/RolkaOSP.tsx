@@ -27,6 +27,9 @@ export type ScenaOSP = {
   lektor?: string;
   akcent?: string[];
   obraz?: string;
+  wymiary?: [number, number]; // szerokość i wysokość zdjęcia w pikselach
+  kadr?: { od: [number, number]; do: [number, number]; zoomOd?: number; zoomDo?: number };
+  znacznik?: { x: number; y: number; slowo: string; tekst: string };
   ilustracja?: string;
   prompt?: string;
   postac?: UstawieniaPostaci; // maskotka w tej scenie
@@ -110,23 +113,70 @@ const porcje = (slowa: Slowo[]): Slowo[][] => {
   return wynik;
 };
 
-// Tło sceny: zdjęcie z powolnym najazdem albo nic (jednolity grafit)
-const Tlo: React.FC<{ scena: ScenaOSP; numer: number; odcinek: string }> = ({ scena, numer, odcinek }) => {
+// Tło sceny: zdjęcie z ruchem kamery. Bez pola "kadr" – powolny najazd na środek.
+// "kadr": punkt zdjęcia (0–1), na który patrzy kamera na początku i na końcu sceny, oraz przybliżenie.
+// "znacznik": złote kółko z podpisem przypięte do miejsca na zdjęciu; pojawia się na wskazanym słowie.
+const Tlo: React.FC<{ scena: ScenaOSP; numer: number; odcinek: string; dlugosc: number }> = ({ scena, numer, odcinek, dlugosc }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const dlugosc = (scena.koniec - scena.start + 1) * fps;
-  const zoom = interpolate(frame, [0, dlugosc], [U.zoomStart, U.zoomKoniec], zakres);
-  const kierunek = numer % 2 === 0 ? 1 : -1;
-  const przesuniecie = interpolate(frame, [0, dlugosc], [0, U.przesuniecie * kierunek], zakres);
   const wejscie = interpolate(frame, [0, PRZENIKANIE], [0, 1], zakres);
-  if (!scena.obraz) return null;
+  if (!scena.obraz || !scena.wymiary) return null;
+  const [W, H] = scena.wymiary;
+  const kadr = scena.kadr ?? { od: [0.5, 0.5], do: [0.5 + (numer % 2 === 0 ? 0.03 : -0.03), 0.5], zoomOd: U.zoomStart, zoomDo: U.zoomKoniec };
+  const t = interpolate(frame, [0, dlugosc], [0, 1], zakres);
+  const plynnie = t * t * (3 - 2 * t);
+  const fx = interpolate(plynnie, [0, 1], [kadr.od[0], kadr.do[0]]);
+  const fy = interpolate(plynnie, [0, 1], [kadr.od[1], kadr.do[1]]);
+  const skala = Math.max(1080 / W, 1920 / H) * interpolate(plynnie, [0, 1], [kadr.zoomOd ?? 1, kadr.zoomDo ?? 1.08]);
+  const szer = W * skala;
+  const wys = H * skala;
+  // Punkt kadru ustawiamy na środku bezpiecznej strefy, pilnując, by zdjęcie zawsze zakrywało ekran
+  const lewo = Math.min(0, Math.max(1080 - szer, SRODEK_X - fx * szer));
+  const gora = Math.min(0, Math.max(1920 - wys, 900 - fy * wys));
+
+  const z = scena.znacznik;
+  const czasZnacznika = z ? scena.slowa.find((s) => normalizuj(s.w).startsWith(normalizuj(z.slowo)))?.s : undefined;
+  const odZnacznika = czasZnacznika !== undefined ? frame - Math.round((czasZnacznika - scena.start) * fps) : -1;
+  const znak = odZnacznika >= 0 ? spring({ frame: odZnacznika, fps, config: { damping: 12 } }) : 0;
+  const puls = odZnacznika >= 0 ? (odZnacznika % 30) / 30 : 0;
+
   return (
-    <AbsoluteFill style={{ opacity: numer === 0 ? 1 : wejscie }}>
-      <Img
-        src={staticFile(`odcinki/${odcinek}/${scena.obraz}`)}
-        style={{ width: "100%", height: "100%", objectFit: "cover", transform: `scale(${zoom}) translateX(${przesuniecie}px)` }}
-      />
-      <AbsoluteFill style={{ background: `linear-gradient(180deg, ${MARKA.tlo}cc 0%, transparent 30%, transparent 55%, ${MARKA.tlo}ee 75%)` }} />
+    <AbsoluteFill style={{ opacity: numer === 0 ? 1 : wejscie, overflow: "hidden" }}>
+      <Img src={staticFile(`odcinki/${odcinek}/${scena.obraz}`)} style={{ position: "absolute", left: lewo, top: gora, width: szer, height: wys }} />
+      <AbsoluteFill style={{ background: `linear-gradient(180deg, ${MARKA.tlo}cc 0%, transparent 32%, transparent 62%, ${MARKA.tlo}f2 82%)` }} />
+      {z && znak > 0 && (
+        <>
+          <div
+            style={{
+              position: "absolute",
+              left: lewo + z.x * szer - 70,
+              top: gora + z.y * wys - 70,
+              width: 140,
+              height: 140,
+              borderRadius: "50%",
+              border: `6px solid ${MARKA.zloto}`,
+              transform: `scale(${znak})`,
+              boxShadow: `0 0 0 ${puls * 40}px rgba(218,167,60,${0.35 * (1 - puls)})`,
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              left: Math.min(U.strefaPrawo - 40 - 420, Math.max(40, lewo + z.x * szer - 210)),
+              top: gora + z.y * wys + 95,
+              width: 420,
+              display: "flex",
+              justifyContent: "center",
+              opacity: znak,
+              transform: `translateY(${(1 - znak) * 20}px)`,
+            }}
+          >
+            <div style={{ background: MARKA.zloto, color: MARKA.tlo, fontFamily: FONT, fontWeight: 800, fontSize: 40, borderRadius: 999, padding: "12px 30px", whiteSpace: "nowrap" }}>
+              {z.tekst}
+            </div>
+          </div>
+        </>
+      )}
     </AbsoluteFill>
   );
 };
@@ -337,7 +387,7 @@ const Hak: React.FC<{ linie: { tekst: string; zloty?: boolean }[] }> = ({ linie 
   const zanik = interpolate(frame, [koniecHaka - PRZENIKANIE * 2, koniecHaka], [1, 0], zakres);
   const najazd = interpolate(frame, [0, koniecHaka], [1, 1.06], zakres);
   return (
-    <AbsoluteFill style={{ backgroundColor: MARKA.tlo, opacity: zanik }}>
+    <AbsoluteFill style={{ backgroundColor: `${MARKA.tlo}b8`, opacity: zanik }}>
       <div
         style={{
           position: "absolute",
@@ -365,8 +415,6 @@ const Hak: React.FC<{ linie: { tekst: string; zloty?: boolean }[] }> = ({ linie 
             height: 560,
             transform: `scale(${najazd})`,
             transformOrigin: "50% 100%",
-            WebkitMaskImage: "linear-gradient(180deg, #000 80%, transparent 100%)",
-            maskImage: "linear-gradient(180deg, #000 80%, transparent 100%)",
           }}
         />
       </div>
@@ -401,7 +449,7 @@ const Plansza: React.FC<NonNullable<Odcinek["plansza"]>> = ({ haslo, pigulka, ko
       </div>
       <div style={{ ...kolumna, top: 790, fontWeight: 700, fontSize: 52, color: MARKA.bialy, opacity: w(22) }}>{kontakt}</div>
       <div style={{ ...kolumna, top: 920, height: 380, display: "flex", justifyContent: "center", opacity: w(28) }}>
-        <Img src={staticFile("postac/stoi.png")} style={{ height: 380 }} />
+        <Img src={staticFile("postac/cieszy-sie.png")} style={{ height: 380 }} />
       </div>
       <div style={{ ...kolumna, top: 1350, fontWeight: 700, fontSize: 26, color: MARKA.tekstPomocniczy, opacity: w(30) }}>{stopka}</div>
     </AbsoluteFill>
@@ -472,7 +520,7 @@ export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [], s
         const start = i === 0 ? 0 : od - PRZENIKANIE;
         return (
           <Sequence key={i} from={start} durationInFrames={doKlatki - start} layout="none">
-            <Tlo scena={scena} numer={i} odcinek={odcinek} />
+            <Tlo scena={scena} numer={i} odcinek={odcinek} dlugosc={doKlatki - start} />
           </Sequence>
         );
       })}

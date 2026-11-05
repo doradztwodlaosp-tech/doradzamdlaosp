@@ -443,6 +443,40 @@ const Adres: React.FC<IlustracjaProps> = ({ dlugosc }) => {
   );
 };
 
+// Wersje do sceny ze zdjęciem sądu: drzwi są na zdjęciu w punkcie ok. (450, 740) płótna
+const DRZWI = { x: 450, y: 740 };
+
+// 4b. Lista leci łukiem prosto w drzwi sądu na zdjęciu
+const ListaDoDrzwi: React.FC<IlustracjaProps> = ({ dlugosc }) => {
+  const frame = useCurrentFrame();
+  const t = interpolate(frame, [dlugosc * 0.2, dlugosc * 0.8], [0, 1], zakres);
+  const skala = 1 - t * 0.7;
+  const x = interpolate(t, [0, 1], [120, DRZWI.x]) - (240 * skala) / 2;
+  const y = interpolate(t, [0, 1], [880, DRZWI.y]) - Math.sin(t * Math.PI) * 260 - (300 * skala) / 2;
+  return (
+    <g opacity={t < 1 ? 1 : 0}>
+      <Dokument x={x} y={y} w={240} h={300} tytul="LISTA" linie={4} obrot={t * 25 - 15} skala={skala} />
+    </g>
+  );
+};
+
+// 5b. Lista odbija się od drzwi i zostaje przekreślona
+const ListaOdbita: React.FC<IlustracjaProps> = ({ dlugosc }) => {
+  const frame = useCurrentFrame();
+  const t = interpolate(frame, [0, dlugosc * 0.3], [0, 1], zakres);
+  const skala = interpolate(t, [0, 1], [0.3, 1]);
+  const x = interpolate(t, [0, 1], [DRZWI.x, 560]) - (300 * skala) / 2;
+  const y = interpolate(t, [0, 1], [DRZWI.y, 760]) - Math.sin(t * Math.PI) * 160 - (370 * skala) / 2;
+  const kreska = interpolate(frame, [dlugosc * 0.4, dlugosc * 0.6], [0, 1], zakres);
+  return (
+    <g transform={`translate(${x} ${y}) scale(${skala})`}>
+      <Dokument x={0} y={0} w={300} h={370} tytul="LISTA" linie={6} obrot={-10} />
+      <line x1="-20" y1="-20" x2={-20 + 340 * kreska} y2={-20 + 410 * kreska} stroke={CZERWONY} strokeWidth="24" strokeLinecap="round" />
+      <line x1="320" y1="-20" x2={320 - 340 * kreska} y2={-20 + 410 * kreska} stroke={CZERWONY} strokeWidth="24" strokeLinecap="round" />
+    </g>
+  );
+};
+
 export const ILUSTRACJE_PION: Record<string, React.FC<IlustracjaProps>> = {
   remiza: Remiza,
   sala: Sala,
@@ -455,4 +489,6 @@ export const ILUSTRACJE_PION: Record<string, React.FC<IlustracjaProps>> = {
   "kalendarz-7-dni": Kalendarz,
   "plansza-zarzad-protokol-wpis": Rownanie,
   adres: Adres,
+  "lista-do-drzwi": ListaDoDrzwi,
+  "lista-odbita": ListaOdbita,
 };

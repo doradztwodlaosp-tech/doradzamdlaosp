@@ -37,7 +37,6 @@
       "akcent": [
         "druhowie!"
       ],
-      "ilustracja": "remiza",
       "prompt": "Pan Prawnik stoi przed małą wiejską remizą OSP z czerwonymi bramami garażowymi i spokojnie unosi dłoń na powitanie.",
       "start": 0,
       "koniec": 1.205,
@@ -60,6 +59,23 @@
           "slowo": "Czołem",
           "ruch": "podskok"
         }
+      },
+      "obraz": "s01-remiza.jpg",
+      "wymiary": [
+        1672,
+        941
+      ],
+      "kadr": {
+        "od": [
+          0.35,
+          0.55
+        ],
+        "do": [
+          0.66,
+          0.5
+        ],
+        "zoomOd": 1.0,
+        "zoomDo": 1.06
       }
     },
     {
@@ -172,7 +188,7 @@
       "akcent": [
         "sądu"
       ],
-      "ilustracja": "lista-do-sadu",
+      "ilustracja": "lista-do-drzwi",
       "prompt": "Pojedyncza kartka z wydrukowaną listą nazwisk leci w wieczornym powietrzu w stronę klasycznego budynku sądu rejonowego z kolumnami.",
       "start": 8.145,
       "koniec": 10.985,
@@ -220,6 +236,23 @@
       ],
       "postac": {
         "plan": "brak"
+      },
+      "obraz": "s04-sad.jpg",
+      "wymiary": [
+        1672,
+        941
+      ],
+      "kadr": {
+        "od": [
+          0.53,
+          0.56
+        ],
+        "do": [
+          0.53,
+          0.56
+        ],
+        "zoomOd": 1.0,
+        "zoomDo": 1.05
       }
     },
     {
@@ -229,7 +262,7 @@
         "nie",
         "działa."
       ],
-      "ilustracja": "odrzucenie",
+      "ilustracja": "lista-odbita",
       "prompt": "Kartka z listą nazwisk leży na kamiennych schodach przed zamkniętymi drzwiami sądu nocą, odrzucona.",
       "start": 11.551,
       "koniec": 13.956,
@@ -272,6 +305,23 @@
           "slowo": "Niestety",
           "ruch": "kreci"
         }
+      },
+      "obraz": "s04-sad.jpg",
+      "wymiary": [
+        1672,
+        941
+      ],
+      "kadr": {
+        "od": [
+          0.53,
+          0.56
+        ],
+        "do": [
+          0.5,
+          0.56
+        ],
+        "zoomOd": 1.05,
+        "zoomDo": 1.1
       }
     },
     {
@@ -352,7 +402,6 @@
         "protokół",
         "uchwały."
       ],
-      "ilustracja": "teczka",
       "prompt": "Otwarta teczka na biurku ze starannie ułożonymi dokumentami – protokołem i uchwałami – z pieczątką, ciepłe światło lampki biurowej.",
       "start": 21.191,
       "koniec": 26.432,
@@ -420,6 +469,29 @@
       ],
       "postac": {
         "plan": "brak"
+      },
+      "obraz": "s07-teczka.jpg",
+      "wymiary": [
+        1672,
+        941
+      ],
+      "kadr": {
+        "od": [
+          0.45,
+          0.65
+        ],
+        "do": [
+          0.58,
+          0.72
+        ],
+        "zoomOd": 1.1,
+        "zoomDo": 1.25
+      },
+      "znacznik": {
+        "x": 0.59,
+        "y": 0.74,
+        "slowo": "protokół",
+        "tekst": "Protokół i uchwały"
       }
     },
     {
@@ -488,7 +560,6 @@
         "siedem",
         "dni"
       ],
-      "ilustracja": "kalendarz-7-dni",
       "prompt": "Zrywany kalendarz ścienny w biurze remizy, z którego odlatują kartki, w tle zegar ścienny, poczucie pośpiechu.",
       "start": 32.068,
       "koniec": 35.683,
@@ -557,6 +628,29 @@
           "poza": "ostrzega",
           "ruch": "kiwa"
         }
+      },
+      "obraz": "s09-biuro.jpg",
+      "wymiary": [
+        1024,
+        1536
+      ],
+      "kadr": {
+        "od": [
+          0.5,
+          0.45
+        ],
+        "do": [
+          0.62,
+          0.3
+        ],
+        "zoomOd": 1.0,
+        "zoomDo": 1.45
+      },
+      "znacznik": {
+        "x": 0.62,
+        "y": 0.34,
+        "slowo": "siedem",
+        "tekst": "7 dni od zmiany"
       }
     },
     {
@@ -637,7 +731,11 @@
           "wpis",
           "KRS."
         ]
-      }
+      },
+      "wymiary": [
+        1530,
+        1015
+      ]
     },
     {
       "tekst": "A jak nie wiecie, od czego zacząć, zajrzyjcie na doradztwodlaosp.pl.",

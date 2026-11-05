@@ -48,7 +48,7 @@ export const USTAWIENIA = {
   maskotkaPelnyOdGory: 470, // górna krawędź na pełnym planie (px)
   maskotkaMalyWysokosc: 430, // wysokość w rogu (px)
   maskotkaMalyOdLewej: 10, // odległość od lewej krawędzi w rogu (px)
-  maskotkaObokWysokosc: 560, // wysokość, gdy wchodzi obok obrazu, żeby coś wskazać (px)
+  maskotkaObokWysokosc: 600, // wysokość, gdy wchodzi obok obrazu, żeby coś wskazać (px)
   maskotkaObokOdGory: 820, // górna krawędź w tym planie (px)
   ilustracjaPrzyMaskotce: 0.22, // jasność ilustracji za maskotką na pełnym planie (0–1)
 
