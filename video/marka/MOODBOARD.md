@@ -17,3 +17,17 @@ Obrazy wzorcowe trzymamy w folderze `video/marka/moodboard/`. Służą do nauki 
 | Plik | Co się podoba |
 |---|---|
 | paragraf-helm.webp | złoty § na hełmie strażackim – symbol prawa i straży w jednym; ciemne światło, faktury skóry i metalu, czerwień + złoto |
+
+## Analiza wzorów (5 rolek, listopad 2026)
+Podpatrujemy mechaniki, nie wygląd. Co sprawia, że te rolki działają:
+
+1. **Trzy rodzaje obrazu na zmianę:**
+   - realistyczne sceny (zdjęcie lub render AI: wozy, remiza, strażak), z ruchem kamery;
+   - czyste infografiki 3D / izometryczne (mapa akcji z odcinkami, trójkąt spalania, cząsteczki) – elementy
+     dochodzą po kolei, linie się rysują, etykiety „wskakują”;
+   - ekran telefonu z aplikacją lub stroną (produkt w akcji).
+2. **Postacie bez twarzy** (czarna sylwetka) albo figurki strażaka 3D – zero problemu z wizerunkiem.
+3. **Napisy u góry**, słowo po słowie, zwykły tekst + pogrubienie + słowo kluczowe w kolorze marki.
+4. **Liczniki i liczby** (2 → 15 sprzętów, 1 l wody → 1700 l pary) – konkret przyciąga uwagę.
+5. **Jeden motyw na film**, prowadzony od haka do odpowiedzi; zakończenie: logo + pytanie lub zachęta.
+6. **Ciągły podkład muzyczny** pod głosem (prawie bez ciszy).

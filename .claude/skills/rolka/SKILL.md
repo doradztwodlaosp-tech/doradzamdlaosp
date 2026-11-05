@@ -14,7 +14,7 @@ barwy i fonty marki: `video/src/marka.ts`. Szablonu nie zmieniaj dla pojedynczeg
 ## 0. Przeczytaj wytyczne marki
 
 Zanim cokolwiek zrobisz, przeczytaj `video/marka/BRANDBOOK.md`, `video/marka/POSTAC.md`,
-`video/marka/MOODBOARD.md` (i obrazy w `video/marka/moodboard/`) oraz `video/marka/SLOWNIK-ANIMACJI.md`.
+`video/marka/ZASADY-FILMU.md` (obowiązkowe zasady), `video/marka/PRZEWODNIK.md`, `video/marka/MOODBOARD.md` (i obrazy w `video/marka/moodboard/`) oraz `video/marka/SLOWNIK-ANIMACJI.md`.
 Trzymaj się ich. Gdy użytkownik używa nazwy ze słownika (np. „najazd”, „przenikanie”), zrób dokładnie ten efekt.
 
 ## 1. Przygotuj odcinek
