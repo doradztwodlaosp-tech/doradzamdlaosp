@@ -44,6 +44,9 @@ export type Odcinek = {
   naczelnik?: boolean;
   maskotka?: boolean;
   szkic?: string; // odcinek bez nagrania: czasy szacunkowe, render bez dźwięku
+  wstep?: number; // sekundy z hasłem-hakiem przed pierwszym słowem lektora
+  hak?: { tekst: string; zloty?: boolean }[]; // linie hasła na pierwszej klatce (działa też jako okładka)
+  plansza?: { haslo: { tekst: string; zloty?: boolean }[]; pigulka: string; kontakt: string; stopka: string };
   sceny: ScenaOSP[];
 };
 
@@ -51,6 +54,7 @@ export type RolkaProps = { odcinek: string; dane?: Odcinek; glosnosc?: number[];
 
 const FPS = 30;
 const ZAKONCZENIE_S = 1.5;
+const PLANSZA_S = 4;
 const PRZENIKANIE = U.przenikanie;
 const zakres = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 
@@ -60,15 +64,29 @@ const SZEROKOSC_TRESCI = U.strefaPrawo - 100;
 
 export const obliczRolke: CalculateMetadataFunction<RolkaProps> = async ({ props }) => {
   const odp = await fetch(staticFile(`odcinki/${props.odcinek}/odcinek.json`));
-  const dane: Odcinek = await odp.json();
+  const surowe: Odcinek = await odp.json();
+  // Przesuwamy cały odcinek o czas wstępu (hak), żeby głos i animacje zostały zsynchronizowane
+  const w = surowe.wstep ?? 0;
+  const dane: Odcinek = {
+    ...surowe,
+    sceny: surowe.sceny.map((s) => ({
+      ...s,
+      start: s.start + w,
+      koniec: s.koniec + w,
+      slowa: s.slowa.map((sl) => ({ ...sl, s: sl.s + w, e: sl.e + w })),
+    })),
+  };
   const koniec = dane.sceny[dane.sceny.length - 1].koniec;
   // Głośność nagrania klatka po klatce (tworzy ją npm run render) – do ruchu ust postaci
   const glosnosc: number[] =
     (dane.naczelnik || dane.maskotka) && !dane.szkic
-      ? await fetch(staticFile(`odcinki/${props.odcinek}/glosnosc.json`)).then((r) => (r.ok ? r.json() : []))
+      ? [
+          ...new Array(Math.round(w * FPS)).fill(0),
+          ...(await fetch(staticFile(`odcinki/${props.odcinek}/glosnosc.json`)).then((r) => (r.ok ? r.json() : []))),
+        ]
       : [];
   return {
-    durationInFrames: Math.ceil((koniec + ZAKONCZENIE_S) * FPS),
+    durationInFrames: Math.ceil((koniec + (dane.plansza ? 0.4 + PLANSZA_S : ZAKONCZENIE_S)) * FPS),
     props: { ...props, dane, glosnosc },
   };
 };
@@ -268,6 +286,85 @@ const Wezwanie: React.FC<{ tekst: string }> = ({ tekst }) => {
   );
 };
 
+// Hak: duże hasło od pierwszej klatki (bez wejścia z zera – klatka 0 jest okładką rolki)
+const Hak: React.FC<{ linie: { tekst: string; zloty?: boolean }[] }> = ({ linie }) => {
+  const frame = useCurrentFrame();
+  const { durationInFrames } = useVideoConfig();
+  const koniecHaka = durationInFrames;
+  const zanik = interpolate(frame, [koniecHaka - PRZENIKANIE * 2, koniecHaka], [1, 0], zakres);
+  const najazd = interpolate(frame, [0, koniecHaka], [1, 1.06], zakres);
+  return (
+    <AbsoluteFill style={{ backgroundColor: MARKA.tlo, opacity: zanik }}>
+      <div
+        style={{
+          position: "absolute",
+          left: SRODEK_X - SZEROKOSC_TRESCI / 2,
+          width: SZEROKOSC_TRESCI,
+          top: 300,
+          transform: `scale(${najazd})`,
+          textAlign: "center",
+          fontFamily: FONT,
+          fontWeight: 800,
+          lineHeight: 1.08,
+        }}
+      >
+        {linie.map((l, i) => (
+          <div key={i} style={{ fontSize: Math.min(120, Math.floor((SZEROKOSC_TRESCI * 1.22) / l.tekst.length)), whiteSpace: "nowrap", color: l.zloty ? MARKA.zloto : MARKA.bialy }}>
+            {l.tekst}
+          </div>
+        ))}
+        <div style={{ width: 160, height: 8, background: MARKA.zloto, margin: "44px auto 0", borderRadius: 4 }} />
+      </div>
+      <div style={{ position: "absolute", left: SRODEK_X - 230, width: 460, top: 860, height: 560, display: "flex", justifyContent: "center" }}>
+        <Img
+          src={staticFile("postac/zaskoczony.png")}
+          style={{
+            height: 560,
+            transform: `scale(${najazd})`,
+            transformOrigin: "50% 100%",
+            WebkitMaskImage: "linear-gradient(180deg, #000 80%, transparent 100%)",
+            maskImage: "linear-gradient(180deg, #000 80%, transparent 100%)",
+          }}
+        />
+      </div>
+    </AbsoluteFill>
+  );
+};
+
+// Plansza końcowa: nic na siebie nie nachodzi, wszystko w bezpiecznej strefie
+const Plansza: React.FC<NonNullable<Odcinek["plansza"]>> = ({ haslo, pigulka, kontakt, stopka }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const tlo = interpolate(frame, [0, PRZENIKANIE], [0, 1], zakres);
+  const w = (opoznienie: number) => spring({ frame: frame - opoznienie, fps, config: { damping: 14 } });
+  const kolumna: React.CSSProperties = {
+    position: "absolute",
+    left: SRODEK_X - SZEROKOSC_TRESCI / 2,
+    width: SZEROKOSC_TRESCI,
+    textAlign: "center",
+    fontFamily: FONT,
+  };
+  return (
+    <AbsoluteFill style={{ backgroundColor: MARKA.tlo, opacity: tlo }}>
+      <div style={{ ...kolumna, top: 300, fontWeight: 800, lineHeight: 1.1, opacity: w(4), transform: `translateY(${(1 - w(4)) * 40}px)` }}>
+        {haslo.map((l, i) => (
+          <div key={i} style={{ fontSize: Math.min(110, Math.floor((SZEROKOSC_TRESCI * 1.22) / l.tekst.length)), whiteSpace: "nowrap", color: l.zloty ? MARKA.zloto : MARKA.bialy }}>
+            {l.tekst}
+          </div>
+        ))}
+      </div>
+      <div style={{ ...kolumna, top: 640, display: "flex", justifyContent: "center", transform: `scale(${w(14)})` }}>
+        <div style={{ background: MARKA.zloto, color: MARKA.tlo, fontWeight: 800, fontSize: 34, whiteSpace: "nowrap", borderRadius: 999, padding: "18px 36px" }}>{pigulka}</div>
+      </div>
+      <div style={{ ...kolumna, top: 790, fontWeight: 700, fontSize: 52, color: MARKA.bialy, opacity: w(22) }}>{kontakt}</div>
+      <div style={{ ...kolumna, top: 920, height: 380, display: "flex", justifyContent: "center", opacity: w(28) }}>
+        <Img src={staticFile("postac/stoi.png")} style={{ height: 380 }} />
+      </div>
+      <div style={{ ...kolumna, top: 1350, fontWeight: 700, fontSize: 26, color: MARKA.tekstPomocniczy, opacity: w(30) }}>{stopka}</div>
+    </AbsoluteFill>
+  );
+};
+
 const PostacNaczelnika: React.FC<{ dane: Odcinek; glosnosc: number[] }> = ({ dane, glosnosc }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -321,7 +418,11 @@ export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [], s
 
   return (
     <AbsoluteFill style={{ backgroundColor: MARKA.tlo }}>
-      {!dane.szkic && <Audio src={staticFile(`odcinki/${odcinek}/${dane.glos}`)} />}
+      {!dane.szkic && (
+        <Sequence from={Math.round((dane.wstep ?? 0) * fps)} layout="none">
+          <Audio src={staticFile(`odcinki/${odcinek}/${dane.glos}`)} />
+        </Sequence>
+      )}
 
       {dane.sceny.map((scena, i) => {
         const { od, doKlatki } = zakresSceny(i);
@@ -387,6 +488,18 @@ export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [], s
       {dane.cta && (
         <Sequence from={klatka(dane.sceny[dane.sceny.length - 1].start)} layout="none">
           <Wezwanie tekst={dane.cta} />
+        </Sequence>
+      )}
+
+      {dane.hak && (
+        <Sequence from={0} durationInFrames={Math.round((dane.wstep ?? 1.5) * fps) + PRZENIKANIE} layout="none">
+          <Hak linie={dane.hak} />
+        </Sequence>
+      )}
+
+      {dane.plansza && (
+        <Sequence from={klatka(dane.sceny[dane.sceny.length - 1].koniec + 0.4)} layout="none">
+          <Plansza {...dane.plansza} />
         </Sequence>
       )}
 

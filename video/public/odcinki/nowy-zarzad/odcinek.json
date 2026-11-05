@@ -2,7 +2,34 @@
   "tytul": "Nowy zarząd? Sąd sam się nie dowie",
   "nadtytul": "PORADNIK OSP • NOWY ZARZĄD",
   "glos": "lektor.mp3",
-  "cta": "Napiszcie w komentarzu",
+  "cta": "Czy Wasz zarząd zdążył w 7 dni?",
+  "wstep": 1.8,
+  "hak": [
+    {
+      "tekst": "NOWY ZARZĄD?",
+      "zloty": true
+    },
+    {
+      "tekst": "SĄD SAM SIĘ"
+    },
+    {
+      "tekst": "NIE DOWIE."
+    }
+  ],
+  "plansza": {
+    "haslo": [
+      {
+        "tekst": "MY ZAWSZE",
+        "zloty": true
+      },
+      {
+        "tekst": "PO STRONIE OSP."
+      }
+    ],
+    "pigulka": "Obserwuj nas • doradztwodlaosp.pl",
+    "kontakt": "WhatsApp: 720 868 902",
+    "stopka": "Materiał informacyjny. Nie zastępuje indywidualnej analizy."
+  },
   "maskotka": true,
   "sceny": [
     {
