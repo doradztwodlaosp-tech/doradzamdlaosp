@@ -60,30 +60,56 @@
           "ruch": "podskok"
         }
       },
-      "obraz": "s01-remiza.jpg",
-      "wymiary": [
-        1672,
-        941
-      ],
-      "kadr": {
-        "od": [
-          0.35,
-          0.55
-        ],
-        "do": [
-          0.66,
-          0.5
-        ],
-        "zoomOd": 1.0,
-        "zoomDo": 1.06
-      }
+      "ujecia": [
+        {
+          "obraz": "s01-remiza.jpg",
+          "kadr": {
+            "od": [
+              0.36,
+              0.5
+            ],
+            "do": [
+              0.5,
+              0.5
+            ],
+            "zoomOd": 1.0,
+            "zoomDo": 1.05
+          },
+          "swiatla": [
+            {
+              "x": 0.58,
+              "y": 0.56,
+              "r": 150
+            },
+            {
+              "x": 0.667,
+              "y": 0.56,
+              "r": 150
+            },
+            {
+              "x": 0.69,
+              "y": 0.31,
+              "r": 110
+            },
+            {
+              "x": 0.24,
+              "y": 0.52,
+              "r": 190
+            },
+            {
+              "x": 0.4,
+              "y": 0.52,
+              "r": 190
+            }
+          ]
+        }
+      ]
     },
     {
       "tekst": "Walne za wami, nowy zarząd wybrany, kawa wypita.",
       "akcent": [
         "zarząd"
       ],
-      "ilustracja": "sala",
       "prompt": "Skromna świetlica w remizie po walnym zebraniu: strażacy ochotnicy rozmawiają przy długim drewnianym stole z kubkami kawy i papierami, ciepłe, przytulne światło.",
       "start": 1.588,
       "koniec": 5.367,
@@ -131,14 +157,84 @@
       ],
       "postac": {
         "plan": "brak"
-      }
+      },
+      "ujecia": [
+        {
+          "obraz": "s01-remiza.jpg",
+          "kadr": {
+            "od": [
+              0.6,
+              0.55
+            ],
+            "do": [
+              0.64,
+              0.55
+            ],
+            "zoomOd": 1.45,
+            "zoomDo": 1.55
+          },
+          "swiatla": [
+            {
+              "x": 0.58,
+              "y": 0.56,
+              "r": 220
+            },
+            {
+              "x": 0.667,
+              "y": 0.56,
+              "r": 220
+            }
+          ],
+          "naklejki": [
+            {
+              "typ": "chip",
+              "x": 0.565,
+              "y": 0.44,
+              "slowo": "Walne",
+              "tekst": "Walne zebranie"
+            },
+            {
+              "typ": "chip",
+              "x": 0.66,
+              "y": 0.69,
+              "slowo": "nowy",
+              "tekst": "Nowy zarząd"
+            }
+          ]
+        },
+        {
+          "od": "kawa",
+          "obraz": "s09-biuro.jpg",
+          "kadr": {
+            "od": [
+              0.6,
+              0.68
+            ],
+            "do": [
+              0.63,
+              0.69
+            ],
+            "zoomOd": 1.5,
+            "zoomDo": 1.62
+          },
+          "pyl": true,
+          "naklejki": [
+            {
+              "typ": "chip",
+              "x": 0.66,
+              "y": 0.615,
+              "slowo": "kawa",
+              "tekst": "Kawa wypita"
+            }
+          ]
+        }
+      ]
     },
     {
       "tekst": "I wielu myśli, że na tym koniec.",
       "akcent": [
         "koniec."
       ],
-      "ilustracja": "koniec",
       "prompt": "Zbliżenie na pusty drewniany stół w sali remizy po zebraniu: puste kubki po kawie i długopis, światła przygasają, nastrój końca.",
       "start": 5.833,
       "koniec": 7.651,
@@ -181,14 +277,42 @@
       ],
       "postac": {
         "plan": "brak"
-      }
+      },
+      "ujecia": [
+        {
+          "obraz": "s09-biuro.jpg",
+          "kadr": {
+            "od": [
+              0.5,
+              0.52
+            ],
+            "do": [
+              0.5,
+              0.5
+            ],
+            "zoomOd": 1.22,
+            "zoomDo": 1.1
+          },
+          "przyciemnij": [
+            0.15,
+            0.6
+          ],
+          "pyl": true,
+          "naklejki": [
+            {
+              "typ": "napis",
+              "slowo": "koniec",
+              "tekst": "KONIEC?"
+            }
+          ]
+        }
+      ]
     },
     {
       "tekst": "Że wystarczy wysłać do sądu listę nowych nazwisk.",
       "akcent": [
         "sądu"
       ],
-      "ilustracja": "lista-do-drzwi",
       "prompt": "Pojedyncza kartka z wydrukowaną listą nazwisk leci w wieczornym powietrzu w stronę klasycznego budynku sądu rejonowego z kolumnami.",
       "start": 8.145,
       "koniec": 10.985,
@@ -237,23 +361,49 @@
       "postac": {
         "plan": "brak"
       },
-      "obraz": "s04-sad.jpg",
-      "wymiary": [
-        1672,
-        941
-      ],
-      "kadr": {
-        "od": [
-          0.53,
-          0.56
-        ],
-        "do": [
-          0.53,
-          0.56
-        ],
-        "zoomOd": 1.0,
-        "zoomDo": 1.05
-      }
+      "ujecia": [
+        {
+          "obraz": "s04-sad.jpg",
+          "kadr": {
+            "od": [
+              0.47,
+              0.5
+            ],
+            "do": [
+              0.53,
+              0.5
+            ],
+            "zoomOd": 1.0,
+            "zoomDo": 1.06
+          },
+          "swiatla": [
+            {
+              "x": 0.115,
+              "y": 0.41,
+              "r": 160
+            },
+            {
+              "x": 0.895,
+              "y": 0.2,
+              "r": 190
+            },
+            {
+              "x": 0.53,
+              "y": 0.4,
+              "r": 260
+            }
+          ],
+          "naklejki": [
+            {
+              "typ": "kartka-leci",
+              "x": 0.53,
+              "y": 0.56,
+              "slowo": "wysłać",
+              "tekst": "LISTA"
+            }
+          ]
+        }
+      ]
     },
     {
       "tekst": "Niestety, druhu. Tak to nie działa.",
@@ -262,7 +412,6 @@
         "nie",
         "działa."
       ],
-      "ilustracja": "lista-odbita",
       "prompt": "Kartka z listą nazwisk leży na kamiennych schodach przed zamkniętymi drzwiami sądu nocą, odrzucona.",
       "start": 11.551,
       "koniec": 13.956,
@@ -306,23 +455,49 @@
           "ruch": "kreci"
         }
       },
-      "obraz": "s04-sad.jpg",
-      "wymiary": [
-        1672,
-        941
-      ],
-      "kadr": {
-        "od": [
-          0.53,
-          0.56
-        ],
-        "do": [
-          0.5,
-          0.56
-        ],
-        "zoomOd": 1.05,
-        "zoomDo": 1.1
-      }
+      "ujecia": [
+        {
+          "obraz": "s04-sad.jpg",
+          "kadr": {
+            "od": [
+              0.53,
+              0.52
+            ],
+            "do": [
+              0.53,
+              0.53
+            ],
+            "zoomOd": 1.2,
+            "zoomDo": 1.3
+          },
+          "swiatla": [
+            {
+              "x": 0.115,
+              "y": 0.41,
+              "r": 160
+            },
+            {
+              "x": 0.895,
+              "y": 0.2,
+              "r": 190
+            },
+            {
+              "x": 0.53,
+              "y": 0.4,
+              "r": 260
+            }
+          ],
+          "naklejki": [
+            {
+              "typ": "kartka-odbita",
+              "x": 0.53,
+              "y": 0.56,
+              "krzyzyk": "nie",
+              "tekst": "LISTA"
+            }
+          ]
+        }
+      ]
     },
     {
       "tekst": "Zmianę zarządu zgłaszacie wnioskiem do KRS. Przez internet, nie na papierze.",
@@ -331,7 +506,6 @@
         "KRS.",
         "internet,"
       ],
-      "ilustracja": "laptop-krs",
       "prompt": "Laptop na biurku w biurze remizy z ogólnym formularzem internetowym na ekranie, świecący ekran w ciemnym pokoju, obok hełm strażacki.",
       "start": 14.49,
       "koniec": 20.498,
@@ -394,7 +568,8 @@
       ],
       "postac": {
         "plan": "brak"
-      }
+      },
+      "mapa": "droga-wniosku"
     },
     {
       "tekst": "A do wniosku dołączacie dokumenty z walnego, przede wszystkim protokół i uchwały.",
@@ -470,36 +645,72 @@
       "postac": {
         "plan": "brak"
       },
-      "obraz": "s07-teczka.jpg",
-      "wymiary": [
-        1672,
-        941
-      ],
-      "kadr": {
-        "od": [
-          0.45,
-          0.65
-        ],
-        "do": [
-          0.58,
-          0.72
-        ],
-        "zoomOd": 1.1,
-        "zoomDo": 1.25
-      },
-      "znacznik": {
-        "x": 0.59,
-        "y": 0.74,
-        "slowo": "protokół",
-        "tekst": "Protokół i uchwały"
-      }
+      "ujecia": [
+        {
+          "obraz": "s07-teczka.jpg",
+          "kadr": {
+            "od": [
+              0.34,
+              0.6
+            ],
+            "do": [
+              0.5,
+              0.62
+            ],
+            "zoomOd": 1.0,
+            "zoomDo": 1.08
+          },
+          "pyl": true,
+          "swiatla": [
+            {
+              "x": 0.78,
+              "y": 0.2,
+              "r": 230
+            }
+          ]
+        },
+        {
+          "od": "przede",
+          "obraz": "s07-teczka.jpg",
+          "kadr": {
+            "od": [
+              0.53,
+              0.72
+            ],
+            "do": [
+              0.55,
+              0.73
+            ],
+            "zoomOd": 1.22,
+            "zoomDo": 1.3
+          },
+          "pyl": true,
+          "naklejki": [
+            {
+              "typ": "znacznik",
+              "x": 0.66,
+              "y": 0.7,
+              "slowo": "protokół",
+              "tekst": "Protokół",
+              "gora": true
+            },
+            {
+              "typ": "znacznik",
+              "x": 0.4,
+              "y": 0.6,
+              "slowo": "uchwały",
+              "tekst": "Uchwały",
+              "gora": true
+            }
+          ]
+        }
+      ]
     },
     {
       "tekst": "Jeśli w protokole czegoś brakuje, sąd wniosek odrzuci.",
       "akcent": [
         "odrzuci."
       ],
-      "ilustracja": "brak-w-protokole",
       "prompt": "Zbliżenie na wydrukowany dokument z jedną wyraźnie pustą linijką, na nim czerwony długopis, dramatyczne światło z boku.",
       "start": 27.182,
       "koniec": 31.223,
@@ -546,13 +757,43 @@
         }
       ],
       "postac": {
-        "plan": "brak",
-        "gest": {
-          "slowo": "brakuje",
-          "plan": "obok",
-          "poza": "wskazuje"
+        "plan": "brak"
+      },
+      "ujecia": [
+        {
+          "obraz": "s07-teczka.jpg",
+          "kadr": {
+            "od": [
+              0.6,
+              0.76
+            ],
+            "do": [
+              0.6,
+              0.77
+            ],
+            "zoomOd": 1.45,
+            "zoomDo": 1.55
+          },
+          "pyl": true,
+          "naklejki": [
+            {
+              "typ": "brak",
+              "x": 0.63,
+              "y": 0.69,
+              "szer": 0.18,
+              "wys": 0.035,
+              "slowo": "brakuje"
+            },
+            {
+              "typ": "pieczec",
+              "x": 0.6,
+              "y": 0.8,
+              "slowo": "odrzuci",
+              "tekst": "ODRZUCONO"
+            }
+          ]
         }
-      }
+      ]
     },
     {
       "tekst": "I jeszcze jedno: macie na to tylko siedem dni od zmiany.",
@@ -629,29 +870,58 @@
           "ruch": "kiwa"
         }
       },
-      "obraz": "s09-biuro.jpg",
-      "wymiary": [
-        1024,
-        1536
-      ],
-      "kadr": {
-        "od": [
-          0.5,
-          0.45
-        ],
-        "do": [
-          0.62,
-          0.3
-        ],
-        "zoomOd": 1.0,
-        "zoomDo": 1.45
-      },
-      "znacznik": {
-        "x": 0.62,
-        "y": 0.34,
-        "slowo": "siedem",
-        "tekst": "7 dni od zmiany"
-      }
+      "ujecia": [
+        {
+          "obraz": "s09-biuro.jpg",
+          "kadr": {
+            "od": [
+              0.5,
+              0.42
+            ],
+            "do": [
+              0.52,
+              0.41
+            ],
+            "zoomOd": 1.0,
+            "zoomDo": 1.07
+          },
+          "pyl": true,
+          "swiatla": [
+            {
+              "x": 0.47,
+              "y": 0.455,
+              "r": 200
+            }
+          ]
+        },
+        {
+          "od": "tylko",
+          "obraz": "s09-biuro.jpg",
+          "kadr": {
+            "od": [
+              0.6,
+              0.36
+            ],
+            "do": [
+              0.62,
+              0.36
+            ],
+            "zoomOd": 1.45,
+            "zoomDo": 1.6
+          },
+          "pyl": true,
+          "naklejki": [
+            {
+              "typ": "znacznik",
+              "x": 0.638,
+              "y": 0.347,
+              "slowo": "siedem",
+              "tekst": "7 dni od zmiany",
+              "gora": true
+            }
+          ]
+        }
+      ]
     },
     {
       "tekst": "Pamiętajcie: nowy zarząd plus dobry protokół równa się wpis w KRS.",
@@ -724,17 +994,44 @@
       "postac": {
         "plan": "brak"
       },
-      "obraz": "porada-tlo.webp",
       "porada": {
-        "tekst": "Nowy zarząd + dobry protokół = wpis w KRS.",
-        "zlote": [
-          "wpis",
-          "KRS."
+        "wiersze": [
+          {
+            "tekst": "Nowy zarząd",
+            "slowo": "nowy"
+          },
+          {
+            "tekst": "+ dobry protokół",
+            "slowo": "plus"
+          },
+          {
+            "tekst": "= wpis w KRS",
+            "slowo": "równa",
+            "zloty": true
+          }
         ]
       },
-      "wymiary": [
-        1530,
-        1015
+      "ujecia": [
+        {
+          "obraz": "porada-tlo.webp",
+          "uklad": "pelny",
+          "kadr": {
+            "od": [
+              0.5,
+              0.5
+            ],
+            "do": [
+              0.53,
+              0.5
+            ],
+            "zoomOd": 1.0,
+            "zoomDo": 1.1
+          },
+          "przyciemnij": [
+            0.25,
+            0.25
+          ]
+        }
       ]
     },
     {
@@ -800,9 +1097,17 @@
       ],
       "postac": {
         "plan": "pelny",
-        "poza": "tlumaczy"
+        "poza": "tlumaczy",
+        "gest": {
+          "slowo": "zajrzyjcie",
+          "plan": "prawo",
+          "poza": "wskazuje"
+        }
       },
-      "etykieta": "doradztwodlaosp.pl"
+      "studio": true,
+      "telefon": {
+        "slowo": "zajrzyjcie"
+      }
     }
   ]
 }

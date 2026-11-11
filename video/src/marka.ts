@@ -37,11 +37,20 @@ export const USTAWIENIA = {
   akcentRozmiar: 64, // słowa kluczowe (px)
   slowNaRaz: 4, // ile słów najwyżej widać naraz
 
-  // Ruch obrazu (gdy scena ma zdjęcie)
-  zoomStart: 1.04, // 1 = bez przybliżenia
-  zoomKoniec: 1.12,
-  przesuniecie: 30, // przesunięcie w bok w trakcie sceny (px)
-  przenikanie: 8, // długość przejścia między scenami (klatki; 30 klatek = 1 s)
+  // Zdjęcia: przejścia i układ
+  przenikanie: 8, // długość przejścia między ujęciami (klatki; 30 klatek = 1 s)
+  pasOdGory: 400, // zdjęcia poziome: górna krawędź ostrego pasa (px); w tle rozmyta kopia zdjęcia
+  pasWysokosc: 1180, // wysokość tego pasa (px)
+
+  // Filmowy wygląd
+  ziarno: 0.14, // siła ziarna filmowego (0 = brak)
+  winieta: 0.5, // przyciemnienie rogów kadru (0 = brak)
+  studioPodloga: 1250, // linia podłogi w studiu Druha Paragrafa (px od góry)
+
+  // Dźwięk (1 = pełna głośność pliku)
+  muzykaGlosnosc: 0.2, // podkład, gdy lektor milczy
+  muzykaPodGlosem: 0.1, // podkład pod głosem lektora
+  efektyGlosnosc: 0.5, // efekty dźwiękowe
 
   // Maskotka – złoty paragraf (gdy w odcinek.json jest "maskotka": true)
   maskotkaPelnyWysokosc: 860, // wysokość na pełnym planie (px)
@@ -51,6 +60,8 @@ export const USTAWIENIA = {
   maskotkaObokWysokosc: 600, // wysokość, gdy wchodzi obok obrazu, żeby coś wskazać (px)
   maskotkaObokOdGory: 820, // górna krawędź w tym planie (px)
   ilustracjaPrzyMaskotce: 0.22, // jasność ilustracji za maskotką na pełnym planie (0–1)
+  maskotkaPrawoWysokosc: 620, // wysokość, gdy stoi po prawej i pokazuje telefon (px)
+  maskotkaPrawoOdGory: 800, // górna krawędź w tym planie (px)
 
   // Pan Naczelnik (gdy w odcinek.json jest "naczelnik": true)
   naczelnikSzerokosc: 300, // szerokość postaci (px); wysokość dopasuje się sama

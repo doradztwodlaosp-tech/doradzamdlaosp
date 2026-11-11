@@ -1,70 +1,49 @@
-import React from "react";
-import {
-  AbsoluteFill,
-  Audio,
-  CalculateMetadataFunction,
-  Img,
-  Sequence,
-  interpolate,
-  spring,
-  staticFile,
-  useCurrentFrame,
-  useVideoConfig,
-} from "remotion";
+import React, { useMemo } from "react";
+import { AbsoluteFill, CalculateMetadataFunction, Img, Sequence, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { Dzwiek } from "./Dzwiek";
 import { FONT, MARKA, USTAWIENIA as U } from "./marka";
-import { Naczelnik } from "./Naczelnik";
-import { Ilustracja } from "./Sceny";
-import { ILUSTRACJE_PION } from "./ScenyPion";
-import { Maskotka, type UstawieniaPostaci } from "./Maskotka";
+import { MAPY, type ZdarzenieDzwiekowe } from "./Mapy";
+import { Maskotka } from "./Maskotka";
+import { PanelIlustracji, PostacNaczelnika } from "./Starsze";
+import { Telefon } from "./Telefon";
+import { UjecieTla } from "./Ujecia";
+import { Winieta, Ziarno } from "./Wyglad";
+import {
+  FPS,
+  ZAKRES,
+  czasSlowa,
+  normalizuj,
+  zbudujOs,
+  type LiniaHasla,
+  type MapaCzas,
+  type Odcinek,
+  type RolkaProps,
+  type ScenaOSP,
+  type Slowo,
+  type UjecieCzas,
+} from "./typy";
 
 // Szablon rolki w stylu doradztwodlaosp.pl (grafit i złoto).
 // Dane odcinka: public/odcinki/<odcinek>/odcinek.json (opis formatu w .claude/skills/rolka/SKILL.md)
+//
+// Warstwy od spodu: ujęcia (zdjęcia, studio) i mapy 3D → winieta → napisy u góry → porada, telefon →
+// Druh Paragraf → pytanie do widza → hak (okładka) → plansza końcowa → ziarno filmowe. Dźwięk: src/Dzwiek.tsx.
 
-export type Slowo = { w: string; s: number; e: number };
-
-export type ScenaOSP = {
-  tekst: string;
-  lektor?: string;
-  akcent?: string[];
-  obraz?: string;
-  wymiary?: [number, number]; // szerokość i wysokość zdjęcia w pikselach
-  kadr?: { od: [number, number]; do: [number, number]; zoomOd?: number; zoomDo?: number };
-  znacznik?: { x: number; y: number; slowo: string; tekst: string };
-  ilustracja?: string;
-  prompt?: string;
-  postac?: UstawieniaPostaci; // maskotka w tej scenie
-  etykieta?: string; // złota pigułka nad maskotką na pełnym planie
-  porada?: { tekst: string; zlote?: string[] }; // karta „Porada Druha Paragrafa”
-  start: number;
-  koniec: number;
-  slowa: Slowo[];
-};
-
-export type Odcinek = {
-  tytul: string;
-  nadtytul?: string;
-  glos: string;
-  cta?: string;
-  naczelnik?: boolean;
-  maskotka?: boolean;
-  szkic?: string; // odcinek bez nagrania: czasy szacunkowe, render bez dźwięku
-  wstep?: number; // sekundy z hasłem-hakiem przed pierwszym słowem lektora
-  hak?: { tekst: string; zloty?: boolean }[]; // linie hasła na pierwszej klatce (działa też jako okładka)
-  plansza?: { haslo: { tekst: string; zloty?: boolean }[]; pigulka: string; kontakt: string; stopka: string };
-  sceny: ScenaOSP[];
-};
-
-export type RolkaProps = { odcinek: string; dane?: Odcinek; glosnosc?: number[]; strefy?: boolean };
-
-const FPS = 30;
 const ZAKONCZENIE_S = 1.5;
 const PLANSZA_S = 4;
 const PRZENIKANIE = U.przenikanie;
-const zakres = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 
 // Środek bezpiecznej strefy w poziomie – treść centrujemy względem niej, nie całego ekranu
 const SRODEK_X = U.strefaPrawo / 2;
 const SZEROKOSC_TRESCI = U.strefaPrawo - 100;
+
+const wymiaryObrazu = (src: string) =>
+  new Promise<[number, number]>((resolve, reject) => {
+    const obraz = new Image();
+    obraz.onload = () => resolve([obraz.naturalWidth, obraz.naturalHeight]);
+    obraz.onerror = () => reject(new Error(`Nie można wczytać obrazu: ${src}`));
+    obraz.src = src;
+  });
 
 export const obliczRolke: CalculateMetadataFunction<RolkaProps> = async ({ props }) => {
   const odp = await fetch(staticFile(`odcinki/${props.odcinek}/odcinek.json`));
@@ -80,22 +59,85 @@ export const obliczRolke: CalculateMetadataFunction<RolkaProps> = async ({ props
       slowa: s.slowa.map((sl) => ({ ...sl, s: sl.s + w, e: sl.e + w })),
     })),
   };
-  const koniec = dane.sceny[dane.sceny.length - 1].koniec;
-  // Głośność nagrania klatka po klatce (tworzy ją npm run render) – do ruchu ust postaci
-  const glosnosc: number[] =
-    (dane.naczelnik || dane.maskotka) && !dane.szkic
-      ? [
-          ...new Array(Math.round(w * FPS)).fill(0),
-          ...(await fetch(staticFile(`odcinki/${props.odcinek}/glosnosc.json`)).then((r) => (r.ok ? r.json() : []))),
-        ]
-      : [];
+  // Głośność nagrania klatka po klatce (tworzy ją npm run render) – do ruchu postaci i ściszania muzyki pod głosem
+  const glosnosc: number[] = dane.szkic
+    ? []
+    : [
+        ...new Array(Math.round(w * FPS)).fill(0),
+        ...(await fetch(staticFile(`odcinki/${props.odcinek}/glosnosc.json`)).then((r) => (r.ok ? r.json() : []))),
+      ];
+  // Wymiary wszystkich zdjęć odcinka – potrzebne do ruchu kamery
+  const pliki = new Set<string>();
+  dane.sceny.forEach((s) => {
+    if (s.obraz) pliki.add(s.obraz);
+    (s.ujecia ?? []).forEach((u) => u.obraz && pliki.add(u.obraz));
+  });
+  const wymiary: Record<string, [number, number]> = {};
+  await Promise.all(
+    [...pliki].map(async (plik) => {
+      wymiary[plik] = await wymiaryObrazu(staticFile(`odcinki/${props.odcinek}/${plik}`));
+    }),
+  );
+  const ostatnia = dane.sceny[dane.sceny.length - 1];
+  const koniec = ostatnia.plansza ? ostatnia.koniec + 1.3 : ostatnia.koniec + (dane.plansza ? 0.4 + PLANSZA_S : ZAKONCZENIE_S);
   return {
-    durationInFrames: Math.ceil((koniec + (dane.plansza ? 0.4 + PLANSZA_S : ZAKONCZENIE_S)) * FPS),
-    props: { ...props, dane, glosnosc },
+    durationInFrames: Math.ceil(koniec * FPS),
+    props: { ...props, dane, glosnosc, wymiary },
   };
 };
 
-const normalizuj = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
+// Efekty dźwiękowe wynikające z tego, co dzieje się na ekranie
+const zbierzDzwieki = (dane: Odcinek, os: { ujecia: UjecieCzas[]; mapy: MapaCzas[] }, planszaOdS: number | null): ZdarzenieDzwiekowe[] => {
+  const z: ZdarzenieDzwiekowe[] = [];
+  if (dane.hak) z.push({ t: 0.02, plik: "uderzenie", glosnosc: 0.6 });
+  os.ujecia.forEach((u) => {
+    if (u.start > 0) z.push({ t: u.start - 0.15, plik: "swist", glosnosc: 0.18 });
+    const czas = (slowo?: string) => (slowo ? czasSlowa(u.scena, slowo) : undefined) ?? u.start;
+    (u.naklejki ?? []).forEach((n) => {
+      switch (n.typ) {
+        case "znacznik":
+        case "chip":
+          z.push({ t: czas(n.slowo), plik: "pop", glosnosc: 0.5 });
+          break;
+        case "pieczec":
+          z.push({ t: czas(n.slowo) + 4 / FPS, plik: "stempel", glosnosc: 0.95 });
+          break;
+        case "brak":
+          z.push({ t: czas(n.slowo), plik: "blad", glosnosc: 0.45 });
+          break;
+        case "kartka-leci":
+          z.push({ t: czas(n.slowo), plik: "papier", glosnosc: 0.7 });
+          break;
+        case "kartka-odbita":
+          z.push({ t: u.start, plik: "papier", glosnosc: 0.5 }, { t: czas(n.krzyzyk), plik: "blad", glosnosc: 0.5 });
+          break;
+        case "napis":
+          z.push({ t: czas(n.slowo), plik: "pop", glosnosc: 0.55 });
+          break;
+        case "licznik":
+          for (let i = 0; i < 6; i++) z.push({ t: czas(n.slowo) + i * 0.14, plik: "tik", glosnosc: 0.5 });
+          z.push({ t: czas(n.slowo) + 0.9, plik: "dzwonek", glosnosc: 0.35 });
+          break;
+      }
+    });
+  });
+  os.mapy.forEach((m) => {
+    if (m.start > 0) z.push({ t: m.start - 0.15, plik: "swist", glosnosc: 0.3 });
+    z.push(...(MAPY[m.nazwa]?.dzwieki(m.sceny) ?? []));
+  });
+  dane.sceny.forEach((s) => {
+    if (s.porada) z.push({ t: s.start + 0.1, plik: "dzwonek", glosnosc: 0.45 });
+    if (s.telefon) {
+      const t0 = czasSlowa(s, s.telefon.slowo ?? "") ?? s.start;
+      z.push({ t: t0, plik: "swist", glosnosc: 0.3 }, { t: t0 + 46 / FPS, plik: "pop", glosnosc: 0.5 });
+    }
+    const gest = s.postac?.gest;
+    const tGestu = gest?.plan ? czasSlowa(s, gest.slowo) : undefined;
+    if (tGestu !== undefined) z.push({ t: tGestu, plik: "pop", glosnosc: 0.3 });
+  });
+  if (planszaOdS !== null) z.push({ t: planszaOdS - 1.15, plik: "narastanie", glosnosc: 0.3 }, { t: planszaOdS + 0.1, plik: "dzwonek", glosnosc: 0.4 });
+  return z;
+};
 
 // Dzieli słowa sceny na krótkie porcje (2-4 słowa), łamiąc po przecinkach i kropkach
 const porcje = (slowa: Slowo[]): Slowo[][] => {
@@ -111,106 +153,6 @@ const porcje = (slowa: Slowo[]): Slowo[][] => {
     }
   });
   return wynik;
-};
-
-// Tło sceny: zdjęcie z ruchem kamery. Bez pola "kadr" – powolny najazd na środek.
-// "kadr": punkt zdjęcia (0–1), na który patrzy kamera na początku i na końcu sceny, oraz przybliżenie.
-// "znacznik": złote kółko z podpisem przypięte do miejsca na zdjęciu; pojawia się na wskazanym słowie.
-const Tlo: React.FC<{ scena: ScenaOSP; numer: number; odcinek: string; dlugosc: number }> = ({ scena, numer, odcinek, dlugosc }) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const wejscie = interpolate(frame, [0, PRZENIKANIE], [0, 1], zakres);
-  if (!scena.obraz || !scena.wymiary) return null;
-  const [W, H] = scena.wymiary;
-  const kadr = scena.kadr ?? { od: [0.5, 0.5], do: [0.5 + (numer % 2 === 0 ? 0.03 : -0.03), 0.5], zoomOd: U.zoomStart, zoomDo: U.zoomKoniec };
-  const t = interpolate(frame, [0, dlugosc], [0, 1], zakres);
-  const plynnie = t * t * (3 - 2 * t);
-  const fx = interpolate(plynnie, [0, 1], [kadr.od[0], kadr.do[0]]);
-  const fy = interpolate(plynnie, [0, 1], [kadr.od[1], kadr.do[1]]);
-  const skala = Math.max(1080 / W, 1920 / H) * interpolate(plynnie, [0, 1], [kadr.zoomOd ?? 1, kadr.zoomDo ?? 1.08]);
-  const szer = W * skala;
-  const wys = H * skala;
-  // Punkt kadru ustawiamy na środku bezpiecznej strefy, pilnując, by zdjęcie zawsze zakrywało ekran
-  const lewo = Math.min(0, Math.max(1080 - szer, SRODEK_X - fx * szer));
-  const gora = Math.min(0, Math.max(1920 - wys, 900 - fy * wys));
-
-  const z = scena.znacznik;
-  const czasZnacznika = z ? scena.slowa.find((s) => normalizuj(s.w).startsWith(normalizuj(z.slowo)))?.s : undefined;
-  const odZnacznika = czasZnacznika !== undefined ? frame - Math.round((czasZnacznika - scena.start) * fps) : -1;
-  const znak = odZnacznika >= 0 ? spring({ frame: odZnacznika, fps, config: { damping: 12 } }) : 0;
-  const puls = odZnacznika >= 0 ? (odZnacznika % 30) / 30 : 0;
-
-  return (
-    <AbsoluteFill style={{ opacity: numer === 0 ? 1 : wejscie, overflow: "hidden" }}>
-      <Img src={staticFile(`odcinki/${odcinek}/${scena.obraz}`)} style={{ position: "absolute", left: lewo, top: gora, width: szer, height: wys }} />
-      <AbsoluteFill style={{ background: `linear-gradient(180deg, ${MARKA.tlo}cc 0%, transparent 32%, transparent 62%, ${MARKA.tlo}f2 82%)` }} />
-      {z && znak > 0 && (
-        <>
-          <div
-            style={{
-              position: "absolute",
-              left: lewo + z.x * szer - 70,
-              top: gora + z.y * wys - 70,
-              width: 140,
-              height: 140,
-              borderRadius: "50%",
-              border: `6px solid ${MARKA.zloto}`,
-              transform: `scale(${znak})`,
-              boxShadow: `0 0 0 ${puls * 40}px rgba(218,167,60,${0.35 * (1 - puls)})`,
-            }}
-          />
-          <div
-            style={{
-              position: "absolute",
-              left: Math.min(U.strefaPrawo - 40 - 420, Math.max(40, lewo + z.x * szer - 210)),
-              top: gora + z.y * wys + 95,
-              width: 420,
-              display: "flex",
-              justifyContent: "center",
-              opacity: znak,
-              transform: `translateY(${(1 - znak) * 20}px)`,
-            }}
-          >
-            <div style={{ background: MARKA.zloto, color: MARKA.tlo, fontFamily: FONT, fontWeight: 800, fontSize: 40, borderRadius: 999, padding: "12px 30px", whiteSpace: "nowrap" }}>
-              {z.tekst}
-            </div>
-          </div>
-        </>
-      )}
-    </AbsoluteFill>
-  );
-};
-
-// Duży pionowy panel z ilustracją (ok. 60% wysokości ekranu, w bezpiecznej strefie)
-const PanelIlustracji: React.FC<{ nazwa: string; dlugosc: number; jasnosc?: number }> = ({ nazwa, dlugosc, jasnosc = 1 }) => {
-  const frame = useCurrentFrame();
-  const wejscie = interpolate(frame, [0, PRZENIKANIE], [0, 1], zakres) * jasnosc;
-  const Pion = ILUSTRACJE_PION[nazwa];
-  const wysokosc = U.ilustracjaWysokosc;
-  const szerokosc = (wysokosc * 900) / 1200;
-  return (
-    <div
-      style={{
-        position: "absolute",
-        top: U.ilustracjaOdGory,
-        left: SRODEK_X - szerokosc / 2,
-        width: szerokosc,
-        height: wysokosc,
-        opacity: wejscie,
-      }}
-    >
-      {Pion ? (
-        <svg viewBox="0 0 900 1200" width="100%" height="100%" style={{ fontFamily: `${FONT}, Arial, sans-serif` }}>
-          <Pion dlugosc={dlugosc} />
-        </svg>
-      ) : (
-        // Starsze, poziome ilustracje: na jasnej karcie w górnej części panelu
-        <div style={{ marginTop: 40, width: "100%", height: (szerokosc * 760) / 900, borderRadius: 32, background: "#F4F1EA", overflow: "hidden" }}>
-          <Ilustracja nazwa={nazwa} />
-        </div>
-      )}
-    </div>
-  );
 };
 
 // Napisy słowo po słowie; słowo wypowiadane w tej chwili świeci na złoto
@@ -295,31 +237,22 @@ const Etykieta: React.FC<{ tekst: string }> = ({ tekst }) => {
   const w = spring({ frame: frame - 6, fps, config: { damping: 12 } });
   return (
     <div style={{ position: "absolute", top: U.maskotkaPelnyOdGory - 90, left: 0, width: U.strefaPrawo, display: "flex", justifyContent: "center" }}>
-      <div
-        style={{
-          transform: `scale(${w})`,
-          fontFamily: FONT,
-          fontWeight: 800,
-          fontSize: 46,
-          color: MARKA.tlo,
-          background: MARKA.zloto,
-          borderRadius: 999,
-          padding: "14px 40px",
-        }}
-      >
-        {tekst}
-      </div>
+      <div style={{ transform: `scale(${w})`, fontFamily: FONT, fontWeight: 800, fontSize: 46, color: MARKA.tlo, background: MARKA.zloto, borderRadius: 999, padding: "14px 40px" }}>{tekst}</div>
     </div>
   );
 };
 
-// Karta „Porada Druha Paragrafa” – stały, rozpoznawalny moment w każdej rolce
-const Porada: React.FC<{ tekst: string; zlote?: string[] }> = ({ tekst, zlote = [] }) => {
+// Karta „Porada Druha Paragrafa” – stały, rozpoznawalny moment w każdej rolce.
+// Wiersze mogą pojawiać się po kolei, każdy na swoim słowie lektora.
+const Porada: React.FC<{ scena: ScenaOSP }> = ({ scena }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+  const porada = scena.porada!;
+  const t = scena.start + frame / fps;
   const w = spring({ frame: frame - 4, fps, config: { damping: 14 } });
   const ikona = spring({ frame: frame - 12, fps, config: { damping: 10 } });
-  const zloteSet = new Set(zlote.map(normalizuj));
+  const zlote = new Set((porada.zlote ?? []).map(normalizuj));
+  const wiersze = porada.wiersze ?? [{ tekst: porada.tekst ?? "" }];
   return (
     <div
       style={{
@@ -332,35 +265,40 @@ const Porada: React.FC<{ tekst: string; zlote?: string[] }> = ({ tekst, zlote = 
         border: `3px solid ${MARKA.zloto}`,
         boxShadow: "0 30px 80px rgba(0,0,0,0.6)",
         padding: "150px 56px 60px",
+        boxSizing: "border-box",
         fontFamily: FONT,
         opacity: w,
         transform: `translateY(${(1 - w) * 60}px)`,
       }}
     >
-      <Img
-        src={staticFile("postac/wskazuje.png")}
-        style={{ position: "absolute", top: -150, left: 30, height: 260, transform: `scale(${ikona})`, transformOrigin: "50% 100%" }}
-      />
+      <Img src={staticFile("postac/wskazuje.png")} style={{ position: "absolute", top: -150, left: 30, height: 260, transform: `scale(${ikona})`, transformOrigin: "50% 100%" }} />
       <div style={{ position: "absolute", top: 58, left: 236, right: 30, fontSize: 26, fontWeight: 800, letterSpacing: 3, whiteSpace: "nowrap", color: MARKA.nadtytul }}>
         PORADA DRUHA PARAGRAFA
       </div>
-      <div style={{ fontSize: 58, fontWeight: 800, lineHeight: 1.18, color: MARKA.bialy }}>
-        {tekst.split(" ").map((slowo, i) => (
-          <span key={i} style={{ color: zloteSet.has(normalizuj(slowo)) ? MARKA.zloto : MARKA.bialy }}>
-            {slowo}{" "}
-          </span>
-        ))}
-      </div>
+      {wiersze.map((wiersz, i) => {
+        const czas = wiersz.slowo ? czasSlowa(scena, wiersz.slowo) : undefined;
+        const ww = czas === undefined ? 1 : spring({ frame: Math.round((t - czas) * fps), fps, config: { damping: 13 } });
+        return (
+          <div key={i} style={{ fontSize: 58, fontWeight: 800, lineHeight: 1.2, opacity: ww, transform: `translateX(${(1 - ww) * -30}px)` }}>
+            {wiersz.tekst.split(" ").map((slowo, j) => (
+              <span key={j} style={{ color: wiersz.zloty || zlote.has(normalizuj(slowo)) ? MARKA.zloto : MARKA.bialy }}>
+                {slowo}{" "}
+              </span>
+            ))}
+          </div>
+        );
+      })}
     </div>
   );
 };
 
-const Wezwanie: React.FC<{ tekst: string }> = ({ tekst }) => {
+// Pytanie do widza w złotej pigułce
+const Wezwanie: React.FC<{ tekst: string; srodek: number }> = ({ tekst, srodek }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const w = spring({ frame, fps, config: { damping: 12 } });
+  const w = spring({ frame: frame - 8, fps, config: { damping: 12 } });
   return (
-    <div style={{ position: "absolute", top: U.przyciskSrodek - 45, left: 0, width: U.strefaPrawo, display: "flex", justifyContent: "center" }}>
+    <div style={{ position: "absolute", top: srodek - 45, left: 0, width: U.strefaPrawo, display: "flex", justifyContent: "center" }}>
       <div
         style={{
           transform: `scale(${w})`,
@@ -371,6 +309,8 @@ const Wezwanie: React.FC<{ tekst: string }> = ({ tekst }) => {
           background: MARKA.zloto,
           borderRadius: 999,
           padding: "18px 44px",
+          whiteSpace: "nowrap",
+          boxShadow: "0 14px 40px rgba(0,0,0,0.5)",
         }}
       >
         {tekst}
@@ -379,15 +319,29 @@ const Wezwanie: React.FC<{ tekst: string }> = ({ tekst }) => {
   );
 };
 
+const TelefonOdSlowa: React.FC<{ opoznienie: number }> = ({ opoznienie }) => {
+  const frame = useCurrentFrame();
+  return <Telefon od={frame - opoznienie} />;
+};
+
+const Haslo: React.FC<{ linie: LiniaHasla[]; najwiecej: number }> = ({ linie, najwiecej }) => (
+  <>
+    {linie.map((l, i) => (
+      <div key={i} style={{ fontSize: Math.min(najwiecej, Math.floor((SZEROKOSC_TRESCI * 1.22) / l.tekst.length)), whiteSpace: "nowrap", color: l.zloty ? MARKA.zloto : MARKA.bialy }}>
+        {l.tekst}
+      </div>
+    ))}
+  </>
+);
+
 // Hak: duże hasło od pierwszej klatki (bez wejścia z zera – klatka 0 jest okładką rolki)
-const Hak: React.FC<{ linie: { tekst: string; zloty?: boolean }[] }> = ({ linie }) => {
+const Hak: React.FC<{ linie: LiniaHasla[] }> = ({ linie }) => {
   const frame = useCurrentFrame();
   const { durationInFrames } = useVideoConfig();
-  const koniecHaka = durationInFrames;
-  const zanik = interpolate(frame, [koniecHaka - PRZENIKANIE * 2, koniecHaka], [1, 0], zakres);
-  const najazd = interpolate(frame, [0, koniecHaka], [1, 1.06], zakres);
+  const zanik = interpolate(frame, [durationInFrames - PRZENIKANIE * 2, durationInFrames], [1, 0], ZAKRES);
+  const najazd = interpolate(frame, [0, durationInFrames], [1, 1.06], ZAKRES);
   return (
-    <AbsoluteFill style={{ backgroundColor: `${MARKA.tlo}b8`, opacity: zanik }}>
+    <AbsoluteFill style={{ backgroundColor: `${MARKA.tlo}9c`, opacity: zanik }}>
       <div
         style={{
           position: "absolute",
@@ -399,24 +353,15 @@ const Hak: React.FC<{ linie: { tekst: string; zloty?: boolean }[] }> = ({ linie 
           fontFamily: FONT,
           fontWeight: 800,
           lineHeight: 1.08,
+          textShadow: "0 6px 40px rgba(0,0,0,0.8)",
         }}
       >
-        {linie.map((l, i) => (
-          <div key={i} style={{ fontSize: Math.min(120, Math.floor((SZEROKOSC_TRESCI * 1.22) / l.tekst.length)), whiteSpace: "nowrap", color: l.zloty ? MARKA.zloto : MARKA.bialy }}>
-            {l.tekst}
-          </div>
-        ))}
+        <Haslo linie={linie} najwiecej={120} />
         <div style={{ width: 160, height: 8, background: MARKA.zloto, margin: "44px auto 0", borderRadius: 4 }} />
       </div>
+      <div style={{ position: "absolute", left: SRODEK_X - 200, top: 1375, width: 400, height: 84, borderRadius: "50%", background: "radial-gradient(ellipse, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 70%)" }} />
       <div style={{ position: "absolute", left: SRODEK_X - 230, width: 460, top: 860, height: 560, display: "flex", justifyContent: "center" }}>
-        <Img
-          src={staticFile("postac/zaskoczony.png")}
-          style={{
-            height: 560,
-            transform: `scale(${najazd})`,
-            transformOrigin: "50% 100%",
-          }}
-        />
+        <Img src={staticFile("postac/zaskoczony.png")} style={{ height: 560, transform: `scale(${najazd})`, transformOrigin: "50% 100%", filter: "drop-shadow(0 14px 22px rgba(0,0,0,0.5))" }} />
       </div>
     </AbsoluteFill>
   );
@@ -426,66 +371,25 @@ const Hak: React.FC<{ linie: { tekst: string; zloty?: boolean }[] }> = ({ linie 
 const Plansza: React.FC<NonNullable<Odcinek["plansza"]>> = ({ haslo, pigulka, kontakt, stopka }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const tlo = interpolate(frame, [0, PRZENIKANIE], [0, 1], zakres);
+  const tlo = interpolate(frame, [0, PRZENIKANIE], [0, 1], ZAKRES);
   const w = (opoznienie: number) => spring({ frame: frame - opoznienie, fps, config: { damping: 14 } });
-  const kolumna: React.CSSProperties = {
-    position: "absolute",
-    left: SRODEK_X - SZEROKOSC_TRESCI / 2,
-    width: SZEROKOSC_TRESCI,
-    textAlign: "center",
-    fontFamily: FONT,
-  };
+  const kolumna: React.CSSProperties = { position: "absolute", left: SRODEK_X - SZEROKOSC_TRESCI / 2, width: SZEROKOSC_TRESCI, textAlign: "center", fontFamily: FONT };
   return (
     <AbsoluteFill style={{ backgroundColor: MARKA.tlo, opacity: tlo }}>
+      <AbsoluteFill style={{ background: "radial-gradient(ellipse 72% 42% at 43% 52%, #2B2E3A 0%, rgba(21,22,27,0) 75%)" }} />
       <div style={{ ...kolumna, top: 300, fontWeight: 800, lineHeight: 1.1, opacity: w(4), transform: `translateY(${(1 - w(4)) * 40}px)` }}>
-        {haslo.map((l, i) => (
-          <div key={i} style={{ fontSize: Math.min(110, Math.floor((SZEROKOSC_TRESCI * 1.22) / l.tekst.length)), whiteSpace: "nowrap", color: l.zloty ? MARKA.zloto : MARKA.bialy }}>
-            {l.tekst}
-          </div>
-        ))}
+        <Haslo linie={haslo} najwiecej={110} />
       </div>
       <div style={{ ...kolumna, top: 640, display: "flex", justifyContent: "center", transform: `scale(${w(14)})` }}>
         <div style={{ background: MARKA.zloto, color: MARKA.tlo, fontWeight: 800, fontSize: 34, whiteSpace: "nowrap", borderRadius: 999, padding: "18px 36px" }}>{pigulka}</div>
       </div>
       <div style={{ ...kolumna, top: 790, fontWeight: 700, fontSize: 52, color: MARKA.bialy, opacity: w(22) }}>{kontakt}</div>
-      <div style={{ ...kolumna, top: 920, height: 380, display: "flex", justifyContent: "center", opacity: w(28) }}>
+      <div style={{ position: "absolute", left: SRODEK_X - 150, top: 1262, width: 300, height: 64, borderRadius: "50%", background: "radial-gradient(ellipse, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 70%)", opacity: w(28) }} />
+      <div style={{ ...kolumna, top: 920, height: 380, display: "flex", justifyContent: "center", opacity: w(28), transform: `translateY(${(1 - w(28)) * 30}px)` }}>
         <Img src={staticFile("postac/cieszy-sie.png")} style={{ height: 380 }} />
       </div>
       <div style={{ ...kolumna, top: 1350, fontWeight: 700, fontSize: 26, color: MARKA.tekstPomocniczy, opacity: w(30) }}>{stopka}</div>
     </AbsoluteFill>
-  );
-};
-
-const PostacNaczelnika: React.FC<{ dane: Odcinek; glosnosc: number[] }> = ({ dane, glosnosc }) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const t = frame / fps;
-  const pierwsza = dane.sceny[0];
-  const ostatnia = dane.sceny[dane.sceny.length - 1];
-  const usta = glosnosc[frame] ?? 0;
-  const mrugniecie = frame % 96 < 4 ? 1 - Math.abs((frame % 96) - 2) / 2 : 0;
-  // Spokojne powitanie: uniesiona dłoń, bez energicznego machania
-  const koniecMachania = pierwsza.koniec + 0.5;
-  const uniesienie = interpolate(t, [0, 0.35, koniecMachania - 0.35, koniecMachania], [0, 1, 1, 0], zakres);
-  const machanie = uniesienie * (0.98 + 0.02 * Math.sin(frame / 4));
-  const kiwanie = t > ostatnia.start ? Math.max(0, Math.sin((t - ostatnia.start) * 5)) : 0;
-  const oddech = Math.sin(frame / 25) * 3;
-  const wejscie = spring({ frame, fps, config: { damping: 14 } });
-  const szerokosc = U.naczelnikSzerokosc;
-  const wysokosc = (szerokosc * 900) / 600;
-  return (
-    <div
-      style={{
-        position: "absolute",
-        left: U.naczelnikOdLewej,
-        top: 1920 - wysokosc + (1 - wejscie) * 200 + oddech,
-        width: szerokosc,
-        height: wysokosc,
-        filter: "drop-shadow(0 -6px 24px rgba(0,0,0,0.5))",
-      }}
-    >
-      <Naczelnik usta={usta} mrugniecie={mrugniecie} machanie={machanie} kiwanie={kiwanie} wysokosc={900} />
-    </div>
   );
 };
 
@@ -497,49 +401,75 @@ const Strefy: React.FC = () => (
   </>
 );
 
-export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [], strefy = false }) => {
+type Warstwa = { start: number; koniec: number; klucz: string; ujecie?: UjecieCzas; mapa?: MapaCzas };
+
+export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [], wymiary = {}, strefy = false }) => {
   const { fps, durationInFrames } = useVideoConfig();
-  if (!dane) return null;
   const klatka = (s: number) => Math.round(s * fps);
+
+  const ostatnia = dane?.sceny[dane.sceny.length - 1];
+  const planszaOd = !dane?.plansza || !ostatnia ? null : ostatnia.plansza ? Math.max(0, klatka(ostatnia.start) - 6) : klatka(ostatnia.koniec + 0.4);
+
+  const os = useMemo(() => (dane ? zbudujOs(dane, durationInFrames / fps) : null), [dane, durationInFrames, fps]);
+  const zdarzenia = useMemo(() => (dane && os ? zbierzDzwieki(dane, os, planszaOd === null ? null : planszaOd / fps) : []), [dane, os, planszaOd, fps]);
+  const warstwy = useMemo<Warstwa[]>(
+    () =>
+      os
+        ? [
+            ...os.ujecia.map((u) => ({ start: u.start, koniec: u.koniec, klucz: u.klucz, ujecie: u })),
+            ...os.mapy.map((m) => ({ start: m.start, koniec: m.koniec, klucz: m.klucz, mapa: m })),
+          ].sort((a, b) => a.start - b.start)
+        : [],
+    [os],
+  );
+  if (!dane || !os || !ostatnia) return null;
+
   const zakresSceny = (i: number) => {
     const od = klatka(dane.sceny[i].start);
     const nastepna = dane.sceny[i + 1];
     return { od, doKlatki: nastepna ? klatka(nastepna.start) : durationInFrames };
   };
+  // Pytanie do widza pada w ostatniej scenie przed planszą końcową
+  const scenaPytania: ScenaOSP | undefined = dane.sceny[ostatnia.plansza ? dane.sceny.length - 2 : dane.sceny.length - 1];
 
   return (
     <AbsoluteFill style={{ backgroundColor: MARKA.tlo }}>
-      {!dane.szkic && (
-        <Sequence from={Math.round((dane.wstep ?? 0) * fps)} layout="none">
-          <Audio src={staticFile(`odcinki/${odcinek}/${dane.glos}`)} />
-        </Sequence>
-      )}
+      <Dzwiek odcinek={odcinek} dane={dane} glosnosc={glosnosc} zdarzenia={zdarzenia} />
 
-      {dane.sceny.map((scena, i) => {
-        const { od, doKlatki } = zakresSceny(i);
-        const start = i === 0 ? 0 : od - PRZENIKANIE;
+      {/* Ujęcia i mapy: każde wchodzi przenikaniem na poprzednie */}
+      {warstwy.map((w) => {
+        const od = w.start <= 0 ? 0 : Math.max(0, klatka(w.start) - PRZENIKANIE);
+        const dlugosc = Math.max(1, Math.min(durationInFrames, klatka(w.koniec)) - od);
+        if (w.ujecie) {
+          return (
+            <Sequence key={w.klucz} from={od} durationInFrames={dlugosc} layout="none">
+              <UjecieTla u={w.ujecie} odcinek={odcinek} wymiary={w.ujecie.obraz ? wymiary[w.ujecie.obraz] : undefined} pierwsze={od === 0} klatkaStartu={od} dlugosc={dlugosc} />
+            </Sequence>
+          );
+        }
+        const Mapa = w.mapa ? MAPY[w.mapa.nazwa]?.Widok : undefined;
+        if (!Mapa || !w.mapa) return null;
         return (
-          <Sequence key={i} from={start} durationInFrames={doKlatki - start} layout="none">
-            <Tlo scena={scena} numer={i} odcinek={odcinek} dlugosc={doKlatki - start} />
+          <Sequence key={w.klucz} from={od} durationInFrames={dlugosc} layout="none">
+            <Mapa sceny={w.mapa.sceny} klatkaStartu={od} pierwsze={od === 0} />
           </Sequence>
         );
       })}
 
+      {/* Starsze rysowane ilustracje w panelu */}
       {dane.sceny.map((scena, i) => {
         if (!scena.ilustracja) return null;
         const { od, doKlatki } = zakresSceny(i);
         return (
           <Sequence key={i} from={od} durationInFrames={doKlatki - od} layout="none">
-            <PanelIlustracji
-              nazwa={scena.ilustracja}
-              dlugosc={doKlatki - od}
-              jasnosc={dane.maskotka && scena.postac?.plan === "pelny" ? U.ilustracjaPrzyMaskotce : 1}
-            />
+            <PanelIlustracji nazwa={scena.ilustracja} dlugosc={doKlatki - od} jasnosc={dane.maskotka && scena.postac?.plan === "pelny" ? U.ilustracjaPrzyMaskotce : 1} />
           </Sequence>
         );
       })}
 
-      {/* Przyciemnienie pod napisami, żeby były czytelne na każdej ilustracji */}
+      <Winieta />
+
+      {/* Przyciemnienie pod napisami, żeby były czytelne na każdym obrazie */}
       <div
         style={{
           position: "absolute",
@@ -552,6 +482,7 @@ export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [], s
       />
 
       {dane.sceny.map((scena, i) => {
+        if (scena.plansza) return null;
         const { od, doKlatki } = zakresSceny(i);
         return (
           <Sequence key={i} from={od} durationInFrames={doKlatki - od} layout="none">
@@ -565,11 +496,13 @@ export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [], s
       {dane.naczelnik && <PostacNaczelnika dane={dane} glosnosc={glosnosc} />}
 
       {dane.sceny.map((scena, i) => {
-        if (!scena.porada) return null;
+        if (!scena.porada && !scena.telefon) return null;
         const { od, doKlatki } = zakresSceny(i);
+        const tTelefonu = scena.telefon ? (czasSlowa(scena, scena.telefon.slowo ?? "") ?? scena.start) : 0;
         return (
           <Sequence key={i} from={od} durationInFrames={doKlatki - od} layout="none">
-            <Porada {...scena.porada} />
+            {scena.porada && <Porada scena={scena} />}
+            {scena.telefon && <TelefonOdSlowa opoznienie={klatka(tTelefonu) - od} />}
           </Sequence>
         );
       })}
@@ -586,9 +519,9 @@ export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [], s
         );
       })}
 
-      {dane.cta && (
-        <Sequence from={klatka(dane.sceny[dane.sceny.length - 1].start)} layout="none">
-          <Wezwanie tekst={dane.cta} />
+      {dane.cta && scenaPytania && (
+        <Sequence from={klatka(scenaPytania.telefon ? (czasSlowa(scenaPytania, scenaPytania.telefon.slowo ?? "") ?? scenaPytania.start) + 0.5 : scenaPytania.start)} layout="none">
+          <Wezwanie tekst={dane.cta} srodek={scenaPytania.telefon ? 500 : U.przyciskSrodek} />
         </Sequence>
       )}
 
@@ -598,11 +531,13 @@ export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [], s
         </Sequence>
       )}
 
-      {dane.plansza && (
-        <Sequence from={klatka(dane.sceny[dane.sceny.length - 1].koniec + 0.4)} layout="none">
+      {dane.plansza && planszaOd !== null && (
+        <Sequence from={planszaOd} layout="none">
           <Plansza {...dane.plansza} />
         </Sequence>
       )}
+
+      <Ziarno />
 
       {strefy && <Strefy />}
     </AbsoluteFill>

@@ -9,7 +9,7 @@ import { KATALOG_VIDEO, katalogOdcinka, wczytajOdcinek } from "./wspolne.mjs";
 const nazwa = process.argv[2];
 const katalog = katalogOdcinka(nazwa);
 const dane = wczytajOdcinek(katalog);
-if ((dane.naczelnik || dane.maskotka) && !dane.szkic) policzGlosnosc(katalog, dane.glos || "lektor.mp3");
+if (!dane.szkic) policzGlosnosc(katalog, dane.glos || "lektor.mp3");
 
 // W chmurze Claude Code używamy przeglądarki zainstalowanej w systemie (Remotion nie może pobrać własnej)
 const PRZEGLADARKA = "/opt/pw-browsers/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell";
