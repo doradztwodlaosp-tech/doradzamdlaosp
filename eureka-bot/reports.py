@@ -32,10 +32,10 @@ _NAGLOWEK_FONT = Font(bold=True, color="FFFFFF")
 _LINK_FONT = Font(color="0563C1", underline="single")
 
 KOLUMNY = [
-    ("Data wydania", 12), ("Sygnatura", 30), ("Profil", 32), ("Podstawa prawna", 30),
+    ("Data wydania", 12), ("Data publikacji", 12), ("Sygnatura", 30), ("Profil", 32), ("Podstawa prawna", 30),
     ("Organ", 20), ("Teza", 70), ("Wzmianki artykułu", 10), ("Wzmianki fraz", 10),
     ("CIT/PIT", 9), ("VAT/akcyza", 9), ("Powód decyzji", 34), ("Fraza wyszukiwania", 26),
-    ("Link EUREKA", 12), ("Plik", 45),
+    ("Link EUREKA", 12), ("Plik", 45), ("Przepisy (metadane EUREKA)", 60),
 ]
 
 
@@ -53,14 +53,14 @@ def _arkusz(wb: Workbook, tytul: str, wiersze: list[dict], z_ocena: bool) -> Non
     kolumny = KOLUMNY + ([("Twoja ocena (TAK = powinna być trafna)", 16)] if z_ocena else [])
     _naglowki(ws, kolumny)
     for n, w in enumerate(sorted(wiersze, key=lambda x: (x["data_wydania"], x["sygnatura"]), reverse=True), start=2):
-        wartosci = [w["data_wydania"], w["sygnatura"], "\n".join(w["profile_nazwy"]), w["podstawa"],
-                    w["organ"], w["teza"], w["art"], w["fraz"], w["dochodowe"], w["vat"], w["powod"],
-                    ", ".join(w["frazy"]), "otwórz", w["plik"]]
+        wartosci = [w["data_wydania"], w.get("data_publikacji", ""), w["sygnatura"], "\n".join(w["profile_nazwy"]),
+                    w["podstawa"], w["organ"], w["teza"], w["art"], w["fraz"], w["dochodowe"], w["vat"], w["powod"],
+                    ", ".join(w["frazy"]), "otwórz", w["plik"], w.get("przepisy", "")]
         if z_ocena:
             wartosci.append("")
         for k, v in enumerate(wartosci, start=1):
-            ws.cell(row=n, column=k, value=v).alignment = Alignment(vertical="top", wrap_text=k in (3, 4, 6, 11))
-        link = ws.cell(row=n, column=13)
+            ws.cell(row=n, column=k, value=v).alignment = Alignment(vertical="top", wrap_text=k in (4, 5, 7, 12, 16))
+        link = ws.cell(row=n, column=14)
         link.hyperlink, link.font = w["link"], _LINK_FONT
     if wiersze:
         ws.auto_filter.ref = f"A1:{get_column_letter(len(kolumny))}{len(wiersze) + 1}"
@@ -78,13 +78,16 @@ def _arkusz_bledow(wb: Workbook, bledy: list[dict]) -> None:
         ws.cell(row=2, column=1, value="(brak błędów)")
 
 
-def _grupa(wynik: dict, grupa: str) -> tuple[list[dict], list[dict]]:
+def _grupa(wynik: dict, grupa: str) -> tuple[list[dict], list[dict], list[dict]]:
+    """(trafne, odrzucone po ocenie treści, pominięte przed pobraniem)."""
     w = [x for x in wynik["wiersze"] if x["grupa"] == grupa]
-    return [x for x in w if x["trafna"]], [x for x in w if not x["trafna"]]
+    return ([x for x in w if x["trafna"]],
+            [x for x in w if not x["trafna"] and x["status"] != "pominieta"],
+            [x for x in w if x["status"] == "pominieta"])
 
 
 def zapisz_xlsx(wynik: dict, grupa: str, sciezka: Path) -> Path:
-    trafne, odrzucone = _grupa(wynik, grupa)
+    trafne, odrzucone, pominiete = _grupa(wynik, grupa)
     l = wynik["licznik"]
     wb = Workbook()
     ws = wb.active
@@ -97,6 +100,7 @@ def zapisz_xlsx(wynik: dict, grupa: str, sciezka: Path) -> Path:
         ("", ""),
         (f"Trafne ({GRUPY[grupa]})", len(trafne)),
         (f"Odrzucone po ocenie treści ({GRUPY[grupa]}) — PDF w folderze _odrzucone", len(odrzucone)),
+        (f"Pominięte bez pobierania — przepisy tylko spoza CIT/PIT (np. VAT)", len(pominiete)),
         ("", ""),
         ("Cały bieg: zapytań (fraz)", l["zapytania"]),
         ("Cały bieg: nowych interpretacji znalezionych", l["znaleziono"]),
@@ -116,6 +120,7 @@ def zapisz_xlsx(wynik: dict, grupa: str, sciezka: Path) -> Path:
 
     _arkusz(wb, "Trafne", trafne, z_ocena=False)
     _arkusz(wb, "Odrzucone", odrzucone, z_ocena=True)
+    _arkusz(wb, "Pominięte – inna ustawa", pominiete, z_ocena=True)
     _arkusz_bledow(wb, wynik["bledy"])
     sciezka.parent.mkdir(parents=True, exist_ok=True)
     wb.save(sciezka)
@@ -134,11 +139,10 @@ def zapisz_raporty(wynik: dict) -> list[Path]:
 # MAIL
 # ===========================================================================
 def temat_maila(wynik: dict) -> str:
-    tu, ou = _grupa(wynik, "ulgi")
-    te, oe = _grupa(wynik, "estonski_cit")
+    tu, _, _ = _grupa(wynik, "ulgi")
+    te, _, _ = _grupa(wynik, "estonski_cit")
     znacznik = "" if wynik["status"] == "sukces" else f"[{STATUSY.get(wynik['status'], wynik['status'])}] "
-    return (f"{znacznik}EUREKA {date.today().isoformat()}: ulgi {len(tu)} nowych, "
-            f"estoński CIT {len(te)} nowych (odrzuconych: {len(ou) + len(oe)})")
+    return f"{znacznik}EUREKA {date.today().isoformat()}: ulgi {len(tu)} nowych, estoński CIT {len(te)} nowych"
 
 
 def tresc_maila_html(wynik: dict, drive_ok: bool | None) -> str:
@@ -147,12 +151,13 @@ def tresc_maila_html(wynik: dict, drive_ok: bool | None) -> str:
               f"<p><b>Status:</b> {escape(STATUSY.get(wynik['status'], wynik['status']))}<br>"
               f"<b>Okno dat wydania:</b> {wynik['od']} .. {wynik['do']}<br>"
               f"<b>Nowych znalezionych:</b> {l['znaleziono']} — trafnych {l['trafne']}, "
-              f"odrzuconych po ocenie treści {l['odrzucone']}, błędów {l['bledy']}</p>"]
+              f"odrzuconych po ocenie treści {l['odrzucone']}, pominiętych (tylko VAT/inne ustawy, "
+              f"bez pobierania) {l['pominiete']}, błędów {l['bledy']}</p>"]
     if wynik.get("komunikat"):
         czesci.append(f"<p style='color:#b00'><b>Uwaga:</b> {escape(wynik['komunikat'])}</p>")
 
     for grupa in ("ulgi", "estonski_cit"):
-        trafne, odrzucone = _grupa(wynik, grupa)
+        trafne, odrzucone, _ = _grupa(wynik, grupa)
         czesci.append(f"<h3>{GRUPY[grupa]}: {len(trafne)} nowych</h3>")
         if trafne:
             czesci.append("<ul>")

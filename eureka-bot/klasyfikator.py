@@ -1,10 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-klasyfikator.py — czy pobrana interpretacja NAPRAWDĘ dotyczy ulgi z profilu?
-=============================================================================
-Bot wyszukuje frazami z profili (profiles.py). Każdą znalezioną interpretację
-pobiera (PDF) i ocenia jej PEŁNĄ TREŚĆ osobno dla każdego profilu, którego
-fraza ją znalazła:
+klasyfikator.py — czy interpretacja NAPRAWDĘ dotyczy ulgi z profilu?
+=====================================================================
+Profile mają szerokie frazy celowo (nie pominąć niczego z dziedziny). Dlatego
+filtrujemy WYNIKI, nie frazy — w dwóch krokach:
+
+1. PRZED POBRANIEM (metadane, bez kosztu): jeśli pole PRZEPISY powołuje się
+   wyłącznie na ustawy inne niż o CIT/PIT (np. tylko VAT), interpretacja nie
+   może dotyczyć żadnej ulgi z profili -> nie pobieramy (`inna_ustawa`).
+   Trafia do raportu (arkusz „Pominięte – inna ustawa”) z linkiem, żeby
+   można było sprawdzić, że filtr niczego nie gubi.
+
+2. PO POBRANIU: PEŁNA TREŚĆ PDF oceniana dla KAŻDEGO z profili (nie tylko
+   tego, którego fraza ją znalazła — np. fraza B+R często znajduje IP Box):
 
   art      — ile razy w treści pada artykuł ulgi z profilu (np. „art. 18d”)
   frazy    — ile razy padają frazy profilu (z odmianą: „ulgi badawczo-rozwojowej”
@@ -130,6 +138,24 @@ def kolejnosc_profili(klucze) -> list[str]:
 # ---------------------------------------------------------------------------
 # METADANE (PRZEPISY) — przed pobraniem, bez kosztu
 # ---------------------------------------------------------------------------
+def inna_ustawa(rekord: dict) -> str | None:
+    """Jeśli interpretacja powołuje się WYŁĄCZNIE na ustawy inne niż o CIT/PIT
+    (VAT, akcyza, PCC...), zwraca ich listę — taka interpretacja nie może
+    dotyczyć żadnej ulgi z profili, więc nie pobieramy PDF. Gdy pole PRZEPISY
+    jest puste (np. stare rekordy z SIP), zwraca None: nie wiemy, więc pobieramy
+    i oceniamy treść."""
+    przepisy = lista_przepisow(rekord)
+    if not przepisy or any(ustawa_wpisu(p) for p in przepisy):
+        return None
+    ustawy = []
+    for p in przepisy:
+        m = re.match(r"\s*\[([^\]]+)\]", p)
+        nazwa = m.group(1) if m else p[:60]
+        if nazwa not in ustawy:
+            ustawy.append(nazwa)
+    return ", ".join(ustawy)
+
+
 def profile_z_przepisow(rekord: dict) -> list[str]:
     """Profile, których artykuł (z właściwej ustawy) jest w polu PRZEPISY."""
     przepisy = lista_przepisow(rekord)
@@ -154,10 +180,29 @@ def tekst_z_pdf(dane: bytes) -> str:
         return ""
 
 
+# Wyliczenia typu „z zastrzeżeniem art. 11c, art. 11i, art. 24a, art. 24b, art. 24ca,
+# art. 24d i art. 24f” (cytat art. 7 ust. 2 ustawy o CIT, analogicznie art. 9 w PIT)
+# są w setkach interpretacji niezwiązanych z ulgą — nie liczymy z nich wzmianek artykułu.
+_ZASTRZEZENIE = re.compile(
+    r"z\s+zastrzeżeniem\s+(?:art\.\s*[\w–-]+(?:\s+(?:ust|pkt|lit)\.?\s*[\w–-]+)*\s*(?:,|\bi\b|\boraz\b)?\s*)+",
+    re.IGNORECASE)
+_DATA_PUBLIKACJI = re.compile(r"Data publikacji:\s*(\d{4}-\d{2}-\d{2})")
+
+
+def bez_zastrzezen(tekst: str) -> str:
+    return _ZASTRZEZENIE.sub(" ", tekst)
+
+
+def data_publikacji(tekst: str) -> str:
+    """Data publikacji z nagłówka PDF EUREKI (API jej nie udostępnia)."""
+    m = _DATA_PUBLIKACJI.search(tekst)
+    return m.group(1) if m else ""
+
+
 def ocen(tekst: str, profil_klucz: str, z_przepisow: bool) -> Ocena:
     profil: Profil = PROFILE[profil_klucz]
     o = Ocena(profil_klucz, przepisy=z_przepisow)
-    o.art = sum(len(w.findall(tekst)) for w in _WZORCE_ART[profil_klucz])
+    o.art = sum(len(w.findall(bez_zastrzezen(tekst))) for w in _WZORCE_ART[profil_klucz])
     o.frazy = sum(len(w.findall(tekst)) for w in _WZORCE_FRAZ[profil_klucz])
     o.cit = len(_CIT.findall(tekst))
     o.pit = len(_PIT.findall(tekst))

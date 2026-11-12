@@ -24,8 +24,8 @@ from pathlib import Path
 import config
 import db
 from eureka_client import BlokadaError, nowa_sesja, pauza, pobierz_pdf, wyszukaj
-from klasyfikator import (Ocena, dopasowanie_z_oceny, kolejnosc_profili, ocen,
-                          profile_z_przepisow, tekst_z_pdf)
+from klasyfikator import (Ocena, data_publikacji, dopasowanie_z_oceny, inna_ustawa, kolejnosc_profili,
+                          lista_przepisow, ocen, profile_z_przepisow, tekst_z_pdf)
 from profiles import PROFILE
 
 LINK_EUREKA = "https://eureka.mf.gov.pl/informacje/{id}"
@@ -118,8 +118,28 @@ def wiersz_raportu(z: Znaleziona, oceny: list[Ocena], profil_glowny: str, trafna
         "powod": glowna.powod,
         "grupa": "estonski_cit" if profil_glowny == "estonski_cit" else "ulgi",
         "status": status,
+        "przepisy": "; ".join(p[:120] for p in lista_przepisow(r)[:4]),
         "plik": str(plik.relative_to(config.BAZA_DANYCH)) if plik else "",
         "link": LINK_EUREKA.format(id=id_inf),
+    }
+
+
+def wiersz_pominiety(z: Znaleziona, ustawy: str) -> dict:
+    """Interpretacja pominięta przed pobraniem (przepisy tylko spoza CIT/PIT)."""
+    r = z.rekord
+    id_inf = str(r.get("ID_INFORMACJI"))
+    profil = kolejnosc_profili(z.profile)[0]
+    return {
+        "id": id_inf, "sygnatura": r.get("SYG") or "", "data_wydania": (str(r.get("DT_WYD") or ""))[:10],
+        "organ": r.get("AUTOR") or "", "teza": r.get("TEZA") or "", "trafna": False,
+        "profile": [profil], "profile_nazwy": [PROFILE[k].nazwa for k in kolejnosc_profili(z.profile)],
+        "podstawa": PROFILE[profil].podstawa_prawna, "frazy": sorted(set(z.frazy.values())),
+        "art": "", "fraz": "", "dochodowe": "", "vat": "",
+        "powod": f"przepisy wyłącznie z: {ustawy}",
+        "grupa": "estonski_cit" if profil == "estonski_cit" else "ulgi",
+        "status": "pominieta",
+        "przepisy": "; ".join(p[:120] for p in lista_przepisow(r)[:4]),
+        "plik": "", "link": LINK_EUREKA.format(id=id_inf),
     }
 
 
@@ -133,7 +153,8 @@ def uruchom_przeglad(od: date, do: date, profile_klucze: list[str] | None = None
     if not podglad:
         config.upewnij_sie_ze_foldery_istnieja()
 
-    licznik = {"zapytania": 0, "znaleziono": 0, "duplikaty": 0, "trafne": 0, "odrzucone": 0, "bledy": 0}
+    licznik = {"zapytania": 0, "znaleziono": 0, "duplikaty": 0, "pominiete": 0,
+               "trafne": 0, "odrzucone": 0, "bledy": 0}
     wiersze: list[dict] = []
     bledy: list[dict] = []
     komunikat = ""
@@ -186,8 +207,18 @@ def uruchom_przeglad(od: date, do: date, profile_klucze: list[str] | None = None
             licznik["duplikaty"] = len(juz_znane)
             print(f"\nNowych interpretacji do pobrania i oceny: {len(znalezione)}")
 
-            # --- 2+3. POBRANIE I OCENA ---
+            # --- 2+3. FILTR PO PRZEPISACH, POBRANIE I OCENA ---
             for id_inf, z in znalezione.items():
+                ustawy = inna_ustawa(z.rekord)
+                if ustawy:
+                    licznik["pominiete"] += 1
+                    wiersz = wiersz_pominiety(z, ustawy)
+                    wiersze.append(wiersz)
+                    if podglad:
+                        print(f"  [POMINIĘTA — {ustawy}] {z.rekord.get('SYG')}")
+                    else:
+                        _zapisz_pominieta(conn, bieg_id, z, wiersz, znane)
+                    continue
                 if podglad:
                     print(f"  [PODGLĄD] {z.rekord.get('SYG')} ({z.rekord.get('DT_WYD')}) — "
                           f"{', '.join(kolejnosc_profili(z.profile))} — fraza: {', '.join(sorted(set(z.frazy.values())))}")
@@ -230,18 +261,34 @@ def uruchom_przeglad(od: date, do: date, profile_klucze: list[str] | None = None
             "komunikat": komunikat, "podglad": podglad}
 
 
+def _zapisz_pominieta(conn, bieg_id, z: Znaleziona, wiersz: dict, znane) -> None:
+    r = z.rekord
+    id_inf = wiersz["id"]
+    db.zapisz_interpretacje(conn, {
+        "id": id_inf, "sygnatura": r.get("SYG"), "tytul": (r.get("TEZA") or "")[:300],
+        "data_wydania": wiersz["data_wydania"], "data_publikacji": None, "organ": r.get("AUTOR"),
+        "link": wiersz["link"], "plik_sciezka": None, "data_pobrania": None,
+        "status_pobrania": "odrzucona", "tresc_skrot": (r.get("TEZA") or "")[:400],
+    })
+    db.zapisz_wynik_biegu(conn, bieg_id, id_inf, wiersz)
+    conn.commit()
+    znane.add(id_inf)
+
+
 def _pobierz_ocen_zapisz(conn, sesja, bieg_id, z: Znaleziona, licznik, wiersze, znane, blad) -> None:
     r = z.rekord
     id_inf = str(r["ID_INFORMACJI"])
     z_przepisow = profile_z_przepisow(r)
-    kandydaci = kolejnosc_profili(z.profile | set(z_przepisow))
+    # Treść oceniamy względem WSZYSTKICH profili (fraza B+R często znajduje IP Box itp.).
+    kandydaci = kolejnosc_profili(PROFILE)
+    znalazcy = kolejnosc_profili(z.profile | set(z_przepisow))
 
     try:
         dane = pobierz_pdf(sesja, id_inf)
     except BlokadaError:
         raise
     except Exception as e:  # noqa: BLE001
-        blad(id_inf, kandydaci[0], f"Pobieranie PDF: {e}")
+        blad(id_inf, znalazcy[0], f"Pobieranie PDF: {e}")
         return
 
     tekst = tekst_z_pdf(dane)
@@ -253,7 +300,8 @@ def _pobierz_ocen_zapisz(conn, sesja, bieg_id, z: Znaleziona, licznik, wiersze, 
     if trafna:
         profil_glowny = trafne[0].profil_klucz
     else:
-        profil_glowny = max(oceny, key=lambda o: o.sila).profil_klucz
+        # Odrzucona: do folderu _odrzucone profilu, którego fraza ją znalazła.
+        profil_glowny = max((o for o in oceny if o.profil_klucz in znalazcy), key=lambda o: o.sila).profil_klucz
 
     plik = folder_dla(profil_glowny, r, trafna) / nazwa_pliku(r)
     plik.parent.mkdir(parents=True, exist_ok=True)
@@ -264,17 +312,18 @@ def _pobierz_ocen_zapisz(conn, sesja, bieg_id, z: Znaleziona, licznik, wiersze, 
 
     status = "pobrano" if trafna else "odrzucona"
     wiersz = wiersz_raportu(z, oceny, profil_glowny, trafna, status, plik)
+    wiersz["data_publikacji"] = data_publikacji(tekst)
     wiersze.append(wiersz)
 
     db.zapisz_interpretacje(conn, {
         "id": id_inf, "sygnatura": r.get("SYG"), "tytul": (r.get("TEZA") or "")[:300],
-        "data_wydania": (str(r.get("DT_WYD") or ""))[:10], "data_publikacji": None,
+        "data_wydania": (str(r.get("DT_WYD") or ""))[:10], "data_publikacji": wiersz["data_publikacji"] or None,
         "organ": r.get("AUTOR"), "link": LINK_EUREKA.format(id=id_inf),
         "plik_sciezka": str(plik), "data_pobrania": db.teraz(),
         "status_pobrania": status, "tresc_skrot": (r.get("TEZA") or "")[:400],
     })
     for o in trafne:
-        db.dopisz_dopasowanie(conn, id_inf, dopasowanie_z_oceny(o, z.frazy.get(o.profil_klucz, "PRZEPISY")))
+        db.dopisz_dopasowanie(conn, id_inf, dopasowanie_z_oceny(o, z.frazy.get(o.profil_klucz, "(treść PDF)")))
     db.zapisz_wynik_biegu(conn, bieg_id, id_inf, wiersz)
     conn.commit()
     znane.add(id_inf)

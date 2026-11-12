@@ -161,12 +161,14 @@ sudo timedatectl set-timezone Europe/Warsaw
 1. **Wyszukiwanie frazami z profili** (`profiles.py`), z filtrem daty wydania z ostatnich
    45 dni (EUREKA nie pozwala filtrować po dacie publikacji — sprawdzone). Nowe
    interpretacje rozpoznaje po tym, że ich ID nie ma w rejestrze.
-2. **Pobranie PDF** każdej nowej znalezionej interpretacji.
-3. **Ocena pełnej treści** dla każdego profilu, który ją znalazł: ile razy pada artykuł
-   ulgi, ile razy frazy profilu (z odmianą), czy tekst dotyczy CIT/PIT czy VAT/akcyzy.
-   Trafna → folder profilu. Nietrafna → folder `_odrzucone` (nic nie jest kasowane).
+2. **Filtr przed pobraniem:** jeśli interpretacja powołuje się wyłącznie na inne ustawy niż
+   o CIT/PIT (np. tylko VAT), nie jest pobierana — trafia do arkusza „Pominięte – inna ustawa”.
+3. **Pobranie PDF** każdej pozostałej nowej interpretacji.
+4. **Ocena pełnej treści** względem wszystkich profili: ile razy pada artykuł ulgi (bez
+   wyliczeń „z zastrzeżeniem art. …”), ile razy frazy profilu (z odmianą), czy tekst
+   dotyczy CIT/PIT czy VAT/akcyzy. Trafna → folder profilu. Nietrafna → `_odrzucone`.
    Progi są w `config.py` (`PROG_ART`, `PROG_FRAZ_Z_ART`, `PROG_FRAZ`) i można je
    zmienić w `eureka.env` bez ruszania kodu.
-4. Przerwa ~15 s między każdym zapytaniem (zalecenia KIS/MF). Po odpowiedzi 403/429
+5. Przerwa ~15 s między każdym zapytaniem (zalecenia KIS/MF). Po odpowiedzi 403/429
    czeka 15 minut (lub tyle, ile każe serwer), próbuje raz, a przy kolejnej blokadzie
    kończy bieg i informuje mailem.

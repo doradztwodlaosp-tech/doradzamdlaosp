@@ -13,8 +13,11 @@
 | Co | Było | Jest | Dlaczego |
 |---|---|---|---|
 | Zakres dat | całe lata 2019..dziś | ostatnie 45 dni (`EUREKA_OKNO_DNI`) | archiwum już masz; bot ma łapać nowe |
-| Ocena trafności | regex na metadanych PRZEPISY; wszystko inne „do weryfikacji” i też pobierane | pełna treść PDF: liczba wzmianek artykułu i fraz, CIT/PIT czy VAT | Twój pomysł: „1-2 słowa o grze komputerowej w interpretacji VAT” ma odpaść |
-| Ta sama interpretacja w kilku profilach | przypisana do pierwszego profilu | oceniana dla każdego profilu, plik w folderze najsilniejszego dopasowania | np. IP Box PIT nie trafi do IP Box CIT |
+| Frazy w profilach | szerokie, żeby nic nie pominąć | **bez zmian** — filtrujemy wyniki, nie frazy | profile mają łapać wszystko z dziedziny |
+| Filtr przed pobraniem | brak | jeśli PRZEPISY powołują się **wyłącznie** na inne ustawy niż CIT/PIT (np. tylko VAT) → bez pobierania; lista w Excelu (arkusz „Pominięte – inna ustawa”) z linkiem | interpretacja wyłącznie z VAT nie może dotyczyć ulgi z CIT/PIT; puste PRZEPISY → pobieramy |
+| Ocena trafności | regex na metadanych PRZEPISY; wszystko inne „do weryfikacji” i też pobierane | pełna treść PDF: liczba wzmianek artykułu i fraz, CIT/PIT czy VAT; wyliczenia „z zastrzeżeniem art. …” (cytat art. 7 ust. 2 CIT) nie liczą się | Twoje przykłady: interpretacje SSE/PSI złapane frazą „art. 24d” tylko przez ten cytat |
+| Względem których profili oceniamy | profil, którego fraza znalazła | **wszystkie** profile; plik w folderze najsilniejszego dopasowania | fraza B+R często znajduje IP Box — ma trafić do IP Box, nie do odrzuconych |
+| Data publikacji | brak | odczytywana z nagłówka PDF, w raporcie i rejestrze | API jej nie udostępnia, PDF tak |
 | Foldery | wg roku | trafne: `<profil>/<rok>`; nietrafne: `_odrzucone/<profil>/<rok>`; estoński CIT osobno | żeby dało się sprawdzić odrzucone |
 | Ta sama fraza w kilku profilach | wysyłana kilka razy | wysyłana raz | mniej zapytań do EUREKI |
 | Raport | JSON + CSV + TXT dziennie | Excel na bieg: ulgi i estoński CIT osobno; arkusze Trafne / Odrzucone (z liczbą wzmianek i powodem) / Błędy | czytelność + materiał do kalibracji |
