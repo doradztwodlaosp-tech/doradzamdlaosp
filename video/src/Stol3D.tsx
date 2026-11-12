@@ -1,0 +1,560 @@
+import React, { useEffect, useMemo, useState } from "react";
+import * as THREE from "three";
+import { useThree } from "@react-three/fiber";
+import { ThreeCanvas } from "@remotion/three";
+import { AbsoluteFill, Easing, continueRender, delayRender, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
+import { FONT, MARKA } from "./marka";
+import { Dlugopis, Helm, Segregator, type Tekstury, useTekstury } from "./Scena3D";
+import { type ScenaOSP, czasSlowa } from "./typy";
+import type { PropsMapy, ZdarzenieDzwiekowe } from "./Mapy";
+
+// „Stół OSP”: jedna makieta w prawdziwym 3D, po której spokojnie przesuwa się kamera.
+// Każda scena odcinka ma pole "kamera" – nazwę miejsca na stole (STACJE niżej).
+// Na stole: makieta remizy z wozem, stos papierów, tabliczka marki, laptop, segregator ze statutem, monety.
+
+const Z = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
+const PLYNNIE = Easing.bezier(0.45, 0, 0.25, 1);
+const PRZEJAZD = 2.2; // sekundy przejazdu kamery między miejscami (spokojnie)
+
+type Stacja = { cel: [number, number, number]; kat: number; odl: number; wys: number };
+const STACJE: Record<string, Stacja> = {
+  remiza: { cel: [-3.0, 0.55, -1.0], kat: 0.32, odl: 11.5, wys: 4.2 },
+  papiery: { cel: [0.25, 0.3, -0.7], kat: 0.12, odl: 8.2, wys: 5.6 },
+  marka: { cel: [2.35, 0.55, -1.05], kat: -0.18, odl: 6.6, wys: 2.0 },
+  laptop: { cel: [3.3, 0.55, 2.1], kat: 0.38, odl: 8.4, wys: 3.4 },
+  statut: { cel: [0.1, 0.15, 1.95], kat: 0.42, odl: 8.8, wys: 5.0 },
+  "statut-otwarty": { cel: [-0.2, 0.1, 1.75], kat: 0.24, odl: 7.6, wys: 7.6 },
+  monety: { cel: [-3.0, 0.35, 2.2], kat: 0.22, odl: 7.4, wys: 3.6 },
+  calosc: { cel: [-0.2, 0.0, 0.5], kat: 0.32, odl: 22, wys: 15 },
+};
+
+// Gdzie stoi kamera w chwili t (sekundy filmu): płynny przejazd do miejsca bieżącej sceny + lekki dryf
+const kameraW = (sceny: ScenaOSP[], t: number) => {
+  const lista = sceny.map((s) => ({ t: s.start - 0.35, st: STACJE[s.kamera ?? ""] ?? STACJE.calosc }));
+  // ostatnia scena, która już się zaczęła, i początek ciągu scen z tym samym miejscem
+  let i = 0;
+  lista.forEach((e, j) => {
+    if (j > 0 && t >= e.t) i = j;
+  });
+  let poczatekCiagu = i;
+  while (poczatekCiagu > 0 && lista[poczatekCiagu - 1].st === lista[i].st) poczatekCiagu--;
+  const obecna = lista[i].st;
+  const poprzednia = poczatekCiagu > 0 ? lista[poczatekCiagu - 1].st : obecna;
+  const poczatek = poczatekCiagu > 0 ? lista[poczatekCiagu].t : -99;
+  const p = interpolate(t, [poczatek, poczatek + PRZEJAZD], [0, 1], { ...Z, easing: PLYNNIE });
+  const m = (a: number, b: number) => a + (b - a) * p;
+  const dryf = Math.sin(t * 0.25) * 0.035;
+  return {
+    cel: [m(poprzednia.cel[0], obecna.cel[0]), m(poprzednia.cel[1], obecna.cel[1]), m(poprzednia.cel[2], obecna.cel[2])] as [number, number, number],
+    kat: m(poprzednia.kat, obecna.kat) + dryf,
+    odl: m(poprzednia.odl, obecna.odl) * (1 - 0.012 * Math.sin(t * 0.18)),
+    wys: m(poprzednia.wys, obecna.wys),
+  };
+};
+
+const Kamera: React.FC<{ sceny: ScenaOSP[]; t: number }> = ({ sceny, t }) => {
+  const { camera } = useThree();
+  const k = kameraW(sceny, t);
+  camera.position.set(k.cel[0] + Math.sin(k.kat) * k.odl, k.cel[1] + k.wys, k.cel[2] + Math.cos(k.kat) * k.odl);
+  camera.lookAt(new THREE.Vector3(...k.cel));
+  return null;
+};
+
+// Czasy zdarzeń wyliczone ze słów lektora
+const czasy = (sceny: ScenaOSP[]) => {
+  const sc = (k: string) => sceny.find((s) => s.kamera === k);
+  const slowo = (k: string, w: string, zapas = 0) => {
+    const s = sc(k);
+    return s ? (czasSlowa(s, w) ?? s.start + zapas) : 999;
+  };
+  const remiza = sc("remiza");
+  const papiery = sceny.filter((s) => s.kamera === "papiery");
+  return {
+    wyjazd: (remiza?.start ?? 0) + 0.4,
+    stos: slowo("papiery", "stos", 1.5),
+    lista: papiery[1] ?? papiery[0],
+    marka: sc("marka")?.start ?? 999,
+    laptop: sc("laptop")?.start ?? 999,
+    polska: slowo("laptop", "Polski", 1),
+    zdalnie: slowo("laptop", "zdalnie", 2),
+    statut: sc("statut")?.start ?? 999,
+    otwarty: sc("statut-otwarty"),
+    otwarcie: (sc("statut-otwarty")?.start ?? 999) - 0.2,
+    monety: sc("monety"),
+    dostawac: slowo("monety", "dostawać", 1.2),
+    calosc: sc("calosc")?.start ?? 999,
+  };
+};
+
+// ───────────── Tekstury z napisami ─────────────
+
+type TeksturyStolu = { brama: THREE.Texture; szyld: THREE.Texture; tabliczka: THREE.Texture; ekran: THREE.Texture; drewno: THREE.Texture };
+
+const plotno = (w: number, h: number, rysuj: (c: CanvasRenderingContext2D) => void) => {
+  const el = document.createElement("canvas");
+  el.width = w;
+  el.height = h;
+  rysuj(el.getContext("2d")!);
+  const t = new THREE.CanvasTexture(el);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  return t;
+};
+
+const useTeksturyStolu = () => {
+  const [tekstury, ustaw] = useState<TeksturyStolu | null>(null);
+  const [uchwyt] = useState(() => delayRender("Tekstury stołu 3D"));
+  useEffect(() => {
+    document.fonts.load(`800 80px ${FONT}`).then(() => {
+      const brama = plotno(256, 256, (c) => {
+        c.fillStyle = "#A8261C";
+        c.fillRect(0, 0, 256, 256);
+        for (let y = 14; y < 256; y += 22) {
+          c.fillStyle = "rgba(0,0,0,0.22)";
+          c.fillRect(0, y, 256, 4);
+          c.fillStyle = "rgba(255,255,255,0.08)";
+          c.fillRect(0, y + 4, 256, 2);
+        }
+      });
+      const szyld = plotno(512, 128, (c) => {
+        c.fillStyle = "#F2EEE6";
+        c.fillRect(0, 0, 512, 128);
+        c.fillStyle = "#A8261C";
+        c.font = `800 92px ${FONT}`;
+        c.textAlign = "center";
+        c.fillText("OSP", 256, 100);
+      });
+      const tabliczka = plotno(1200, 300, (c) => {
+        const g = c.createLinearGradient(0, 0, 0, 300);
+        g.addColorStop(0, "#2A2C35");
+        g.addColorStop(1, "#1C1D23");
+        c.fillStyle = g;
+        c.fillRect(0, 0, 1200, 300);
+        c.strokeStyle = MARKA.zloto;
+        c.lineWidth = 6;
+        c.strokeRect(18, 18, 1164, 264);
+        c.fillStyle = MARKA.zloto;
+        c.font = `800 190px ${FONT}`;
+        c.textAlign = "center";
+        c.fillText("§", 150, 215);
+        c.textAlign = "left";
+        c.font = `800 74px ${FONT}`;
+        c.fillText("DORADZTWO DLA OSP", 270, 140);
+        c.fillStyle = "#CBCBD3";
+        c.font = `600 50px ${FONT}`;
+        c.fillText("doradztwodlaosp.pl", 272, 220);
+      });
+      const ekran = plotno(800, 500, (c) => {
+        c.fillStyle = "#15161B";
+        c.fillRect(0, 0, 800, 500);
+        c.fillStyle = "#20222A";
+        c.fillRect(0, 0, 800, 70);
+        c.fillStyle = MARKA.zloto;
+        c.font = `800 34px ${FONT}`;
+        c.fillText("§  doradztwodlaosp.pl", 34, 47);
+        c.fillStyle = "white";
+        c.font = `800 52px ${FONT}`;
+        c.fillText("Status OPP", 50, 170);
+        c.fillText("dla Twojej OSP", 50, 232);
+        c.fillStyle = "#CBCBD3";
+        c.font = `600 28px ${FONT}`;
+        c.fillText("Statut • walne • KRS – krok po kroku", 50, 290);
+        c.fillStyle = MARKA.zloto;
+        c.beginPath();
+        c.roundRect(50, 340, 300, 70, 35);
+        c.fill();
+        c.fillStyle = "#15161B";
+        c.font = `800 30px ${FONT}`;
+        c.fillText("Napisz do nas", 92, 386);
+      });
+      const drewno = plotno(1024, 1024, (c) => {
+        c.fillStyle = "#3A2B21";
+        c.fillRect(0, 0, 1024, 1024);
+        for (let i = 0; i < 260; i++) {
+          const y = (i * 977) % 1024;
+          c.fillStyle = `rgba(${i % 2 ? "0,0,0" : "255,220,170"},${0.03 + ((i * 37) % 10) / 400})`;
+          c.fillRect(0, y, 1024, 1 + (i % 3));
+        }
+      });
+      drewno.wrapS = drewno.wrapT = THREE.RepeatWrapping;
+      drewno.repeat.set(3, 3);
+      ustaw({ brama, szyld, tabliczka, ekran, drewno });
+      continueRender(uchwyt);
+    });
+  }, [uchwyt]);
+  return tekstury;
+};
+
+// ───────────── Przedmioty ─────────────
+
+const Remiza: React.FC<{ t: number; c: ReturnType<typeof czasy>; tx: TeksturyStolu }> = ({ t, c, tx }) => {
+  const otwarcie = interpolate(t, [c.wyjazd, c.wyjazd + 1.6], [0, 1], { ...Z, easing: PLYNNIE });
+  const wyjazd = interpolate(t, [c.wyjazd + 1.0, c.wyjazd + 4.2], [0, 1], { ...Z, easing: PLYNNIE });
+  const dach = useMemo(() => {
+    const sh = new THREE.Shape();
+    sh.moveTo(-0.95, 0);
+    sh.lineTo(0.95, 0);
+    sh.lineTo(0, 0.62);
+    sh.closePath();
+    return new THREE.ExtrudeGeometry(sh, { depth: 2.7, bevelEnabled: false });
+  }, []);
+  const okno = (x: number, y: number, z: number, ry = 0) => (
+    <mesh position={[x, y, z]} rotation={[0, ry, 0]}>
+      <planeGeometry args={[0.26, 0.3]} />
+      <meshBasicMaterial color="#FFC978" />
+    </mesh>
+  );
+  return (
+    <group position={[-3.2, 0, -1.7]}>
+      {/* budynek */}
+      <mesh position={[0, 0.55, 0]} castShadow receiveShadow>
+        <boxGeometry args={[2.6, 1.1, 1.6]} />
+        <meshStandardMaterial color="#B9AE9B" roughness={0.9} />
+      </mesh>
+      <mesh geometry={dach} position={[-1.35, 1.1, 0]} rotation={[0, Math.PI / 2, 0]} castShadow>
+        <meshStandardMaterial color="#5E2A22" roughness={0.7} />
+      </mesh>
+      {/* wieża */}
+      <mesh position={[1.0, 1.55, -0.3]} castShadow>
+        <boxGeometry args={[0.5, 1.5, 0.5]} />
+        <meshStandardMaterial color="#B3A894" roughness={0.9} />
+      </mesh>
+      <mesh position={[1.0, 2.5, -0.3]} rotation={[0, Math.PI / 4, 0]} castShadow>
+        <coneGeometry args={[0.45, 0.45, 4]} />
+        <meshStandardMaterial color="#5E2A22" roughness={0.7} />
+      </mesh>
+      {okno(1.0, 1.9, -0.04)}
+      {/* szyld */}
+      <mesh position={[0, 1.0, 0.806]}>
+        <planeGeometry args={[0.8, 0.2]} />
+        <meshStandardMaterial map={tx.szyld} roughness={0.6} />
+      </mesh>
+      {/* bramy: ciemny otwór i podnoszona brama */}
+      {[-0.55, 0.55].map((x, i) => {
+        const o = i === 0 ? otwarcie : 0;
+        return (
+          <group key={x}>
+            <mesh position={[x, 0.42, 0.803]}>
+              <planeGeometry args={[0.78, 0.82]} />
+              <meshBasicMaterial color="#120C08" />
+            </mesh>
+            <mesh position={[x, 0.42 + 0.41 * o, 0.806]} scale={[1, 1 - 0.95 * o, 1]}>
+              <planeGeometry args={[0.78, 0.82]} />
+              <meshStandardMaterial map={tx.brama} roughness={0.5} />
+            </mesh>
+          </group>
+        );
+      })}
+      {okno(-1.07, 0.65, 0.802)}
+      {okno(1.07, 0.65, 0.802)}
+      {/* światło z wnętrza */}
+      <pointLight position={[-0.55, 0.5, 1.4]} intensity={3 * otwarcie + 0.6} color="#FFB45A" distance={4} />
+      {/* wóz strażacki */}
+      <group position={[-0.55, 0, 0.1 + wyjazd * 2.0]}>
+        <mesh position={[0, 0.27, -0.12]} castShadow>
+          <boxGeometry args={[0.56, 0.42, 0.95]} />
+          <meshStandardMaterial color="#C0392B" roughness={0.4} />
+        </mesh>
+        <mesh position={[0, 0.25, 0.5]} castShadow>
+          <boxGeometry args={[0.56, 0.38, 0.32]} />
+          <meshStandardMaterial color="#C0392B" roughness={0.4} />
+        </mesh>
+        <mesh position={[0, 0.33, 0.667]}>
+          <planeGeometry args={[0.46, 0.16]} />
+          <meshStandardMaterial color="#1B2230" roughness={0.2} metalness={0.4} />
+        </mesh>
+        <mesh position={[0, 0.2, 0.2]}>
+          <boxGeometry args={[0.57, 0.04, 1.3]} />
+          <meshStandardMaterial color="#F2EEE6" />
+        </mesh>
+        <mesh position={[0, 0.5, -0.12]}>
+          <boxGeometry args={[0.5, 0.04, 0.9]} />
+          <meshStandardMaterial color="#9A9DA6" metalness={0.6} roughness={0.4} />
+        </mesh>
+        <mesh position={[0, 0.47, 0.55]}>
+          <boxGeometry args={[0.3, 0.05, 0.08]} />
+          <meshBasicMaterial color={Math.sin(t * 9) > 0 ? "#4F8BFF" : "#1E3A7A"} />
+        </mesh>
+        {[-0.45, 0.1, 0.5].map((z) =>
+          [-0.29, 0.29].map((x) => (
+            <mesh key={`${x}${z}`} position={[x, 0.09, z]} rotation={[0, 0, Math.PI / 2]} castShadow>
+              <cylinderGeometry args={[0.09, 0.09, 0.07, 20]} />
+              <meshStandardMaterial color="#141414" roughness={0.8} />
+            </mesh>
+          )),
+        )}
+      </group>
+    </group>
+  );
+};
+
+// Stos papierów: kolejne kartki spadają na stos na słowie „stos”
+const Papiery: React.FC<{ t: number; c: ReturnType<typeof czasy> }> = ({ t, c }) => {
+  const kartki = useMemo(
+    () => Array.from({ length: 22 }, (_, i) => ({ obrot: Math.sin(i * 12.9898) * 0.22, dx: Math.sin(i * 4.1) * 0.08, dz: Math.cos(i * 3.3) * 0.08 })),
+    [],
+  );
+  return (
+    <group position={[0.25, 0, -0.8]}>
+      {kartki.map((k, i) => {
+        const odKiedy = c.stos - 0.6 + (i - 6) * 0.11;
+        const spad = i < 6 ? 1 : interpolate(t, [odKiedy, odKiedy + 0.55], [0, 1], { ...Z, easing: Easing.out(Easing.cubic) });
+        if (spad <= 0) return null;
+        return (
+          <mesh
+            key={i}
+            position={[k.dx, 0.01 + i * 0.022 + (1 - spad) * 1.6, k.dz]}
+            rotation={[0, k.obrot + (1 - spad) * 0.6, 0]}
+            castShadow
+            receiveShadow
+          >
+            <boxGeometry args={[0.95, 0.012, 1.3]} />
+            <meshStandardMaterial color={i % 5 === 3 ? "#E7DCC4" : "#F1ECE1"} roughness={0.95} />
+          </mesh>
+        );
+      })}
+      {/* spinacz na wierzchu */}
+      <mesh position={[0.3, 0.52, -0.5]} rotation={[-Math.PI / 2, 0, 0.3]}>
+        <torusGeometry args={[0.06, 0.012, 8, 24]} />
+        <meshStandardMaterial color="#B8BBC4" metalness={0.8} roughness={0.3} />
+      </mesh>
+    </group>
+  );
+};
+
+// Tabliczka marki na biurku
+const Tabliczka: React.FC<{ t: number; c: ReturnType<typeof czasy>; tx: TeksturyStolu }> = ({ t, c, tx }) => {
+  const blask = interpolate(t, [c.marka, c.marka + 1.4], [0, 1], Z);
+  return (
+    <group position={[2.45, 0, -1.05]} rotation={[0, -0.18, 0]}>
+      <mesh position={[0, 0.06, 0]} castShadow receiveShadow>
+        <boxGeometry args={[2.5, 0.12, 0.55]} />
+        <meshStandardMaterial color="#17181D" roughness={0.5} />
+      </mesh>
+      <mesh position={[0, 0.42, 0.02]} rotation={[-0.22, 0, 0]} castShadow>
+        <boxGeometry args={[2.4, 0.62, 0.06]} />
+        <meshStandardMaterial color="#1C1D23" roughness={0.4} />
+      </mesh>
+      <mesh position={[0, 0.42, 0.056]} rotation={[-0.22, 0, 0]}>
+        <planeGeometry args={[2.36, 0.59]} />
+        <meshStandardMaterial map={tx.tabliczka} roughness={0.35} metalness={0.15} emissive="#ffffff" emissiveMap={tx.tabliczka} emissiveIntensity={0.08 + 0.22 * blask} />
+      </mesh>
+      <spotLight position={[0.4, 2.4, 2.2]} angle={0.5} penumbra={0.8} intensity={14 * blask} color="#FFE3B0" distance={8} />
+    </group>
+  );
+};
+
+const Laptop: React.FC<{ t: number; c: ReturnType<typeof czasy>; tx: TeksturyStolu }> = ({ t, c, tx }) => {
+  const otwarcie = interpolate(t, [c.laptop - 0.3, c.laptop + 1.6], [0.15, 1], { ...Z, easing: PLYNNIE });
+  const kat = -Math.PI / 2 + otwarcie * (Math.PI / 2 + 0.28);
+  return (
+    <group position={[3.3, 0, 2.1]} rotation={[0, -0.25, 0]}>
+      <mesh position={[0, 0.035, 0]} castShadow receiveShadow>
+        <boxGeometry args={[1.7, 0.07, 1.15]} />
+        <meshStandardMaterial color="#3A3D46" metalness={0.5} roughness={0.4} />
+      </mesh>
+      <mesh position={[0, 0.072, 0.05]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[1.5, 0.7]} />
+        <meshStandardMaterial color="#202228" roughness={0.8} />
+      </mesh>
+      <group position={[0, 0.07, -0.56]} rotation={[kat, 0, 0]}>
+        <mesh position={[0, 0.56, -0.02]} castShadow>
+          <boxGeometry args={[1.7, 1.12, 0.04]} />
+          <meshStandardMaterial color="#3A3D46" metalness={0.5} roughness={0.4} />
+        </mesh>
+        <mesh position={[0, 0.56, 0.002]}>
+          <planeGeometry args={[1.58, 0.99]} />
+          <meshBasicMaterial map={tx.ekran} toneMapped={false} />
+        </mesh>
+      </group>
+      <pointLight position={[0, 0.7, 0.6]} intensity={1.8 * otwarcie} color="#C9D6FF" distance={3} />
+    </group>
+  );
+};
+
+// Stosy złotych monet rosnące na słowie „dostawać”
+const Monety: React.FC<{ t: number; c: ReturnType<typeof czasy> }> = ({ t, c }) => {
+  const stosy: [number, number, number][] = [
+    [-0.55, 0, 0.1, ],
+    [0.1, 0, -0.25],
+    [0.65, 0, 0.25],
+    [0.05, 0, 0.55],
+  ].map((p) => p as [number, number, number]);
+  const wysokosci = [9, 14, 7, 4];
+  return (
+    <group position={[-3.0, 0, 2.2]}>
+      {stosy.map((p, s) =>
+        Array.from({ length: wysokosci[s] }, (_, i) => {
+          const kiedy = c.dostawac + s * 0.25 + i * 0.07;
+          const w = interpolate(t, [kiedy, kiedy + 0.35], [0, 1], { ...Z, easing: Easing.out(Easing.cubic) });
+          if (w <= 0) return null;
+          return (
+            <mesh key={`${s}-${i}`} position={[p[0] + Math.sin(i * 7.7) * 0.015, 0.03 + i * 0.062 + (1 - w) * 0.9, p[2]]} castShadow receiveShadow>
+              <cylinderGeometry args={[0.26, 0.26, 0.055, 40]} />
+              <meshStandardMaterial color={MARKA.zloto} metalness={0.85} roughness={0.28} />
+            </mesh>
+          );
+        }),
+      )}
+    </group>
+  );
+};
+
+const Swiat: React.FC<{ sceny: ScenaOSP[]; t: number; tx: TeksturyStolu; ts: Tekstury }> = ({ sceny, t, tx, ts }) => {
+  const c = czasy(sceny);
+  const otw = c.otwarty ? interpolate(t, [c.otwarcie, c.otwarcie + 2.0], [0, 1], { ...Z, easing: Easing.bezier(0.55, 0, 0.25, 1) }) : 0;
+  const blask = c.otwarty ? interpolate(t, [c.otwarcie + 2.0, c.otwarcie + 3.0], [0, 0.8], Z) : 0;
+  return (
+    <>
+      <Kamera sceny={sceny} t={t} />
+      <color attach="background" args={[MARKA.tlo]} />
+      <fog attach="fog" args={[MARKA.tlo, 26, 60]} />
+      <ambientLight intensity={0.5} color="#9aa0b8" />
+      <hemisphereLight args={["#ffe2b0", "#15161B", 0.45]} />
+      <spotLight
+        position={[3, 16, 9]}
+        angle={0.62}
+        penumbra={0.75}
+        intensity={420}
+        decay={2}
+        color="#FFD9A0"
+        castShadow
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-bias={-0.0004}
+      />
+      <pointLight position={[-7, 3, -5]} intensity={10} color={MARKA.zloto} />
+      <mesh position={[0, -0.05, 0]} receiveShadow>
+        <boxGeometry args={[60, 0.1, 40]} />
+        <meshStandardMaterial map={tx.drewno} color="#5A4636" roughness={0.75} />
+      </mesh>
+      <Remiza t={t} c={c} tx={tx} />
+      <Papiery t={t} c={c} />
+      <Tabliczka t={t} c={c} tx={tx} />
+      <Laptop t={t} c={c} tx={tx} />
+      <Segregator t={ts} otwarcie={otw} blask={blask} pozycja={[0.1, 0.06, 2.0]} obrot={0.42} />
+      <Monety t={t} c={c} />
+      <Helm pozycja={[-1.3, 0.06, 0.5]} obrot={0.3} />
+      <Dlugopis pozycja={[1.6, 0.1, 2.9]} obrot={0.9} />
+    </>
+  );
+};
+
+// ───────────── Karty nad sceną (HTML) ─────────────
+
+const Karta: React.FC<{ t: number; od: number; do: number; tytul?: string; wiersze: { tekst: string; t: number }[] }> = ({ t, od, do: koniec, tytul, wiersze }) => {
+  const { fps } = useVideoConfig();
+  if (t < od - 0.05 || t > koniec + 0.6) return null;
+  const wejscie = spring({ frame: (t - od) * fps, fps, config: { damping: 18, mass: 1 } });
+  const wyjscie = interpolate(t, [koniec, koniec + 0.5], [1, 0], Z);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: 440,
+        left: 459 - 380,
+        width: 760,
+        padding: "30px 38px 34px",
+        borderRadius: 22,
+        background: "rgba(32,34,42,0.94)",
+        border: `2px solid ${MARKA.zloto}`,
+        boxShadow: "0 24px 60px rgba(0,0,0,0.55)",
+        fontFamily: FONT,
+        transform: `translateY(${(1 - wejscie) * 30}px)`,
+        opacity: Math.min(1, wejscie * 1.3) * wyjscie,
+      }}
+    >
+      {tytul ? <div style={{ color: MARKA.nadtytul, fontWeight: 700, fontSize: 26, letterSpacing: 3, marginBottom: 4 }}>{tytul}</div> : null}
+      {wiersze.map((w) => {
+        const p = spring({ frame: (t - w.t) * fps, fps, config: { damping: 20 } });
+        return (
+          <div key={w.tekst} style={{ display: "flex", alignItems: "center", gap: 18, marginTop: 18, opacity: t < w.t ? 0 : p, transform: `translateX(${(1 - p) * -24}px)` }}>
+            <div style={{ width: 40, height: 40, borderRadius: 20, background: MARKA.zloto, color: MARKA.tlo, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 24, flexShrink: 0 }}>✓</div>
+            <div style={{ color: "white", fontWeight: 700, fontSize: 38, whiteSpace: "nowrap" }}>{w.tekst}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const Licznik: React.FC<{ t: number; od: number; do: number }> = ({ t, od, do: koniec }) => {
+  if (t < od - 0.05 || t > koniec + 0.6) return null;
+  const w = interpolate(t, [od, od + 0.6], [0, 1], Z) * interpolate(t, [koniec, koniec + 0.5], [1, 0], Z);
+  const liczba = interpolate(t, [od, od + 1.6], [0, 1.5], { ...Z, easing: Easing.out(Easing.cubic) });
+  return (
+    <div style={{ position: "absolute", top: 450, width: 918, textAlign: "center", fontFamily: FONT, opacity: w, transform: `translateY(${(1 - w) * 20}px)` }}>
+      <div style={{ fontWeight: 800, fontSize: 150, color: MARKA.zloto, lineHeight: 1, textShadow: "0 10px 40px rgba(0,0,0,0.6)" }}>{liczba.toFixed(1).replace(".", ",")}%</div>
+      <div style={{ marginTop: 12, fontWeight: 700, fontSize: 38, color: "white", textShadow: "0 4px 18px rgba(0,0,0,0.8)" }}>podatku od mieszkańców co roku</div>
+    </div>
+  );
+};
+
+export const StolOSP: React.FC<PropsMapy> = ({ sceny, klatkaStartu }) => {
+  const frame = useCurrentFrame();
+  const { fps, width, height } = useVideoConfig();
+  const t = (klatkaStartu + frame) / fps;
+  const tx = useTeksturyStolu();
+  const ts = useTekstury();
+  const c = czasy(sceny);
+  const wejscie = interpolate(frame, [0, 10], [0, 1], Z);
+  const lista = c.lista;
+  const sl = (s: ScenaOSP | undefined, w: string) => (s ? (czasSlowa(s, w) ?? s.start) : 999);
+  return (
+    <AbsoluteFill style={{ opacity: klatkaStartu === 0 ? 1 : wejscie }}>
+      {tx && ts ? (
+        <ThreeCanvas width={width} height={height} shadows camera={{ fov: 32, near: 0.1, far: 120 }} gl={{ antialias: true }}>
+          <Swiat sceny={sceny} t={t} tx={tx} ts={ts} />
+        </ThreeCanvas>
+      ) : null}
+      <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: 560, background: "linear-gradient(rgba(21,22,27,0.85), rgba(21,22,27,0))" }} />
+      {lista ? (
+        <Karta
+          t={t}
+          od={lista.start - 0.1}
+          do={lista.koniec + 0.3}
+          wiersze={[
+            { tekst: "Statut", t: sl(lista, "Statut") },
+            { tekst: "Walne zebranie", t: sl(lista, "walne") },
+            { tekst: "Wnioski do KRS", t: sl(lista, "wnioski") },
+            { tekst: "Sprawozdania", t: sl(lista, "sprawozdania") },
+          ]}
+        />
+      ) : null}
+      {(() => {
+        const s = sceny.find((x) => x.kamera === "laptop");
+        return s ? (
+          <Karta t={t} od={c.polska - 0.2} do={s.koniec + 0.2} wiersze={[{ tekst: "Cała Polska", t: c.polska }, { tekst: "100% zdalnie", t: c.zdalnie }]} />
+        ) : null;
+      })()}
+      {c.otwarty ? (
+        <Karta
+          t={t}
+          od={sl(c.otwarty, "Sprawdzamy") - 0.15}
+          do={c.otwarty.koniec + 0.4}
+          tytul="KROK PO KROKU"
+          wiersze={[
+            { tekst: "Analiza statutu", t: sl(c.otwarty, "Sprawdzamy") },
+            { tekst: "Dokumenty na walne", t: sl(c.otwarty, "dokumenty") },
+            { tekst: "Wniosek do KRS", t: sl(c.otwarty, "wniosek") },
+          ]}
+        />
+      ) : null}
+      {c.monety ? <Licznik t={t} od={sl(c.monety, "1,5%")} do={c.monety.koniec + 0.4} /> : null}
+    </AbsoluteFill>
+  );
+};
+
+export const dzwiekiStolu = (sceny: ScenaOSP[]): ZdarzenieDzwiekowe[] => {
+  const c = czasy(sceny);
+  const z: ZdarzenieDzwiekowe[] = [];
+  sceny.slice(1).forEach((s, i) => {
+    if (s.kamera && s.kamera !== sceny[i].kamera) z.push({ t: s.start - 0.35, plik: "swist", glosnosc: 0.22 });
+  });
+  z.push({ t: c.stos - 0.2, plik: "papier", glosnosc: 0.55 });
+  if (c.lista) ["Statut", "walne", "wnioski", "sprawozdania"].forEach((w) => z.push({ t: czasSlowa(c.lista!, w) ?? 0, plik: "tik", glosnosc: 0.4 }));
+  z.push({ t: c.polska, plik: "tik", glosnosc: 0.4 }, { t: c.zdalnie, plik: "tik", glosnosc: 0.4 });
+  if (c.otwarty) z.push({ t: c.otwarcie + 0.3, plik: "papier", glosnosc: 0.5 });
+  if (c.monety) z.push({ t: c.dostawac + 0.3, plik: "dzwonek", glosnosc: 0.4 });
+  return z.filter((e) => e.t > 0 && e.t < 900);
+};

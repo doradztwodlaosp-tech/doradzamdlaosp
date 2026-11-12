@@ -1,3 +1,4 @@
+import { StolOSP, dzwiekiStolu } from "./Stol3D";
 import React from "react";
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { FONT, MARKA, USTAWIENIA as U } from "./marka";
@@ -409,6 +410,7 @@ const dzwiekiOpp = (sceny: ScenaOSP[]): ZdarzenieDzwiekowe[] => {
 };
 
 export const MAPY: Record<string, { Widok: React.FC<PropsMapy>; dzwieki: (sceny: ScenaOSP[]) => ZdarzenieDzwiekowe[] }> = {
+  "stol-osp": { Widok: StolOSP, dzwieki: dzwiekiStolu },
   "droga-wniosku": { Widok: DrogaWniosku, dzwieki: dzwiekiWniosku },
   "droga-opp": { Widok: DrogaOPP, dzwieki: dzwiekiOpp },
 };

@@ -13,7 +13,8 @@ const Z = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 const plynnie = Easing.bezier(0.45, 0, 0.2, 1);
 
 // Tekstury z napisami rysowane na płótnie (po wczytaniu fontu marki)
-const useTekstury = () => {
+export type Tekstury = { okladka: THREE.Texture; strona: THREE.Texture; grzbiet: THREE.Texture };
+export const useTekstury = () => {
   const [tekstury, ustaw] = useState<{ okladka: THREE.Texture; strona: THREE.Texture; grzbiet: THREE.Texture } | null>(null);
   const [uchwyt] = useState(() => delayRender("Tekstury 3D"));
   useEffect(() => {
@@ -103,8 +104,13 @@ const Kamera: React.FC<{ klatka: number }> = ({ klatka }) => {
   return null;
 };
 
-const Segregator: React.FC<{ klatka: number; t: NonNullable<ReturnType<typeof useTekstury>> }> = ({ klatka, t }) => {
-  const otwarcie = interpolate(klatka, [118, 172], [0, 1], { ...Z, easing: Easing.bezier(0.55, 0, 0.25, 1) });
+export const Segregator: React.FC<{ otwarcie: number; blask: number; t: Tekstury; pozycja?: [number, number, number]; obrot?: number }> = ({
+  otwarcie,
+  blask,
+  t,
+  pozycja = [0, 0.06, 0],
+  obrot = 0.38,
+}) => {
   const SZ = 1.4;
   const GL = 1.9;
   const okladkaMat = useMemo(() => {
@@ -118,10 +124,8 @@ const Segregator: React.FC<{ klatka: number; t: NonNullable<ReturnType<typeof us
     const gora = new THREE.MeshStandardMaterial({ map: t.strona, roughness: 0.85 });
     return [krawedz, krawedz, gora, krawedz, krawedz, krawedz];
   }, [t]);
-  // złoty połysk na stronie po otwarciu
-  const blask = interpolate(klatka, [175, 200, 240], [0, 1, 0.55], Z);
   return (
-    <group position={[0, 0.06, 0]} rotation={[0, 0.38, 0]}>
+    <group position={pozycja} rotation={[0, obrot, 0]}>
       {/* tylna okładka */}
       <mesh position={[0, 0.015, 0]} castShadow receiveShadow>
         <boxGeometry args={[SZ, 0.03, GL]} />
@@ -150,8 +154,8 @@ const Segregator: React.FC<{ klatka: number; t: NonNullable<ReturnType<typeof us
   );
 };
 
-const Helm: React.FC = () => (
-  <group position={[2.05, 0.06, -1.25]} rotation={[0, 0.7, 0]}>
+export const Helm: React.FC<{ pozycja?: [number, number, number]; obrot?: number }> = ({ pozycja = [2.05, 0.06, -1.25], obrot = 0.7 }) => (
+  <group position={pozycja} rotation={[0, obrot, 0]}>
     <mesh position={[0, 0.02, 0]} scale={[1, 1, 1.18]} castShadow receiveShadow>
       <cylinderGeometry args={[0.72, 0.78, 0.04, 48]} />
       <meshStandardMaterial color="#9E1E16" roughness={0.35} />
@@ -171,8 +175,8 @@ const Helm: React.FC = () => (
   </group>
 );
 
-const Dlugopis: React.FC = () => (
-  <group position={[1.15, 0.1, 0.55]} rotation={[0, 0.5, Math.PI / 2]}>
+export const Dlugopis: React.FC<{ pozycja?: [number, number, number]; obrot?: number }> = ({ pozycja = [1.15, 0.1, 0.55], obrot = 0.5 }) => (
+  <group position={pozycja} rotation={[0, obrot, Math.PI / 2]}>
     <mesh castShadow>
       <cylinderGeometry args={[0.035, 0.035, 1.0, 16]} />
       <meshStandardMaterial color={MARKA.zloto} metalness={0.7} roughness={0.3} />
@@ -215,7 +219,11 @@ const Swiat: React.FC<{ klatka: number; t: NonNullable<ReturnType<typeof useTeks
         <planeGeometry args={[60, 12]} />
         <meshStandardMaterial color="#1E2027" roughness={1} />
       </mesh>
-      <Segregator klatka={klatka} t={t} />
+      <Segregator
+        t={t}
+        otwarcie={interpolate(klatka, [118, 172], [0, 1], { ...Z, easing: Easing.bezier(0.55, 0, 0.25, 1) })}
+        blask={interpolate(klatka, [175, 200, 240], [0, 1, 0.55], Z)}
+      />
       <Helm />
       <Dlugopis />
     </>

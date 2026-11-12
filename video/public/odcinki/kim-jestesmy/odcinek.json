@@ -1,0 +1,658 @@
+{
+  "tytul": "Wy gasicie pożary. My – papiery.",
+  "nadtytul": "DORADZTWO DLA OSP • KIM JESTEŚMY",
+  "glos": "lektor.mp3",
+  "maskotka": true,
+  "wstep": 2.2,
+  "hak": [
+    {
+      "tekst": "WY GASICIE POŻARY.",
+      "zloty": true
+    },
+    {
+      "tekst": "MY – PAPIERY."
+    }
+  ],
+  "cta": "Z czym Wasza OSP ma najwięcej papierów?",
+  "plansza": {
+    "haslo": [
+      {
+        "tekst": "POMAGAMY TYM,",
+        "zloty": true
+      },
+      {
+        "tekst": "KTÓRZY POMAGAJĄ"
+      },
+      {
+        "tekst": "INNYM."
+      }
+    ],
+    "pigulka": "Zaobserwuj nas • doradztwodlaosp.pl",
+    "kontakt": "WhatsApp: 720 868 902",
+    "stopka": "Materiał informacyjny. Nie zastępuje indywidualnej analizy."
+  },
+  "sceny": [
+    {
+      "tekst": "Wy ratujecie ludzi, gasicie pożary i wyjeżdżacie do wypadków.",
+      "akcent": [
+        "ratujecie"
+      ],
+      "mapa": "stol-osp",
+      "kamera": "remiza",
+      "start": 0,
+      "koniec": 4.692,
+      "slowa": [
+        {
+          "w": "Wy",
+          "s": 0,
+          "e": 0.244
+        },
+        {
+          "w": "ratujecie",
+          "s": 0.244,
+          "e": 0.914
+        },
+        {
+          "w": "ludzi,",
+          "s": 0.914,
+          "e": 1.584
+        },
+        {
+          "w": "gasicie",
+          "s": 1.584,
+          "e": 2.133
+        },
+        {
+          "w": "pożary",
+          "s": 2.133,
+          "e": 2.62
+        },
+        {
+          "w": "i",
+          "s": 2.62,
+          "e": 2.803
+        },
+        {
+          "w": "wyjeżdżacie",
+          "s": 2.803,
+          "e": 3.595
+        },
+        {
+          "w": "do",
+          "s": 3.595,
+          "e": 3.839
+        },
+        {
+          "w": "wypadków.",
+          "s": 3.839,
+          "e": 4.692
+        }
+      ]
+    },
+    {
+      "tekst": "A potem wracacie do remizy, a tam czeka stos papierów.",
+      "akcent": [
+        "papierów."
+      ],
+      "mapa": "stol-osp",
+      "kamera": "papiery",
+      "start": 5.292,
+      "koniec": 9.446,
+      "slowa": [
+        {
+          "w": "A",
+          "s": 5.292,
+          "e": 5.468
+        },
+        {
+          "w": "potem",
+          "s": 5.468,
+          "e": 5.877
+        },
+        {
+          "w": "wracacie",
+          "s": 5.877,
+          "e": 6.462
+        },
+        {
+          "w": "do",
+          "s": 6.462,
+          "e": 6.696
+        },
+        {
+          "w": "remizy,",
+          "s": 6.696,
+          "e": 7.398
+        },
+        {
+          "w": "a",
+          "s": 7.398,
+          "e": 7.574
+        },
+        {
+          "w": "tam",
+          "s": 7.574,
+          "e": 7.867
+        },
+        {
+          "w": "czeka",
+          "s": 7.867,
+          "e": 8.276
+        },
+        {
+          "w": "stos",
+          "s": 8.276,
+          "e": 8.627
+        },
+        {
+          "w": "papierów.",
+          "s": 8.627,
+          "e": 9.446
+        }
+      ]
+    },
+    {
+      "tekst": "Statut, walne zebranie, wnioski do KRS, sprawozdania.",
+      "lektor": "Statut, walne zebranie, wnioski do ka-er-esu, sprawozdania.",
+      "akcent": [
+        "KRS,"
+      ],
+      "mapa": "stol-osp",
+      "kamera": "papiery",
+      "start": 10.046,
+      "koniec": 14.585,
+      "slowa": [
+        {
+          "w": "Statut,",
+          "s": 10.046,
+          "e": 10.792
+        },
+        {
+          "w": "walne",
+          "s": 10.792,
+          "e": 11.227
+        },
+        {
+          "w": "zebranie,",
+          "s": 11.227,
+          "e": 12.098
+        },
+        {
+          "w": "wnioski",
+          "s": 12.098,
+          "e": 12.657
+        },
+        {
+          "w": "do",
+          "s": 12.657,
+          "e": 12.906
+        },
+        {
+          "w": "KRS,",
+          "s": 12.906,
+          "e": 13.466
+        },
+        {
+          "w": "sprawozdania.",
+          "s": 13.466,
+          "e": 14.585
+        }
+      ]
+    },
+    {
+      "tekst": "Tym zajmujemy się my. Doradztwo dla OSP.",
+      "lektor": "Tym zajmujemy się my. Doradztwo dla o-es-pe.",
+      "akcent": [
+        "my."
+      ],
+      "mapa": "stol-osp",
+      "kamera": "marka",
+      "postac": {
+        "plan": "brak",
+        "gest": {
+          "slowo": "Doradztwo",
+          "plan": "obok",
+          "poza": "cieszy-sie",
+          "ruch": "podskok"
+        }
+      },
+      "start": 15.185,
+      "koniec": 18.569,
+      "slowa": [
+        {
+          "w": "Tym",
+          "s": 15.185,
+          "e": 15.498
+        },
+        {
+          "w": "zajmujemy",
+          "s": 15.498,
+          "e": 16.187
+        },
+        {
+          "w": "się",
+          "s": 16.187,
+          "e": 16.501
+        },
+        {
+          "w": "my.",
+          "s": 16.501,
+          "e": 17.002
+        },
+        {
+          "w": "Doradztwo",
+          "s": 17.002,
+          "e": 17.692
+        },
+        {
+          "w": "dla",
+          "s": 17.692,
+          "e": 18.005
+        },
+        {
+          "w": "OSP.",
+          "s": 18.005,
+          "e": 18.569
+        }
+      ]
+    },
+    {
+      "tekst": "Pomagamy jednostkom z całej Polski, w pełni zdalnie.",
+      "akcent": [
+        "Polski,"
+      ],
+      "mapa": "stol-osp",
+      "kamera": "laptop",
+      "start": 19.169,
+      "koniec": 23.169,
+      "slowa": [
+        {
+          "w": "Pomagamy",
+          "s": 19.169,
+          "e": 19.766
+        },
+        {
+          "w": "jednostkom",
+          "s": 19.766,
+          "e": 20.483
+        },
+        {
+          "w": "z",
+          "s": 20.483,
+          "e": 20.662
+        },
+        {
+          "w": "całej",
+          "s": 20.662,
+          "e": 21.08
+        },
+        {
+          "w": "Polski,",
+          "s": 21.08,
+          "e": 21.796
+        },
+        {
+          "w": "w",
+          "s": 21.796,
+          "e": 21.975
+        },
+        {
+          "w": "pełni",
+          "s": 21.975,
+          "e": 22.393
+        },
+        {
+          "w": "zdalnie.",
+          "s": 22.393,
+          "e": 23.169
+        }
+      ]
+    },
+    {
+      "tekst": "Najczęściej prowadzimy OSP do statusu organizacji pożytku publicznego.",
+      "lektor": "Najczęściej prowadzimy o-es-pe do statusu organizacji pożytku publicznego.",
+      "akcent": [
+        "pożytku",
+        "publicznego."
+      ],
+      "mapa": "stol-osp",
+      "kamera": "statut",
+      "start": 23.769,
+      "koniec": 29.462,
+      "slowa": [
+        {
+          "w": "Najczęściej",
+          "s": 23.769,
+          "e": 24.672
+        },
+        {
+          "w": "prowadzimy",
+          "s": 24.672,
+          "e": 25.505
+        },
+        {
+          "w": "OSP",
+          "s": 25.505,
+          "e": 25.852
+        },
+        {
+          "w": "do",
+          "s": 25.852,
+          "e": 26.129
+        },
+        {
+          "w": "statusu",
+          "s": 26.129,
+          "e": 26.754
+        },
+        {
+          "w": "organizacji",
+          "s": 26.754,
+          "e": 27.657
+        },
+        {
+          "w": "pożytku",
+          "s": 27.657,
+          "e": 28.281
+        },
+        {
+          "w": "publicznego.",
+          "s": 28.281,
+          "e": 29.462
+        }
+      ]
+    },
+    {
+      "tekst": "Sprawdzamy statut, przygotowujemy dokumenty na walne i składamy wniosek do KRS.",
+      "lektor": "Sprawdzamy statut, przygotowujemy dokumenty na walne i składamy wniosek do ka-er-esu.",
+      "akcent": [
+        "KRS."
+      ],
+      "mapa": "stol-osp",
+      "kamera": "statut-otwarty",
+      "start": 30.062,
+      "koniec": 36.6,
+      "slowa": [
+        {
+          "w": "Sprawdzamy",
+          "s": 30.062,
+          "e": 30.87
+        },
+        {
+          "w": "statut,",
+          "s": 30.87,
+          "e": 31.679
+        },
+        {
+          "w": "przygotowujemy",
+          "s": 31.679,
+          "e": 32.758
+        },
+        {
+          "w": "dokumenty",
+          "s": 32.758,
+          "e": 33.499
+        },
+        {
+          "w": "na",
+          "s": 33.499,
+          "e": 33.769
+        },
+        {
+          "w": "walne",
+          "s": 33.769,
+          "e": 34.241
+        },
+        {
+          "w": "i",
+          "s": 34.241,
+          "e": 34.443
+        },
+        {
+          "w": "składamy",
+          "s": 34.443,
+          "e": 35.117
+        },
+        {
+          "w": "wniosek",
+          "s": 35.117,
+          "e": 35.724
+        },
+        {
+          "w": "do",
+          "s": 35.724,
+          "e": 35.993
+        },
+        {
+          "w": "KRS.",
+          "s": 35.993,
+          "e": 36.6
+        }
+      ]
+    },
+    {
+      "tekst": "Dzięki temu Wasza jednostka może co roku dostawać 1,5% podatku od mieszkańców.",
+      "lektor": "Dzięki temu Wasza jednostka może co roku dostawać półtora procent podatku od mieszkańców.",
+      "akcent": [
+        "1,5%"
+      ],
+      "mapa": "stol-osp",
+      "kamera": "monety",
+      "start": 37.2,
+      "koniec": 44.046,
+      "slowa": [
+        {
+          "w": "Dzięki",
+          "s": 37.2,
+          "e": 37.783
+        },
+        {
+          "w": "temu",
+          "s": 37.783,
+          "e": 38.22
+        },
+        {
+          "w": "Wasza",
+          "s": 38.22,
+          "e": 38.729
+        },
+        {
+          "w": "jednostka",
+          "s": 38.729,
+          "e": 39.531
+        },
+        {
+          "w": "może",
+          "s": 39.531,
+          "e": 39.968
+        },
+        {
+          "w": "co",
+          "s": 39.968,
+          "e": 40.259
+        },
+        {
+          "w": "roku",
+          "s": 40.259,
+          "e": 40.696
+        },
+        {
+          "w": "dostawać",
+          "s": 40.696,
+          "e": 41.424
+        },
+        {
+          "w": "1,5%",
+          "s": 41.424,
+          "e": 41.861
+        },
+        {
+          "w": "podatku",
+          "s": 41.861,
+          "e": 42.517
+        },
+        {
+          "w": "od",
+          "s": 42.517,
+          "e": 42.808
+        },
+        {
+          "w": "mieszkańców.",
+          "s": 42.808,
+          "e": 44.046
+        }
+      ]
+    },
+    {
+      "tekst": "Wy zajmujecie się strażą. My zajmiemy się papierami.",
+      "akcent": [
+        "strażą.",
+        "papierami."
+      ],
+      "mapa": "stol-osp",
+      "kamera": "calosc",
+      "start": 44.646,
+      "koniec": 48.646,
+      "slowa": [
+        {
+          "w": "Wy",
+          "s": 44.646,
+          "e": 44.885
+        },
+        {
+          "w": "zajmujecie",
+          "s": 44.885,
+          "e": 45.601
+        },
+        {
+          "w": "się",
+          "s": 45.601,
+          "e": 45.9
+        },
+        {
+          "w": "strażą.",
+          "s": 45.9,
+          "e": 46.616
+        },
+        {
+          "w": "My",
+          "s": 46.616,
+          "e": 46.855
+        },
+        {
+          "w": "zajmiemy",
+          "s": 46.855,
+          "e": 47.452
+        },
+        {
+          "w": "się",
+          "s": 47.452,
+          "e": 47.751
+        },
+        {
+          "w": "papierami.",
+          "s": 47.751,
+          "e": 48.646
+        }
+      ]
+    },
+    {
+      "tekst": "Z czym Wasza OSP ma najwięcej papierów?",
+      "lektor": "Z czym Wasza o-es-pe ma najwięcej papierów?",
+      "akcent": [
+        "papierów?"
+      ],
+      "studio": true,
+      "postac": {
+        "plan": "pelny",
+        "poza": "tlumaczy"
+      },
+      "start": 49.246,
+      "koniec": 52.554,
+      "slowa": [
+        {
+          "w": "Z",
+          "s": 49.246,
+          "e": 49.445
+        },
+        {
+          "w": "czym",
+          "s": 49.445,
+          "e": 49.842
+        },
+        {
+          "w": "Wasza",
+          "s": 49.842,
+          "e": 50.305
+        },
+        {
+          "w": "OSP",
+          "s": 50.305,
+          "e": 50.635
+        },
+        {
+          "w": "ma",
+          "s": 50.635,
+          "e": 50.9
+        },
+        {
+          "w": "najwięcej",
+          "s": 50.9,
+          "e": 51.628
+        },
+        {
+          "w": "papierów?",
+          "s": 51.628,
+          "e": 52.554
+        }
+      ]
+    },
+    {
+      "tekst": "Zaobserwuj nas. Pomagamy tym, którzy pomagają innym.",
+      "akcent": [
+        "Zaobserwuj"
+      ],
+      "plansza": true,
+      "start": 53.154,
+      "koniec": 57.154,
+      "slowa": [
+        {
+          "w": "Zaobserwuj",
+          "s": 53.154,
+          "e": 53.849
+        },
+        {
+          "w": "nas.",
+          "s": 53.849,
+          "e": 54.371
+        },
+        {
+          "w": "Pomagamy",
+          "s": 54.371,
+          "e": 54.951
+        },
+        {
+          "w": "tym,",
+          "s": 54.951,
+          "e": 55.473
+        },
+        {
+          "w": "którzy",
+          "s": 55.473,
+          "e": 55.936
+        },
+        {
+          "w": "pomagają",
+          "s": 55.936,
+          "e": 56.516
+        },
+        {
+          "w": "innym.",
+          "s": 56.516,
+          "e": 57.154
+        }
+      ]
+    }
+  ],
+  "szkic": "Czasy szacunkowe (bez lektora). Po dodaniu lektor.mp3 uruchom: npm run czasy -- kim-jestesmy"
+}

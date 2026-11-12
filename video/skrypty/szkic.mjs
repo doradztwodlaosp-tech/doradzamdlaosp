@@ -4,8 +4,8 @@
 // Gdy pojawi się nagranie (lektor.mp3 w folderze odcinka): npm run czasy -- <odcinek>
 import { katalogOdcinka, slowaProporcjonalnie, wczytajOdcinek, zapiszOdcinek } from "./wspolne.mjs";
 
-const ZNAKOW_NA_SEKUNDE = 15.5; // tempo żwawego lektora
-const PAUZA = 0.42; // przerwa między zdaniami (s)
+const ZNAKOW_NA_SEKUNDE = Number(process.env.TEMPO || 15.5); // tempo lektora (znaki na sekundę); spokojniej: TEMPO=13
+const PAUZA = Number(process.env.PAUZA || 0.42); // przerwa między zdaniami (s)
 
 const katalog = katalogOdcinka(process.argv[2]);
 const dane = wczytajOdcinek(katalog);
