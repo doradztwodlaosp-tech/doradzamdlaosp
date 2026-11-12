@@ -31,7 +31,8 @@
     "glos": "NODE_USE_ENV_PROXY=1 node skrypty/glos.mjs",
     "obrazy": "NODE_USE_ENV_PROXY=1 node skrypty/obrazy.mjs",
     "czasy": "node skrypty/czasy-z-nagrania.mjs",
-    "render": "node skrypty/render.mjs"
+    "render": "node skrypty/render.mjs",
+    "szkic": "node skrypty/szkic.mjs"
   },
   "allowScripts": {
     "esbuild": false

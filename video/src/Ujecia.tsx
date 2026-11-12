@@ -86,7 +86,7 @@ const Chip: React.FC<{ tekst: string; od: number }> = ({ tekst, od }) => {
           padding: "10px 28px 10px 12px",
           fontFamily: FONT,
           fontWeight: 800,
-          fontSize: 36,
+          fontSize: 40,
           color: MARKA.bialy,
           whiteSpace: "nowrap",
           boxShadow: "0 10px 30px rgba(0,0,0,0.55)",

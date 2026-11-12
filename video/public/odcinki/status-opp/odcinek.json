@@ -1,0 +1,712 @@
+{
+  "tytul": "1,5% dla Twojej OSP? Najpierw statut.",
+  "nadtytul": "PORADNIK OSP • STATUS OPP",
+  "glos": "lektor.mp3",
+  "cta": "Czy Wasza OSP ma już status OPP?",
+  "wstep": 1.8,
+  "hak": [
+    {
+      "tekst": "1,5% PODATKU",
+      "zloty": true
+    },
+    {
+      "tekst": "DLA TWOJEJ OSP?"
+    },
+    {
+      "tekst": "NAJPIERW STATUT."
+    }
+  ],
+  "plansza": {
+    "haslo": [
+      {
+        "tekst": "POMAGAMY TYM,",
+        "zloty": true
+      },
+      {
+        "tekst": "KTÓRZY POMAGAJĄ"
+      },
+      {
+        "tekst": "INNYM."
+      }
+    ],
+    "pigulka": "Zaobserwuj nas • doradztwodlaosp.pl",
+    "kontakt": "WhatsApp: 720 868 902",
+    "stopka": "Materiał informacyjny. Nie zastępuje indywidualnej analizy."
+  },
+  "maskotka": true,
+  "sceny": [
+    {
+      "tekst": "Twoja OSP może dostawać 1,5% podatku od mieszkańców.",
+      "lektor": "Twoja o-es-pe może dostawać półtora procent podatku od mieszkańców.",
+      "akcent": [
+        "1,5%"
+      ],
+      "ujecia": [
+        {
+          "obraz": "remiza.jpg",
+          "kadr": {
+            "od": [
+              0.4,
+              0.5
+            ],
+            "do": [
+              0.56,
+              0.5
+            ],
+            "zoomOd": 1,
+            "zoomDo": 1.06
+          },
+          "swiatla": [
+            {
+              "x": 0.58,
+              "y": 0.56,
+              "r": 150
+            },
+            {
+              "x": 0.667,
+              "y": 0.56,
+              "r": 150
+            },
+            {
+              "x": 0.69,
+              "y": 0.31,
+              "r": 110
+            },
+            {
+              "x": 0.24,
+              "y": 0.52,
+              "r": 190
+            },
+            {
+              "x": 0.4,
+              "y": 0.52,
+              "r": 190
+            }
+          ],
+          "przyciemnij": [
+            0,
+            0.5
+          ],
+          "naklejki": [
+            {
+              "typ": "licznik",
+              "slowo": "1,5",
+              "od": 0,
+              "do": 1.5,
+              "miejsca": 1,
+              "sufiks": "%",
+              "podpis": "podatku od mieszkańców"
+            }
+          ]
+        }
+      ],
+      "start": 0,
+      "koniec": 4.323,
+      "slowa": [
+        {
+          "w": "Twoja",
+          "s": 0,
+          "e": 0.473
+        },
+        {
+          "w": "OSP",
+          "s": 0.473,
+          "e": 0.81
+        },
+        {
+          "w": "może",
+          "s": 0.81,
+          "e": 1.216
+        },
+        {
+          "w": "dostawać",
+          "s": 1.216,
+          "e": 1.891
+        },
+        {
+          "w": "1,5%",
+          "s": 1.891,
+          "e": 2.296
+        },
+        {
+          "w": "podatku",
+          "s": 2.296,
+          "e": 2.904
+        },
+        {
+          "w": "od",
+          "s": 2.904,
+          "e": 3.174
+        },
+        {
+          "w": "mieszkańców.",
+          "s": 3.174,
+          "e": 4.323
+        }
+      ]
+    },
+    {
+      "tekst": "Dlaczego nie dostaje?",
+      "akcent": [
+        "nie"
+      ],
+      "studio": true,
+      "postac": {
+        "plan": "pelny",
+        "poza": "mysli"
+      },
+      "start": 4.743,
+      "koniec": 6.097,
+      "slowa": [
+        {
+          "w": "Dlaczego",
+          "s": 4.743,
+          "e": 5.226
+        },
+        {
+          "w": "nie",
+          "s": 5.226,
+          "e": 5.468
+        },
+        {
+          "w": "dostaje?",
+          "s": 5.468,
+          "e": 6.097
+        }
+      ]
+    },
+    {
+      "tekst": "Bo nie ma statusu OPP. Pokażę, od czego zacząć.",
+      "lektor": "Bo nie ma statusu o-pe-pe. Pokażę, od czego zacząć.",
+      "akcent": [
+        "OPP."
+      ],
+      "mapa": "droga-opp",
+      "start": 6.517,
+      "koniec": 9.808,
+      "slowa": [
+        {
+          "w": "Bo",
+          "s": 6.517,
+          "e": 6.717
+        },
+        {
+          "w": "nie",
+          "s": 6.717,
+          "e": 6.966
+        },
+        {
+          "w": "ma",
+          "s": 6.966,
+          "e": 7.166
+        },
+        {
+          "w": "statusu",
+          "s": 7.166,
+          "e": 7.614
+        },
+        {
+          "w": "OPP.",
+          "s": 7.614,
+          "e": 8.063
+        },
+        {
+          "w": "Pokażę,",
+          "s": 8.063,
+          "e": 8.661
+        },
+        {
+          "w": "od",
+          "s": 8.661,
+          "e": 8.861
+        },
+        {
+          "w": "czego",
+          "s": 8.861,
+          "e": 9.21
+        },
+        {
+          "w": "zacząć.",
+          "s": 9.21,
+          "e": 9.808
+        }
+      ]
+    },
+    {
+      "tekst": "Zaczyna się od statutu.",
+      "akcent": [
+        "statutu."
+      ],
+      "mapa": "droga-opp",
+      "start": 10.228,
+      "koniec": 11.712,
+      "slowa": [
+        {
+          "w": "Zaczyna",
+          "s": 10.228,
+          "e": 10.659
+        },
+        {
+          "w": "się",
+          "s": 10.659,
+          "e": 10.898
+        },
+        {
+          "w": "od",
+          "s": 10.898,
+          "e": 11.089
+        },
+        {
+          "w": "statutu.",
+          "s": 11.089,
+          "e": 11.712
+        }
+      ]
+    },
+    {
+      "tekst": "Musi mieć niezależną komisję rewizyjną.",
+      "akcent": [
+        "niezależną"
+      ],
+      "mapa": "droga-opp",
+      "start": 12.132,
+      "koniec": 14.648,
+      "slowa": [
+        {
+          "w": "Musi",
+          "s": 12.132,
+          "e": 12.446
+        },
+        {
+          "w": "mieć",
+          "s": 12.446,
+          "e": 12.761
+        },
+        {
+          "w": "niezależną",
+          "s": 12.761,
+          "e": 13.39
+        },
+        {
+          "w": "komisję",
+          "s": 13.39,
+          "e": 13.861
+        },
+        {
+          "w": "rewizyjną.",
+          "s": 13.861,
+          "e": 14.648
+        }
+      ]
+    },
+    {
+      "tekst": "I cztery zakazy dotyczące majątku i osób bliskich zarządowi.",
+      "akcent": [
+        "cztery",
+        "zakazy"
+      ],
+      "mapa": "droga-opp",
+      "postac": {
+        "plan": "brak",
+        "gest": {
+          "slowo": "cztery",
+          "plan": "obok",
+          "poza": "ostrzega"
+        }
+      },
+      "start": 15.068,
+      "koniec": 18.939,
+      "slowa": [
+        {
+          "w": "I",
+          "s": 15.068,
+          "e": 15.227
+        },
+        {
+          "w": "cztery",
+          "s": 15.227,
+          "e": 15.651
+        },
+        {
+          "w": "zakazy",
+          "s": 15.651,
+          "e": 16.075
+        },
+        {
+          "w": "dotyczące",
+          "s": 16.075,
+          "e": 16.659
+        },
+        {
+          "w": "majątku",
+          "s": 16.659,
+          "e": 17.136
+        },
+        {
+          "w": "i",
+          "s": 17.136,
+          "e": 17.295
+        },
+        {
+          "w": "osób",
+          "s": 17.295,
+          "e": 17.613
+        },
+        {
+          "w": "bliskich",
+          "s": 17.613,
+          "e": 18.143
+        },
+        {
+          "w": "zarządowi.",
+          "s": 18.143,
+          "e": 18.939
+        }
+      ]
+    },
+    {
+      "tekst": "Ale to nie wszystko.",
+      "akcent": [
+        "wszystko."
+      ],
+      "mapa": "droga-opp",
+      "start": 19.359,
+      "koniec": 20.649,
+      "slowa": [
+        {
+          "w": "Ale",
+          "s": 19.359,
+          "e": 19.589
+        },
+        {
+          "w": "to",
+          "s": 19.589,
+          "e": 19.773
+        },
+        {
+          "w": "nie",
+          "s": 19.773,
+          "e": 20.004
+        },
+        {
+          "w": "wszystko.",
+          "s": 20.004,
+          "e": 20.649
+        }
+      ]
+    },
+    {
+      "tekst": "Zmianę statutu uchwala walne zebranie, a potem trzeba ją wpisać do KRS.",
+      "lektor": "Zmianę statutu uchwala walne zebranie, a potem trzeba ją wpisać do ka-er-esu.",
+      "akcent": [
+        "walne",
+        "KRS."
+      ],
+      "mapa": "droga-opp",
+      "start": 21.069,
+      "koniec": 26.037,
+      "slowa": [
+        {
+          "w": "Zmianę",
+          "s": 21.069,
+          "e": 21.511
+        },
+        {
+          "w": "statutu",
+          "s": 21.511,
+          "e": 22.007
+        },
+        {
+          "w": "uchwala",
+          "s": 22.007,
+          "e": 22.504
+        },
+        {
+          "w": "walne",
+          "s": 22.504,
+          "e": 22.891
+        },
+        {
+          "w": "zebranie,",
+          "s": 22.891,
+          "e": 23.663
+        },
+        {
+          "w": "a",
+          "s": 23.663,
+          "e": 23.829
+        },
+        {
+          "w": "potem",
+          "s": 23.829,
+          "e": 24.215
+        },
+        {
+          "w": "trzeba",
+          "s": 24.215,
+          "e": 24.657
+        },
+        {
+          "w": "ją",
+          "s": 24.657,
+          "e": 24.878
+        },
+        {
+          "w": "wpisać",
+          "s": 24.878,
+          "e": 25.319
+        },
+        {
+          "w": "do",
+          "s": 25.319,
+          "e": 25.54
+        },
+        {
+          "w": "KRS.",
+          "s": 25.54,
+          "e": 26.037
+        }
+      ]
+    },
+    {
+      "tekst": "Dopiero wtedy składacie wniosek o status OPP.",
+      "lektor": "Dopiero wtedy składacie wniosek o status o-pe-pe.",
+      "akcent": [
+        "status",
+        "OPP."
+      ],
+      "mapa": "droga-opp",
+      "start": 26.457,
+      "koniec": 29.618,
+      "slowa": [
+        {
+          "w": "Dopiero",
+          "s": 26.457,
+          "e": 26.965
+        },
+        {
+          "w": "wtedy",
+          "s": 26.965,
+          "e": 27.36
+        },
+        {
+          "w": "składacie",
+          "s": 27.36,
+          "e": 27.981
+        },
+        {
+          "w": "wniosek",
+          "s": 27.981,
+          "e": 28.489
+        },
+        {
+          "w": "o",
+          "s": 28.489,
+          "e": 28.658
+        },
+        {
+          "w": "status",
+          "s": 28.658,
+          "e": 29.11
+        },
+        {
+          "w": "OPP.",
+          "s": 29.11,
+          "e": 29.618
+        }
+      ]
+    },
+    {
+      "tekst": "Jeden brakujący zapis w statucie i sąd odmówi wpisu.",
+      "akcent": [
+        "odmówi"
+      ],
+      "ujecia": [
+        {
+          "obraz": "paragraf.webp",
+          "uklad": "pelny",
+          "kadr": {
+            "od": [
+              0.5,
+              0.5
+            ],
+            "do": [
+              0.53,
+              0.5
+            ],
+            "zoomOd": 1,
+            "zoomDo": 1.1
+          },
+          "przyciemnij": [
+            0.25,
+            0.25
+          ]
+        }
+      ],
+      "porada": {
+        "wiersze": [
+          {
+            "tekst": "Jeden brakujący zapis",
+            "slowo": "Jeden"
+          },
+          {
+            "tekst": "w statucie",
+            "slowo": "statucie"
+          },
+          {
+            "tekst": "= sąd odmówi wpisu",
+            "slowo": "sąd",
+            "zloty": true
+          }
+        ]
+      },
+      "start": 30.038,
+      "koniec": 33.393,
+      "slowa": [
+        {
+          "w": "Jeden",
+          "s": 30.038,
+          "e": 30.399
+        },
+        {
+          "w": "brakujący",
+          "s": 30.399,
+          "e": 30.967
+        },
+        {
+          "w": "zapis",
+          "s": 30.967,
+          "e": 31.328
+        },
+        {
+          "w": "w",
+          "s": 31.328,
+          "e": 31.483
+        },
+        {
+          "w": "statucie",
+          "s": 31.483,
+          "e": 31.999
+        },
+        {
+          "w": "i",
+          "s": 31.999,
+          "e": 32.154
+        },
+        {
+          "w": "sąd",
+          "s": 32.154,
+          "e": 32.412
+        },
+        {
+          "w": "odmówi",
+          "s": 32.412,
+          "e": 32.825
+        },
+        {
+          "w": "wpisu.",
+          "s": 32.825,
+          "e": 33.393
+        }
+      ]
+    },
+    {
+      "tekst": "Czy Wasza OSP ma już status OPP?",
+      "lektor": "Czy Wasza o-es-pe ma już status o-pe-pe?",
+      "akcent": [
+        "OPP?"
+      ],
+      "studio": true,
+      "postac": {
+        "plan": "pelny",
+        "poza": "tlumaczy"
+      },
+      "start": 33.813,
+      "koniec": 36.394,
+      "slowa": [
+        {
+          "w": "Czy",
+          "s": 33.813,
+          "e": 34.113
+        },
+        {
+          "w": "Wasza",
+          "s": 34.113,
+          "e": 34.533
+        },
+        {
+          "w": "OSP",
+          "s": 34.533,
+          "e": 34.833
+        },
+        {
+          "w": "ma",
+          "s": 34.833,
+          "e": 35.073
+        },
+        {
+          "w": "już",
+          "s": 35.073,
+          "e": 35.373
+        },
+        {
+          "w": "status",
+          "s": 35.373,
+          "e": 35.853
+        },
+        {
+          "w": "OPP?",
+          "s": 35.853,
+          "e": 36.394
+        }
+      ]
+    },
+    {
+      "tekst": "Zaobserwuj nas. Pomagamy tym, którzy pomagają innym.",
+      "akcent": [
+        "Zaobserwuj"
+      ],
+      "plansza": true,
+      "start": 36.814,
+      "koniec": 40.168,
+      "slowa": [
+        {
+          "w": "Zaobserwuj",
+          "s": 36.814,
+          "e": 37.397
+        },
+        {
+          "w": "nas.",
+          "s": 37.397,
+          "e": 37.835
+        },
+        {
+          "w": "Pomagamy",
+          "s": 37.835,
+          "e": 38.321
+        },
+        {
+          "w": "tym,",
+          "s": 38.321,
+          "e": 38.758
+        },
+        {
+          "w": "którzy",
+          "s": 38.758,
+          "e": 39.147
+        },
+        {
+          "w": "pomagają",
+          "s": 39.147,
+          "e": 39.634
+        },
+        {
+          "w": "innym.",
+          "s": 39.634,
+          "e": 40.168
+        }
+      ]
+    }
+  ],
+  "szkic": "Czasy szacunkowe (bez lektora). Po dodaniu lektor.mp3 uruchom: npm run czasy -- status-opp"
+}

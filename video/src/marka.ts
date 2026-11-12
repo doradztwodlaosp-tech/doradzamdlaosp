@@ -48,8 +48,8 @@ export const USTAWIENIA = {
   studioPodloga: 1250, // linia podłogi w studiu Druha Paragrafa (px od góry)
 
   // Dźwięk (1 = pełna głośność pliku)
-  muzykaGlosnosc: 0.2, // podkład, gdy lektor milczy
-  muzykaPodGlosem: 0.1, // podkład pod głosem lektora
+  muzykaGlosnosc: 0.3, // podkład, gdy lektor milczy
+  muzykaPodGlosem: 0.14, // podkład pod głosem lektora
   efektyGlosnosc: 0.5, // efekty dźwiękowe
 
   // Maskotka – złoty paragraf (gdy w odcinek.json jest "maskotka": true)
@@ -68,7 +68,7 @@ export const USTAWIENIA = {
   naczelnikOdLewej: 10, // odległość od lewej krawędzi (px)
 
   // Przycisk na końcu rolki
-  przyciskSrodek: 1345, // środek przycisku od górnej krawędzi (px)
+  przyciskSrodek: 1392, // środek pigułki z pytaniem od górnej krawędzi (px) – tuż pod stopami postaci
   przyciskRozmiar: 42, // wielkość tekstu (px)
 };
 

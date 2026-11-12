@@ -253,6 +253,9 @@ const Porada: React.FC<{ scena: ScenaOSP }> = ({ scena }) => {
   const ikona = spring({ frame: frame - 12, fps, config: { damping: 10 } });
   const zlote = new Set((porada.zlote ?? []).map(normalizuj));
   const wiersze = porada.wiersze ?? [{ tekst: porada.tekst ?? "" }];
+  // Wielkość liter dobrana tak, żeby najdłuższy wiersz zmieścił się w karcie
+  const najdluzszy = Math.max(...wiersze.map((wr) => wr.tekst.length));
+  const rozmiar = porada.wiersze ? Math.min(66, Math.floor(700 / (najdluzszy * 0.62))) : 58;
   return (
     <div
       style={{
@@ -279,7 +282,7 @@ const Porada: React.FC<{ scena: ScenaOSP }> = ({ scena }) => {
         const czas = wiersz.slowo ? czasSlowa(scena, wiersz.slowo) : undefined;
         const ww = czas === undefined ? 1 : spring({ frame: Math.round((t - czas) * fps), fps, config: { damping: 13 } });
         return (
-          <div key={i} style={{ fontSize: 58, fontWeight: 800, lineHeight: 1.2, opacity: ww, transform: `translateX(${(1 - ww) * -30}px)` }}>
+          <div key={i} style={{ fontSize: rozmiar, fontWeight: 800, lineHeight: 1.2, whiteSpace: porada.wiersze ? "nowrap" : "normal", opacity: ww, transform: `translateX(${(1 - ww) * -30}px)` }}>
             {wiersz.tekst.split(" ").map((slowo, j) => (
               <span key={j} style={{ color: wiersz.zloty || zlote.has(normalizuj(slowo)) ? MARKA.zloto : MARKA.bialy }}>
                 {slowo}{" "}

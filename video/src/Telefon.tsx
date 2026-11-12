@@ -9,7 +9,7 @@ export const Telefon: React.FC<{ od: number }> = ({ od }) => {
   const { fps } = useVideoConfig();
   if (od < 0) return null;
   const w = spring({ frame: od, fps, config: { damping: 15 } });
-  const przewijanie = interpolate(od, [10, 40], [0, -46], ZAKRES);
+  const przewijanie = interpolate(od, [10, 40], [0, -18], ZAKRES);
   const klik = interpolate(od, [46, 64], [0, 1], ZAKRES);
   const wcisniecie = od >= 46 && od < 54 ? 0.94 : 1;
   return (
