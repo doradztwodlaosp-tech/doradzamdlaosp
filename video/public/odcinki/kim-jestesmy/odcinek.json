@@ -33,504 +33,1119 @@
   },
   "sceny": [
     {
-      "tekst": "Wy ratujecie ludzi, gasicie pożary i wyjeżdżacie do wypadków.",
+      "tekst": "Ratujecie ludzi. Gasicie pożary. Wyjeżdżacie do wypadków.",
       "akcent": [
-        "ratujecie"
+        "Ratujecie"
       ],
       "mapa": "stol-osp",
       "kamera": "remiza",
       "start": 0,
-      "koniec": 4.692,
+      "koniec": 4.071,
       "slowa": [
         {
-          "w": "Wy",
+          "w": "Ratujecie",
           "s": 0,
-          "e": 0.244
+          "e": 0.605
         },
         {
-          "w": "ratujecie",
-          "s": 0.244,
-          "e": 0.914
+          "w": "ludzi.",
+          "s": 0.605,
+          "e": 1.21
         },
         {
-          "w": "ludzi,",
-          "s": 0.914,
-          "e": 1.584
+          "w": "Gasicie",
+          "s": 1.21,
+          "e": 1.706
         },
         {
-          "w": "gasicie",
-          "s": 1.584,
-          "e": 2.133
+          "w": "pożary.",
+          "s": 1.706,
+          "e": 2.366
         },
         {
-          "w": "pożary",
-          "s": 2.133,
-          "e": 2.62
-        },
-        {
-          "w": "i",
-          "s": 2.62,
-          "e": 2.803
-        },
-        {
-          "w": "wyjeżdżacie",
-          "s": 2.803,
-          "e": 3.595
+          "w": "Wyjeżdżacie",
+          "s": 2.366,
+          "e": 3.081
         },
         {
           "w": "do",
-          "s": 3.595,
-          "e": 3.839
+          "s": 3.081,
+          "e": 3.301
         },
         {
           "w": "wypadków.",
-          "s": 3.839,
-          "e": 4.692
+          "s": 3.301,
+          "e": 4.071
         }
       ]
     },
     {
-      "tekst": "A potem wracacie do remizy, a tam czeka stos papierów.",
+      "tekst": "Na akcji nic was nie zaskoczy. Ale w remizie czeka przeciwnik, którego nikt nie lubi. Papiery.",
       "akcent": [
-        "papierów."
+        "Papiery."
       ],
       "mapa": "stol-osp",
       "kamera": "papiery",
-      "start": 5.292,
-      "koniec": 9.446,
+      "start": 4.621,
+      "koniec": 11.336,
       "slowa": [
         {
-          "w": "A",
-          "s": 5.292,
-          "e": 5.468
+          "w": "Na",
+          "s": 4.621,
+          "e": 4.84
         },
         {
-          "w": "potem",
-          "s": 5.468,
-          "e": 5.877
+          "w": "akcji",
+          "s": 4.84,
+          "e": 5.222
         },
         {
-          "w": "wracacie",
-          "s": 5.877,
-          "e": 6.462
+          "w": "nic",
+          "s": 5.222,
+          "e": 5.495
         },
         {
-          "w": "do",
-          "s": 6.462,
-          "e": 6.696
+          "w": "was",
+          "s": 5.495,
+          "e": 5.768
         },
         {
-          "w": "remizy,",
-          "s": 6.696,
-          "e": 7.398
+          "w": "nie",
+          "s": 5.768,
+          "e": 6.041
         },
         {
-          "w": "a",
-          "s": 7.398,
-          "e": 7.574
+          "w": "zaskoczy.",
+          "s": 6.041,
+          "e": 6.805
         },
         {
-          "w": "tam",
-          "s": 7.574,
-          "e": 7.867
+          "w": "Ale",
+          "s": 6.805,
+          "e": 7.078
+        },
+        {
+          "w": "w",
+          "s": 7.078,
+          "e": 7.242
+        },
+        {
+          "w": "remizie",
+          "s": 7.242,
+          "e": 7.733
         },
         {
           "w": "czeka",
-          "s": 7.867,
-          "e": 8.276
+          "s": 7.733,
+          "e": 8.115
         },
         {
-          "w": "stos",
-          "s": 8.276,
-          "e": 8.627
+          "w": "przeciwnik,",
+          "s": 8.115,
+          "e": 8.988
         },
         {
-          "w": "papierów.",
-          "s": 8.627,
-          "e": 9.446
+          "w": "którego",
+          "s": 8.988,
+          "e": 9.48
+        },
+        {
+          "w": "nikt",
+          "s": 9.48,
+          "e": 9.807
+        },
+        {
+          "w": "nie",
+          "s": 9.807,
+          "e": 10.08
+        },
+        {
+          "w": "lubi.",
+          "s": 10.08,
+          "e": 10.626
+        },
+        {
+          "w": "Papiery.",
+          "s": 10.626,
+          "e": 11.336
         }
       ]
     },
     {
-      "tekst": "Statut, walne zebranie, wnioski do KRS, sprawozdania.",
-      "lektor": "Statut, walne zebranie, wnioski do ka-er-esu, sprawozdania.",
+      "tekst": "Statut. Walne zebranie. KRS. Sprawozdania. Umowy z gminą.",
+      "lektor": "Statut. Walne zebranie. Ka-er-es. Sprawozdania. Umowy z gminą.",
       "akcent": [
-        "KRS,"
+        "KRS."
       ],
       "mapa": "stol-osp",
       "kamera": "papiery",
-      "start": 10.046,
-      "koniec": 14.585,
+      "karta": {
+        "wiersze": [
+          {
+            "tekst": "Statut",
+            "slowo": "Statut"
+          },
+          {
+            "tekst": "Walne zebranie",
+            "slowo": "Walne"
+          },
+          {
+            "tekst": "KRS",
+            "slowo": "KRS"
+          },
+          {
+            "tekst": "Sprawozdania",
+            "slowo": "Sprawozdania"
+          },
+          {
+            "tekst": "Umowy z gminą",
+            "slowo": "Umowy"
+          }
+        ]
+      },
+      "start": 11.886,
+      "koniec": 16.314,
       "slowa": [
         {
-          "w": "Statut,",
-          "s": 10.046,
-          "e": 10.792
+          "w": "Statut.",
+          "s": 11.886,
+          "e": 12.542
         },
         {
-          "w": "walne",
-          "s": 10.792,
-          "e": 11.227
+          "w": "Walne",
+          "s": 12.542,
+          "e": 12.925
         },
         {
-          "w": "zebranie,",
-          "s": 11.227,
-          "e": 12.098
+          "w": "zebranie.",
+          "s": 12.925,
+          "e": 13.69
         },
         {
-          "w": "wnioski",
-          "s": 12.098,
-          "e": 12.657
+          "w": "KRS.",
+          "s": 13.69,
+          "e": 14.182
         },
         {
-          "w": "do",
-          "s": 12.657,
-          "e": 12.906
+          "w": "Sprawozdania.",
+          "s": 14.182,
+          "e": 15.166
         },
         {
-          "w": "KRS,",
-          "s": 12.906,
-          "e": 13.466
+          "w": "Umowy",
+          "s": 15.166,
+          "e": 15.549
         },
         {
-          "w": "sprawozdania.",
-          "s": 13.466,
-          "e": 14.585
+          "w": "z",
+          "s": 15.549,
+          "e": 15.713
+        },
+        {
+          "w": "gminą.",
+          "s": 15.713,
+          "e": 16.314
         }
       ]
     },
     {
-      "tekst": "Jesteśmy prawnikami. Doradztwo dla OSP.",
-      "lektor": "Jesteśmy prawnikami. Doradztwo dla o-es-pe.",
+      "tekst": "Jeden błąd w protokole i sąd oddala wniosek. Jedno przeoczone pismo i jednostka traci pieniądze.",
       "akcent": [
-        "prawnikami."
+        "oddala",
+        "traci"
+      ],
+      "mapa": "stol-osp",
+      "kamera": "protokol",
+      "start": 16.864,
+      "koniec": 23.721,
+      "slowa": [
+        {
+          "w": "Jeden",
+          "s": 16.864,
+          "e": 17.271
+        },
+        {
+          "w": "błąd",
+          "s": 17.271,
+          "e": 17.62
+        },
+        {
+          "w": "w",
+          "s": 17.62,
+          "e": 17.794
+        },
+        {
+          "w": "protokole",
+          "s": 17.794,
+          "e": 18.433
+        },
+        {
+          "w": "i",
+          "s": 18.433,
+          "e": 18.608
+        },
+        {
+          "w": "sąd",
+          "s": 18.608,
+          "e": 18.898
+        },
+        {
+          "w": "oddala",
+          "s": 18.898,
+          "e": 19.363
+        },
+        {
+          "w": "wniosek.",
+          "s": 19.363,
+          "e": 20.119
+        },
+        {
+          "w": "Jedno",
+          "s": 20.119,
+          "e": 20.525
+        },
+        {
+          "w": "przeoczone",
+          "s": 20.525,
+          "e": 21.223
+        },
+        {
+          "w": "pismo",
+          "s": 21.223,
+          "e": 21.629
+        },
+        {
+          "w": "i",
+          "s": 21.629,
+          "e": 21.804
+        },
+        {
+          "w": "jednostka",
+          "s": 21.804,
+          "e": 22.443
+        },
+        {
+          "w": "traci",
+          "s": 22.443,
+          "e": 22.85
+        },
+        {
+          "w": "pieniądze.",
+          "s": 22.85,
+          "e": 23.721
+        }
+      ]
+    },
+    {
+      "tekst": "Dlatego powstało Doradztwo dla OSP. Jesteśmy prawnikami, którzy znają straż od środka.",
+      "lektor": "Dlatego powstało Doradztwo dla o-es-pe. Jesteśmy prawnikami, którzy znają straż od środka.",
+      "akcent": [
+        "prawnikami,"
       ],
       "mapa": "stol-osp",
       "kamera": "marka",
       "postac": {
         "plan": "brak",
         "gest": {
-          "slowo": "Doradztwo",
+          "slowo": "Jesteśmy",
           "plan": "obok",
-          "poza": "cieszy-sie",
-          "ruch": "podskok"
+          "poza": "tlumaczy",
+          "ruch": "kiwa"
         }
       },
-      "start": 15.185,
-      "koniec": 18.492,
+      "start": 24.271,
+      "koniec": 30.7,
       "slowa": [
         {
-          "w": "Jesteśmy",
-          "s": 15.185,
-          "e": 15.833
+          "w": "Dlatego",
+          "s": 24.271,
+          "e": 24.807
         },
         {
-          "w": "prawnikami.",
-          "s": 15.833,
-          "e": 16.871
+          "w": "powstało",
+          "s": 24.807,
+          "e": 25.402
         },
         {
           "w": "Doradztwo",
-          "s": 16.871,
-          "e": 17.584
+          "s": 25.402,
+          "e": 26.057
         },
         {
           "w": "dla",
-          "s": 17.584,
-          "e": 17.909
+          "s": 26.057,
+          "e": 26.355
         },
         {
           "w": "OSP.",
-          "s": 17.909,
-          "e": 18.492
+          "s": 26.355,
+          "e": 26.89
+        },
+        {
+          "w": "Jesteśmy",
+          "s": 26.89,
+          "e": 27.486
+        },
+        {
+          "w": "prawnikami,",
+          "s": 27.486,
+          "e": 28.438
+        },
+        {
+          "w": "którzy",
+          "s": 28.438,
+          "e": 28.914
+        },
+        {
+          "w": "znają",
+          "s": 28.914,
+          "e": 29.331
+        },
+        {
+          "w": "straż",
+          "s": 29.331,
+          "e": 29.748
+        },
+        {
+          "w": "od",
+          "s": 29.748,
+          "e": 29.986
+        },
+        {
+          "w": "środka.",
+          "s": 29.986,
+          "e": 30.7
         }
       ]
     },
     {
-      "tekst": "Prowadzimy jednostki do statusu organizacji pożytku publicznego.",
+      "tekst": "W czym pomagamy jednostkom?",
       "akcent": [
-        "pożytku",
-        "publicznego."
+        "jednostkom?"
       ],
       "mapa": "stol-osp",
-      "kamera": "statut",
-      "start": 19.092,
-      "koniec": 24.015,
+      "kamera": "remiza",
+      "start": 31.25,
+      "koniec": 33.179,
       "slowa": [
         {
-          "w": "Prowadzimy",
-          "s": 19.092,
-          "e": 19.88
+          "w": "W",
+          "s": 31.25,
+          "e": 31.415
         },
         {
-          "w": "jednostki",
-          "s": 19.88,
-          "e": 20.602
+          "w": "czym",
+          "s": 31.415,
+          "e": 31.746
         },
         {
-          "w": "do",
-          "s": 20.602,
-          "e": 20.865
+          "w": "pomagamy",
+          "s": 31.746,
+          "e": 32.297
         },
         {
-          "w": "statusu",
-          "s": 20.865,
-          "e": 21.455
-        },
-        {
-          "w": "organizacji",
-          "s": 21.455,
-          "e": 22.309
-        },
-        {
-          "w": "pożytku",
-          "s": 22.309,
-          "e": 22.899
-        },
-        {
-          "w": "publicznego.",
-          "s": 22.899,
-          "e": 24.015
+          "w": "jednostkom?",
+          "s": 32.297,
+          "e": 33.179
         }
       ]
     },
     {
-      "tekst": "Sprawdzamy statut, przygotowujemy dokumenty na walne i składamy wniosek do KRS.",
-      "lektor": "Sprawdzamy statut, przygotowujemy dokumenty na walne i składamy wniosek do ka-er-esu.",
-      "akcent": [
-        "KRS."
-      ],
-      "mapa": "stol-osp",
-      "kamera": "statut-otwarty",
-      "start": 24.615,
-      "koniec": 31.154,
-      "slowa": [
-        {
-          "w": "Sprawdzamy",
-          "s": 24.615,
-          "e": 25.424
-        },
-        {
-          "w": "statut,",
-          "s": 25.424,
-          "e": 26.233
-        },
-        {
-          "w": "przygotowujemy",
-          "s": 26.233,
-          "e": 27.312
-        },
-        {
-          "w": "dokumenty",
-          "s": 27.312,
-          "e": 28.053
-        },
-        {
-          "w": "na",
-          "s": 28.053,
-          "e": 28.323
-        },
-        {
-          "w": "walne",
-          "s": 28.323,
-          "e": 28.795
-        },
-        {
-          "w": "i",
-          "s": 28.795,
-          "e": 28.997
-        },
-        {
-          "w": "składamy",
-          "s": 28.997,
-          "e": 29.671
-        },
-        {
-          "w": "wniosek",
-          "s": 29.671,
-          "e": 30.278
-        },
-        {
-          "w": "do",
-          "s": 30.278,
-          "e": 30.547
-        },
-        {
-          "w": "KRS.",
-          "s": 30.547,
-          "e": 31.154
-        }
-      ]
-    },
-    {
-      "tekst": "Dzięki temu OSP może co roku dostawać 1,5% podatku od mieszkańców.",
-      "lektor": "Dzięki temu o-es-pe może co roku dostawać półtora procent podatku od mieszkańców.",
+      "tekst": "Status organizacji pożytku publicznego, a z nim 1,5% podatku od mieszkańców. Co roku.",
+      "lektor": "Status organizacji pożytku publicznego, a z nim półtora procent podatku od mieszkańców. Co roku.",
       "akcent": [
         "1,5%"
       ],
       "mapa": "stol-osp",
       "kamera": "monety",
-      "start": 31.754,
-      "koniec": 37.985,
+      "start": 33.729,
+      "koniec": 40.586,
       "slowa": [
         {
-          "w": "Dzięki",
-          "s": 31.754,
-          "e": 32.369
+          "w": "Status",
+          "s": 33.729,
+          "e": 34.237
         },
         {
-          "w": "temu",
-          "s": 32.369,
-          "e": 32.831
+          "w": "organizacji",
+          "s": 34.237,
+          "e": 35.062
         },
         {
-          "w": "OSP",
-          "s": 32.831,
-          "e": 33.215
+          "w": "pożytku",
+          "s": 35.062,
+          "e": 35.633
         },
         {
-          "w": "może",
-          "s": 33.215,
-          "e": 33.677
+          "w": "publicznego,",
+          "s": 35.633,
+          "e": 36.713
         },
         {
-          "w": "co",
-          "s": 33.677,
-          "e": 33.985
+          "w": "a",
+          "s": 36.713,
+          "e": 36.903
         },
         {
-          "w": "roku",
-          "s": 33.985,
-          "e": 34.446
+          "w": "z",
+          "s": 36.903,
+          "e": 37.094
         },
         {
-          "w": "dostawać",
-          "s": 34.446,
-          "e": 35.215
+          "w": "nim",
+          "s": 37.094,
+          "e": 37.411
         },
         {
           "w": "1,5%",
-          "s": 35.215,
-          "e": 35.677
+          "s": 37.411,
+          "e": 37.792
         },
         {
           "w": "podatku",
-          "s": 35.677,
-          "e": 36.369
+          "s": 37.792,
+          "e": 38.363
         },
         {
           "w": "od",
-          "s": 36.369,
-          "e": 36.677
+          "s": 38.363,
+          "e": 38.617
         },
         {
           "w": "mieszkańców.",
-          "s": 36.677,
-          "e": 37.985
+          "s": 38.617,
+          "e": 39.697
+        },
+        {
+          "w": "Co",
+          "s": 39.697,
+          "e": 39.951
+        },
+        {
+          "w": "roku.",
+          "s": 39.951,
+          "e": 40.586
         }
       ]
     },
     {
-      "tekst": "Pomagamy też samym strażakom, w sprawach prawnych i podatkowych.",
+      "tekst": "Statuty, zmiany zarządu i wpisy do KRS. Bez odbijania się od sądu.",
+      "lektor": "Statuty, zmiany zarządu i wpisy do ka-er-esu. Bez odbijania się od sądu.",
       "akcent": [
-        "strażakom,"
+        "KRS."
       ],
       "mapa": "stol-osp",
-      "kamera": "helm",
-      "start": 38.585,
-      "koniec": 43.508,
+      "kamera": "statut-otwarty",
+      "karta": {
+        "wiersze": [
+          {
+            "tekst": "Statuty",
+            "slowo": "Statuty"
+          },
+          {
+            "tekst": "Zmiany zarządu",
+            "slowo": "zmiany"
+          },
+          {
+            "tekst": "Wpisy do KRS",
+            "slowo": "wpisy"
+          }
+        ]
+      },
+      "start": 41.136,
+      "koniec": 46.279,
       "slowa": [
         {
-          "w": "Pomagamy",
-          "s": 38.585,
-          "e": 39.2
+          "w": "Statuty,",
+          "s": 41.136,
+          "e": 41.895
         },
         {
-          "w": "też",
-          "s": 39.2,
-          "e": 39.508
+          "w": "zmiany",
+          "s": 41.895,
+          "e": 42.363
         },
         {
-          "w": "samym",
-          "s": 39.508,
-          "e": 39.938
-        },
-        {
-          "w": "strażakom,",
-          "s": 39.938,
-          "e": 40.862
-        },
-        {
-          "w": "w",
-          "s": 40.862,
-          "e": 41.046
-        },
-        {
-          "w": "sprawach",
-          "s": 41.046,
-          "e": 41.662
-        },
-        {
-          "w": "prawnych",
-          "s": 41.662,
-          "e": 42.277
+          "w": "zarządu",
+          "s": 42.363,
+          "e": 42.889
         },
         {
           "w": "i",
-          "s": 42.277,
-          "e": 42.462
+          "s": 42.889,
+          "e": 43.064
         },
         {
-          "w": "podatkowych.",
-          "s": 42.462,
-          "e": 43.508
+          "w": "wpisy",
+          "s": 43.064,
+          "e": 43.473
+        },
+        {
+          "w": "do",
+          "s": 43.473,
+          "e": 43.707
+        },
+        {
+          "w": "KRS.",
+          "s": 43.707,
+          "e": 44.233
+        },
+        {
+          "w": "Bez",
+          "s": 44.233,
+          "e": 44.525
+        },
+        {
+          "w": "odbijania",
+          "s": 44.525,
+          "e": 45.168
+        },
+        {
+          "w": "się",
+          "s": 45.168,
+          "e": 45.46
+        },
+        {
+          "w": "od",
+          "s": 45.46,
+          "e": 45.694
+        },
+        {
+          "w": "sądu.",
+          "s": 45.694,
+          "e": 46.279
         }
       ]
     },
     {
-      "tekst": "Działamy w całej Polsce, w pełni zdalnie.",
+      "tekst": "Umowy z gminą, wystąpienia do rady gminy. A gdy gmina mówi „nie”, stajemy po waszej stronie.",
+      "akcent": [
+        "stronie."
+      ],
+      "mapa": "stol-osp",
+      "kamera": "gmina",
+      "karta": {
+        "wiersze": [
+          {
+            "tekst": "Umowy z gminą",
+            "slowo": "Umowy"
+          },
+          {
+            "tekst": "Wystąpienia do rady gminy",
+            "slowo": "wystąpienia"
+          },
+          {
+            "tekst": "Gdy gmina mówi „nie”",
+            "slowo": "nie"
+          }
+        ]
+      },
+      "start": 46.829,
+      "koniec": 53.4,
+      "slowa": [
+        {
+          "w": "Umowy",
+          "s": 46.829,
+          "e": 47.209
+        },
+        {
+          "w": "z",
+          "s": 47.209,
+          "e": 47.372
+        },
+        {
+          "w": "gminą,",
+          "s": 47.372,
+          "e": 47.969
+        },
+        {
+          "w": "wystąpienia",
+          "s": 47.969,
+          "e": 48.675
+        },
+        {
+          "w": "do",
+          "s": 48.675,
+          "e": 48.892
+        },
+        {
+          "w": "rady",
+          "s": 48.892,
+          "e": 49.218
+        },
+        {
+          "w": "gminy.",
+          "s": 49.218,
+          "e": 49.816
+        },
+        {
+          "w": "A",
+          "s": 49.816,
+          "e": 49.979
+        },
+        {
+          "w": "gdy",
+          "s": 49.979,
+          "e": 50.25
+        },
+        {
+          "w": "gmina",
+          "s": 50.25,
+          "e": 50.63
+        },
+        {
+          "w": "mówi",
+          "s": 50.63,
+          "e": 50.956
+        },
+        {
+          "w": "„nie”,",
+          "s": 50.956,
+          "e": 51.553
+        },
+        {
+          "w": "stajemy",
+          "s": 51.553,
+          "e": 52.042
+        },
+        {
+          "w": "po",
+          "s": 52.042,
+          "e": 52.26
+        },
+        {
+          "w": "waszej",
+          "s": 52.26,
+          "e": 52.694
+        },
+        {
+          "w": "stronie.",
+          "s": 52.694,
+          "e": 53.4
+        }
+      ]
+    },
+    {
+      "tekst": "Podatki jednostki. Od zakupu wozu po zwolnienia, o których mało kto wie.",
+      "akcent": [
+        "Podatki"
+      ],
+      "mapa": "stol-osp",
+      "kamera": "woz",
+      "karta": {
+        "wiersze": [
+          {
+            "tekst": "Zakup wozu",
+            "slowo": "zakupu"
+          },
+          {
+            "tekst": "Zwolnienia podatkowe",
+            "slowo": "zwolnienia"
+          }
+        ],
+        "tytul": "PODATKI JEDNOSTKI"
+      },
+      "start": 53.95,
+      "koniec": 59.093,
+      "slowa": [
+        {
+          "w": "Podatki",
+          "s": 53.95,
+          "e": 54.442
+        },
+        {
+          "w": "jednostki.",
+          "s": 54.442,
+          "e": 55.263
+        },
+        {
+          "w": "Od",
+          "s": 55.263,
+          "e": 55.482
+        },
+        {
+          "w": "zakupu",
+          "s": 55.482,
+          "e": 55.92
+        },
+        {
+          "w": "wozu",
+          "s": 55.92,
+          "e": 56.248
+        },
+        {
+          "w": "po",
+          "s": 56.248,
+          "e": 56.467
+        },
+        {
+          "w": "zwolnienia,",
+          "s": 56.467,
+          "e": 57.342
+        },
+        {
+          "w": "o",
+          "s": 57.342,
+          "e": 57.506
+        },
+        {
+          "w": "których",
+          "s": 57.506,
+          "e": 57.999
+        },
+        {
+          "w": "mało",
+          "s": 57.999,
+          "e": 58.327
+        },
+        {
+          "w": "kto",
+          "s": 58.327,
+          "e": 58.6
+        },
+        {
+          "w": "wie.",
+          "s": 58.6,
+          "e": 59.093
+        }
+      ]
+    },
+    {
+      "tekst": "A w czym pomagamy strażakom?",
+      "akcent": [
+        "strażakom?"
+      ],
+      "mapa": "stol-osp",
+      "kamera": "helm",
+      "start": 59.643,
+      "koniec": 61.643,
+      "slowa": [
+        {
+          "w": "A",
+          "s": 59.643,
+          "e": 59.805
+        },
+        {
+          "w": "w",
+          "s": 59.805,
+          "e": 59.967
+        },
+        {
+          "w": "czym",
+          "s": 59.967,
+          "e": 60.292
+        },
+        {
+          "w": "pomagamy",
+          "s": 60.292,
+          "e": 60.832
+        },
+        {
+          "w": "strażakom?",
+          "s": 60.832,
+          "e": 61.643
+        }
+      ]
+    },
+    {
+      "tekst": "Świadczenia po wypadku na akcji. Świadczenie ratownicze. Podatki i sprawy prawne w życiu prywatnym: spadek, darowizna, umowa, pismo do urzędu.",
+      "akcent": [
+        "prywatnym:"
+      ],
+      "mapa": "stol-osp",
+      "kamera": "helm",
+      "karta": {
+        "wiersze": [
+          {
+            "tekst": "Świadczenia po wypadku",
+            "slowo": "Świadczenia"
+          },
+          {
+            "tekst": "Świadczenie ratownicze",
+            "slowo": "ratownicze."
+          },
+          {
+            "tekst": "Podatki i sprawy prywatne",
+            "slowo": "Podatki"
+          },
+          {
+            "tekst": "Spadek • darowizna • umowa",
+            "slowo": "spadek,"
+          }
+        ],
+        "tytul": "POMAGAMY STRAŻAKOM"
+      },
+      "start": 62.193,
+      "koniec": 72.336,
+      "slowa": [
+        {
+          "w": "Świadczenia",
+          "s": 62.193,
+          "e": 62.909
+        },
+        {
+          "w": "po",
+          "s": 62.909,
+          "e": 63.13
+        },
+        {
+          "w": "wypadku",
+          "s": 63.13,
+          "e": 63.626
+        },
+        {
+          "w": "na",
+          "s": 63.626,
+          "e": 63.847
+        },
+        {
+          "w": "akcji.",
+          "s": 63.847,
+          "e": 64.453
+        },
+        {
+          "w": "Świadczenie",
+          "s": 64.453,
+          "e": 65.17
+        },
+        {
+          "w": "ratownicze.",
+          "s": 65.17,
+          "e": 66.052
+        },
+        {
+          "w": "Podatki",
+          "s": 66.052,
+          "e": 66.548
+        },
+        {
+          "w": "i",
+          "s": 66.548,
+          "e": 66.713
+        },
+        {
+          "w": "sprawy",
+          "s": 66.713,
+          "e": 67.154
+        },
+        {
+          "w": "prawne",
+          "s": 67.154,
+          "e": 67.595
+        },
+        {
+          "w": "w",
+          "s": 67.595,
+          "e": 67.76
+        },
+        {
+          "w": "życiu",
+          "s": 67.76,
+          "e": 68.146
+        },
+        {
+          "w": "prywatnym:",
+          "s": 68.146,
+          "e": 68.973
+        },
+        {
+          "w": "spadek,",
+          "s": 68.973,
+          "e": 69.635
+        },
+        {
+          "w": "darowizna,",
+          "s": 69.635,
+          "e": 70.461
+        },
+        {
+          "w": "umowa,",
+          "s": 70.461,
+          "e": 71.068
+        },
+        {
+          "w": "pismo",
+          "s": 71.068,
+          "e": 71.454
+        },
+        {
+          "w": "do",
+          "s": 71.454,
+          "e": 71.674
+        },
+        {
+          "w": "urzędu.",
+          "s": 71.674,
+          "e": 72.336
+        }
+      ]
+    },
+    {
+      "tekst": "Pomogliśmy już wielu z was. I nasze wyniki mówią same za siebie.",
+      "akcent": [
+        "wyniki"
+      ],
+      "mapa": "stol-osp",
+      "kamera": "marka",
+      "postac": {
+        "plan": "brak",
+        "gest": {
+          "slowo": "Pomogliśmy",
+          "plan": "obok",
+          "poza": "cieszy-sie",
+          "ruch": "podskok"
+        }
+      },
+      "start": 72.886,
+      "koniec": 77.457,
+      "slowa": [
+        {
+          "w": "Pomogliśmy",
+          "s": 72.886,
+          "e": 73.547
+        },
+        {
+          "w": "już",
+          "s": 73.547,
+          "e": 73.822
+        },
+        {
+          "w": "wielu",
+          "s": 73.822,
+          "e": 74.208
+        },
+        {
+          "w": "z",
+          "s": 74.208,
+          "e": 74.373
+        },
+        {
+          "w": "was.",
+          "s": 74.373,
+          "e": 74.869
+        },
+        {
+          "w": "I",
+          "s": 74.869,
+          "e": 75.034
+        },
+        {
+          "w": "nasze",
+          "s": 75.034,
+          "e": 75.419
+        },
+        {
+          "w": "wyniki",
+          "s": 75.419,
+          "e": 75.86
+        },
+        {
+          "w": "mówią",
+          "s": 75.86,
+          "e": 76.245
+        },
+        {
+          "w": "same",
+          "s": 76.245,
+          "e": 76.576
+        },
+        {
+          "w": "za",
+          "s": 76.576,
+          "e": 76.796
+        },
+        {
+          "w": "siebie.",
+          "s": 76.796,
+          "e": 77.457
+        }
+      ]
+    },
+    {
+      "tekst": "Bez dojazdów i bez kolejek. Działamy w całej Polsce, w pełni zdalnie.",
       "akcent": [
         "zdalnie."
       ],
       "mapa": "stol-osp",
       "kamera": "laptop",
-      "start": 44.108,
-      "koniec": 47.262,
+      "karta": {
+        "wiersze": [
+          {
+            "tekst": "Bez dojazdów i kolejek",
+            "slowo": "dojazdów"
+          },
+          {
+            "tekst": "Cała Polska",
+            "slowo": "Polsce,"
+          },
+          {
+            "tekst": "100% zdalnie",
+            "slowo": "zdalnie."
+          }
+        ]
+      },
+      "start": 78.007,
+      "koniec": 82.936,
       "slowa": [
         {
+          "w": "Bez",
+          "s": 78.007,
+          "e": 78.278
+        },
+        {
+          "w": "dojazdów",
+          "s": 78.278,
+          "e": 78.82
+        },
+        {
+          "w": "i",
+          "s": 78.82,
+          "e": 78.982
+        },
+        {
+          "w": "bez",
+          "s": 78.982,
+          "e": 79.253
+        },
+        {
+          "w": "kolejek.",
+          "s": 79.253,
+          "e": 79.957
+        },
+        {
           "w": "Działamy",
-          "s": 44.108,
-          "e": 44.681
+          "s": 79.957,
+          "e": 80.499
         },
         {
           "w": "w",
-          "s": 44.681,
-          "e": 44.853
+          "s": 80.499,
+          "e": 80.661
         },
         {
           "w": "całej",
-          "s": 44.853,
-          "e": 45.255
+          "s": 80.661,
+          "e": 81.04
         },
         {
           "w": "Polsce,",
-          "s": 45.255,
-          "e": 45.943
+          "s": 81.04,
+          "e": 81.69
         },
         {
           "w": "w",
-          "s": 45.943,
-          "e": 46.115
+          "s": 81.69,
+          "e": 81.853
         },
         {
           "w": "pełni",
-          "s": 46.115,
-          "e": 46.516
+          "s": 81.853,
+          "e": 82.232
         },
         {
           "w": "zdalnie.",
-          "s": 46.516,
-          "e": 47.262
+          "s": 82.232,
+          "e": 82.936
         }
       ]
     },
@@ -542,54 +1157,54 @@
       ],
       "mapa": "stol-osp",
       "kamera": "calosc",
-      "start": 47.862,
-      "koniec": 51.862,
+      "start": 83.486,
+      "koniec": 87.2,
       "slowa": [
         {
           "w": "Wy",
-          "s": 47.862,
-          "e": 48.1
+          "s": 83.486,
+          "e": 83.707
         },
         {
           "w": "zajmujecie",
-          "s": 48.1,
-          "e": 48.817
+          "s": 83.707,
+          "e": 84.373
         },
         {
           "w": "się",
-          "s": 48.817,
-          "e": 49.115
+          "s": 84.373,
+          "e": 84.65
         },
         {
           "w": "strażą.",
-          "s": 49.115,
-          "e": 49.832
+          "s": 84.65,
+          "e": 85.315
         },
         {
           "w": "My",
-          "s": 49.832,
-          "e": 50.07
+          "s": 85.315,
+          "e": 85.537
         },
         {
           "w": "zajmiemy",
-          "s": 50.07,
-          "e": 50.668
+          "s": 85.537,
+          "e": 86.091
         },
         {
           "w": "się",
-          "s": 50.668,
-          "e": 50.966
+          "s": 86.091,
+          "e": 86.368
         },
         {
           "w": "papierami.",
-          "s": 50.966,
-          "e": 51.862
+          "s": 86.368,
+          "e": 87.2
         }
       ]
     },
     {
-      "tekst": "Z czym Wasza OSP ma najwięcej papierów?",
-      "lektor": "Z czym Wasza o-es-pe ma najwięcej papierów?",
+      "tekst": "Z czym wasza OSP ma najwięcej papierów? Napiszcie w komentarzu.",
+      "lektor": "Z czym wasza o-es-pe ma najwięcej papierów? Napiszcie w komentarzu.",
       "akcent": [
         "papierów?"
       ],
@@ -598,89 +1213,115 @@
         "plan": "pelny",
         "poza": "tlumaczy"
       },
-      "start": 52.462,
-      "koniec": 55.769,
+      "start": 87.75,
+      "koniec": 92.536,
       "slowa": [
         {
           "w": "Z",
-          "s": 52.462,
-          "e": 52.66
+          "s": 87.75,
+          "e": 87.929
         },
         {
           "w": "czym",
-          "s": 52.66,
-          "e": 53.057
+          "s": 87.929,
+          "e": 88.288
         },
         {
-          "w": "Wasza",
-          "s": 53.057,
-          "e": 53.52
+          "w": "wasza",
+          "s": 88.288,
+          "e": 88.707
         },
         {
           "w": "OSP",
-          "s": 53.52,
-          "e": 53.851
+          "s": 88.707,
+          "e": 89.006
         },
         {
           "w": "ma",
-          "s": 53.851,
-          "e": 54.115
+          "s": 89.006,
+          "e": 89.246
         },
         {
           "w": "najwięcej",
-          "s": 54.115,
-          "e": 54.843
+          "s": 89.246,
+          "e": 89.904
         },
         {
           "w": "papierów?",
-          "s": 54.843,
-          "e": 55.769
+          "s": 89.904,
+          "e": 90.741
+        },
+        {
+          "w": "Napiszcie",
+          "s": 90.741,
+          "e": 91.399
+        },
+        {
+          "w": "w",
+          "s": 91.399,
+          "e": 91.579
+        },
+        {
+          "w": "komentarzu.",
+          "s": 91.579,
+          "e": 92.536
         }
       ]
     },
     {
-      "tekst": "Zaobserwuj nas. Pomagamy tym, którzy pomagają innym.",
+      "tekst": "Zaobserwuj Doradztwo dla OSP. Pomagamy tym, którzy pomagają innym.",
+      "lektor": "Zaobserwuj Doradztwo dla o-es-pe. Pomagamy tym, którzy pomagają innym.",
       "akcent": [
         "Zaobserwuj"
       ],
       "plansza": true,
-      "start": 56.369,
-      "koniec": 60.369,
+      "start": 93.086,
+      "koniec": 98.086,
       "slowa": [
         {
           "w": "Zaobserwuj",
-          "s": 56.369,
-          "e": 57.065
+          "s": 93.086,
+          "e": 93.792
         },
         {
-          "w": "nas.",
-          "s": 57.065,
-          "e": 57.587
+          "w": "Doradztwo",
+          "s": 93.792,
+          "e": 94.439
+        },
+        {
+          "w": "dla",
+          "s": 94.439,
+          "e": 94.733
+        },
+        {
+          "w": "OSP.",
+          "s": 94.733,
+          "e": 95.262
         },
         {
           "w": "Pomagamy",
-          "s": 57.587,
-          "e": 58.166
+          "s": 95.262,
+          "e": 95.85
         },
         {
           "w": "tym,",
-          "s": 58.166,
-          "e": 58.688
+          "s": 95.85,
+          "e": 96.38
         },
         {
           "w": "którzy",
-          "s": 58.688,
-          "e": 59.152
+          "s": 96.38,
+          "e": 96.85
         },
         {
           "w": "pomagają",
-          "s": 59.152,
-          "e": 59.732
+          "s": 96.85,
+          "e": 97.439
         },
         {
           "w": "innym.",
-          "s": 59.732,
-          "e": 60.369
+          "s": 97.439,
+          "e": 98.086
         }
       ]
     }

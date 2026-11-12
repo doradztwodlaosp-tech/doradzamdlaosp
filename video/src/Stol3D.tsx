@@ -25,6 +25,9 @@ const STACJE: Record<string, Stacja> = {
   statut: { cel: [0.1, 0.15, 3.45], kat: 0.42, odl: 7.4, wys: 4.8 },
   "statut-otwarty": { cel: [-0.2, 0.1, 3.25], kat: 0.24, odl: 7.6, wys: 7.6 },
   monety: { cel: [-6.0, 0.4, 3.8], kat: 0.22, odl: 6.0, wys: 3.0 },
+  protokol: { cel: [3.0, 0.2, 0.3], kat: 0.15, odl: 6.0, wys: 4.6 },
+  gmina: { cel: [10.0, 0.9, 0.0], kat: -0.35, odl: 11.5, wys: 3.6 },
+  woz: { cel: [-6.55, 0.35, -1.3], kat: 0.75, odl: 5.0, wys: 1.9 },
   helm: { cel: [-3.0, 0.35, 0.3], kat: 0.5, odl: 6.8, wys: 3.4 },
   calosc: { cel: [-0.5, 0.0, 0.3], kat: 0.3, odl: 19, wys: 13.5 },
 };
@@ -72,7 +75,7 @@ const czasy = (sceny: ScenaOSP[]) => {
   const papiery = sceny.filter((s) => s.kamera === "papiery");
   return {
     wyjazd: (remiza?.start ?? 0) + 0.4,
-    stos: slowo("papiery", "stos", 1.5),
+    stos: slowo("papiery", "Papiery", 1.5),
     lista: papiery[1] ?? papiery[0],
     marka: sc("marka")?.start ?? 999,
     laptop: sc("laptop")?.start ?? 999,
@@ -82,14 +85,18 @@ const czasy = (sceny: ScenaOSP[]) => {
     otwarty: sc("statut-otwarty"),
     otwarcie: (sc("statut-otwarty")?.start ?? 999) - 0.2,
     monety: sc("monety"),
-    dostawac: slowo("monety", "dostawać", 1.2),
+    dostawac: slowo("monety", "1,5%", 1.2),
+    oddala: slowo("protokol", "oddala", 1.5),
+    traci: slowo("protokol", "traci", 3.5),
+    gmina: sc("gmina")?.start ?? 999,
+    nie: slowo("gmina", "nie", 4),
     calosc: sc("calosc")?.start ?? 999,
   };
 };
 
 // ───────────── Tekstury z napisami ─────────────
 
-type TeksturyStolu = { brama: THREE.Texture; szyld: THREE.Texture; tabliczka: THREE.Texture; ekran: THREE.Texture; drewno: THREE.Texture };
+type TeksturyStolu = { brama: THREE.Texture; szyld: THREE.Texture; tabliczka: THREE.Texture; ekran: THREE.Texture; drewno: THREE.Texture; protokol: THREE.Texture; pieczec: THREE.Texture; urzad: THREE.Texture };
 
 const plotno = (w: number, h: number, rysuj: (c: CanvasRenderingContext2D) => void) => {
   const el = document.createElement("canvas");
@@ -177,9 +184,43 @@ const useTeksturyStolu = () => {
           c.fillRect(0, y, 1024, 1 + (i % 3));
         }
       });
+      const protokol = plotno(650, 900, (c) => {
+        c.fillStyle = "#F1EBDD";
+        c.fillRect(0, 0, 650, 900);
+        c.fillStyle = "#2B2C33";
+        c.textAlign = "center";
+        c.font = `800 52px ${FONT}`;
+        c.fillText("PROTOKÓŁ", 325, 110);
+        c.font = `600 28px ${FONT}`;
+        c.fillStyle = "#6A6B74";
+        c.fillText("z Walnego Zebrania Członków", 325, 155);
+        for (let k = 0; k < 14; k++) {
+          c.fillStyle = "#B9B4A8";
+          c.fillRect(60, 220 + k * 44, k % 4 === 3 ? 300 : 530, 11);
+        }
+        c.fillStyle = "#2B2C33";
+        c.fillRect(380, 840, 200, 3);
+      });
+      const pieczec = plotno(600, 220, (c) => {
+        c.strokeStyle = "#C0392B";
+        c.lineWidth = 14;
+        c.strokeRect(14, 14, 572, 192);
+        c.fillStyle = "#C0392B";
+        c.font = `800 82px ${FONT}`;
+        c.textAlign = "center";
+        c.fillText("ODDALONO", 300, 142);
+      });
+      const urzad = plotno(700, 120, (c) => {
+        c.fillStyle = "#F4F1EA";
+        c.fillRect(0, 0, 700, 120);
+        c.fillStyle = "#2B2C33";
+        c.font = `800 64px ${FONT}`;
+        c.textAlign = "center";
+        c.fillText("URZĄD GMINY", 350, 86);
+      });
       drewno.wrapS = drewno.wrapT = THREE.RepeatWrapping;
       drewno.repeat.set(3, 3);
-      ustaw({ brama, szyld, tabliczka, ekran, drewno });
+      ustaw({ brama, szyld, tabliczka, ekran, drewno, protokol, pieczec, urzad });
       continueRender(uchwyt);
     });
   }, [uchwyt]);
@@ -401,6 +442,103 @@ const Monety: React.FC<{ t: number; c: ReturnType<typeof czasy> }> = ({ t, c }) 
   );
 };
 
+// Protokół z walnego: na „oddala” spada czerwona pieczęć, na „traci” moneta toczy się ze stołu
+const Protokol: React.FC<{ t: number; c: ReturnType<typeof czasy>; tx: TeksturyStolu }> = ({ t, c, tx }) => {
+  const st = interpolate(t, [c.oddala - 0.05, c.oddala + 0.18], [0, 1], { ...Z, easing: Easing.in(Easing.quad) });
+  const tocz = interpolate(t, [c.traci - 0.2, c.traci + 2.4], [0, 1], { ...Z, easing: Easing.inOut(Easing.quad) });
+  return (
+    <group position={[3.0, 0, 0.3]} rotation={[0, 0.12, 0]}>
+      <mesh position={[0, 0.012, 0]} receiveShadow castShadow>
+        <boxGeometry args={[1.3, 0.012, 1.8]} />
+        <meshStandardMaterial color="#E7DFCC" roughness={0.95} />
+      </mesh>
+      <mesh position={[0, 0.0195, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[1.28, 1.77]} />
+        <meshStandardMaterial map={tx.protokol} roughness={0.9} />
+      </mesh>
+      {st > 0 ? (
+        <mesh position={[0.05, 0.022 + (1 - st) * 0.8, 0.1]} rotation={[-Math.PI / 2, 0, -0.18]} scale={1 + (1 - st) * 0.5}>
+          <planeGeometry args={[1.05, 0.385]} />
+          <meshBasicMaterial map={tx.pieczec} transparent opacity={0.92 * st} depthWrite={false} />
+        </mesh>
+      ) : null}
+      <mesh position={[0.95 + tocz * 1.6, 0.21, 0.55 + tocz * 0.9]} rotation={[Math.PI / 2, 0, -tocz * 14]} castShadow>
+        <cylinderGeometry args={[0.2, 0.2, 0.05, 40]} />
+        <meshStandardMaterial color={MARKA.zloto} metalness={0.45} roughness={0.35} emissive="#5a3c08" emissiveIntensity={0.35} />
+      </mesh>
+    </group>
+  );
+};
+
+// Urząd gminy: makieta z kolumnami i flagą
+const Gmina: React.FC<{ t: number; c: ReturnType<typeof czasy>; tx: TeksturyStolu }> = ({ t, c, tx }) => {
+  const fronton = useMemo(() => {
+    const sh = new THREE.Shape();
+    sh.moveTo(-1.35, 0);
+    sh.lineTo(1.35, 0);
+    sh.lineTo(0, 0.55);
+    sh.closePath();
+    return new THREE.ExtrudeGeometry(sh, { depth: 0.12, bevelEnabled: false });
+  }, []);
+  const fala = Math.sin(t * 2.2) * 0.12;
+  const swiatlo = interpolate(t, [c.nie - 0.2, c.nie + 0.6], [0, 1], Z);
+  return (
+    <group position={[10.0, 0, 0.0]} rotation={[0, -0.35, 0]}>
+      <mesh position={[0, 0.06, 0.25]} receiveShadow castShadow>
+        <boxGeometry args={[3.1, 0.12, 2.3]} />
+        <meshStandardMaterial color="#CFC8BA" roughness={0.9} />
+      </mesh>
+      <mesh position={[0, 0.78, -0.1]} castShadow receiveShadow>
+        <boxGeometry args={[2.6, 1.3, 1.5]} />
+        <meshStandardMaterial color="#E9E4DA" roughness={0.85} />
+      </mesh>
+      <mesh position={[0, 1.48, -0.85]} castShadow>
+        <boxGeometry args={[2.7, 0.12, 1.75]} />
+        <meshStandardMaterial color="#D9D2C4" roughness={0.85} />
+      </mesh>
+      <mesh geometry={fronton} position={[0, 1.54, 0.76]} castShadow>
+        <meshStandardMaterial color="#E9E4DA" roughness={0.85} />
+      </mesh>
+      {[-0.9, -0.3, 0.3, 0.9].map((x) => (
+        <mesh key={x} position={[x, 0.78, 0.86]} castShadow>
+          <cylinderGeometry args={[0.08, 0.09, 1.3, 16]} />
+          <meshStandardMaterial color="#F4F1EA" roughness={0.7} />
+        </mesh>
+      ))}
+      <mesh position={[0, 1.7, 0.885]}>
+        <planeGeometry args={[1.05, 0.18]} />
+        <meshStandardMaterial map={tx.urzad} roughness={0.6} />
+      </mesh>
+      <mesh position={[0, 0.5, 0.651]}>
+        <planeGeometry args={[0.42, 0.72]} />
+        <meshStandardMaterial color="#5A3B26" roughness={0.6} />
+      </mesh>
+      {[-0.85, 0.85].map((x) => (
+        <mesh key={x} position={[x, 0.85, 0.651]}>
+          <planeGeometry args={[0.3, 0.38]} />
+          <meshBasicMaterial color="#FFD08A" />
+        </mesh>
+      ))}
+      {/* maszt z flagą */}
+      <mesh position={[1.45, 1.35, 1.1]} castShadow>
+        <cylinderGeometry args={[0.025, 0.025, 2.6, 10]} />
+        <meshStandardMaterial color="#B8BBC4" metalness={0.7} roughness={0.3} />
+      </mesh>
+      <group position={[1.47, 2.42, 1.1]} rotation={[0, fala, 0]}>
+        <mesh position={[0.3, 0.09, 0]}>
+          <planeGeometry args={[0.6, 0.18]} />
+          <meshStandardMaterial color="#F4F4F4" side={THREE.DoubleSide} />
+        </mesh>
+        <mesh position={[0.3, -0.09, 0]}>
+          <planeGeometry args={[0.6, 0.18]} />
+          <meshStandardMaterial color="#D4213D" side={THREE.DoubleSide} />
+        </mesh>
+      </group>
+      <pointLight position={[0, 1.2, 2.4]} intensity={6 * swiatlo} color={MARKA.zloto} distance={5} />
+    </group>
+  );
+};
+
 const Swiat: React.FC<{ sceny: ScenaOSP[]; t: number; tx: TeksturyStolu; ts: Tekstury }> = ({ sceny, t, tx, ts }) => {
   const c = czasy(sceny);
   const otw = c.otwarty ? interpolate(t, [c.otwarcie, c.otwarcie + 2.0], [0, 1], { ...Z, easing: Easing.bezier(0.55, 0, 0.25, 1) }) : 0;
@@ -435,6 +573,8 @@ const Swiat: React.FC<{ sceny: ScenaOSP[]; t: number; tx: TeksturyStolu; ts: Tek
       <Laptop t={t} c={c} tx={tx} />
       <Segregator t={ts} otwarcie={otw} blask={blask} pozycja={[0.1, 0.06, 3.5]} obrot={0.42} />
       <Monety t={t} c={c} />
+      <Protokol t={t} c={c} tx={tx} />
+      <Gmina t={t} c={c} tx={tx} />
       <Helm pozycja={[-3.0, 0.06, 0.3]} obrot={0.3} />
       <Dlugopis pozycja={[1.7, 0.1, 4.6]} obrot={0.9} />
     </>
@@ -447,6 +587,7 @@ const Karta: React.FC<{ t: number; od: number; do: number; tytul?: string; wiers
   const { fps } = useVideoConfig();
   if (t < od - 0.05 || t > koniec + 0.6) return null;
   const wejscie = spring({ frame: (t - od) * fps, fps, config: { damping: 18, mass: 1 } });
+  const rozmiar = Math.min(38, Math.floor(600 / (Math.max(...wiersze.map((w) => w.tekst.length)) * 0.6)));
   const wyjscie = interpolate(t, [koniec, koniec + 0.5], [1, 0], Z);
   return (
     <div
@@ -469,9 +610,9 @@ const Karta: React.FC<{ t: number; od: number; do: number; tytul?: string; wiers
       {wiersze.map((w) => {
         const p = spring({ frame: (t - w.t) * fps, fps, config: { damping: 20 } });
         return (
-          <div key={w.tekst} style={{ display: "flex", alignItems: "center", gap: 18, marginTop: 18, opacity: t < w.t ? 0 : p, transform: `translateX(${(1 - p) * -24}px)` }}>
+          <div key={w.tekst} style={{ display: "flex", alignItems: "center", gap: 18, marginTop: 16, opacity: t < w.t ? 0 : p, transform: `translateX(${(1 - p) * -24}px)` }}>
             <div style={{ width: 40, height: 40, borderRadius: 20, background: MARKA.zloto, color: MARKA.tlo, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 24, flexShrink: 0 }}>✓</div>
-            <div style={{ color: "white", fontWeight: 700, fontSize: 38, whiteSpace: "nowrap" }}>{w.tekst}</div>
+            <div style={{ color: "white", fontWeight: 700, fontSize: rozmiar, whiteSpace: "nowrap" }}>{w.tekst}</div>
           </div>
         );
       })}
@@ -499,7 +640,6 @@ export const StolOSP: React.FC<PropsMapy> = ({ sceny, klatkaStartu }) => {
   const ts = useTekstury();
   const c = czasy(sceny);
   const wejscie = interpolate(frame, [0, 10], [0, 1], Z);
-  const lista = c.lista;
   const sl = (s: ScenaOSP | undefined, w: string) => (s ? (czasSlowa(s, w) ?? s.start) : 999);
   return (
     <AbsoluteFill style={{ opacity: klatkaStartu === 0 ? 1 : wejscie }}>
@@ -509,53 +649,18 @@ export const StolOSP: React.FC<PropsMapy> = ({ sceny, klatkaStartu }) => {
         </ThreeCanvas>
       ) : null}
       <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: 560, background: "linear-gradient(rgba(21,22,27,0.85), rgba(21,22,27,0))" }} />
-      {lista ? (
-        <Karta
-          t={t}
-          od={lista.start - 0.1}
-          do={lista.koniec + 0.3}
-          wiersze={[
-            { tekst: "Statut", t: sl(lista, "Statut") },
-            { tekst: "Walne zebranie", t: sl(lista, "walne") },
-            { tekst: "Wnioski do KRS", t: sl(lista, "wnioski") },
-            { tekst: "Sprawozdania", t: sl(lista, "sprawozdania") },
-          ]}
-        />
-      ) : null}
-      {(() => {
-        const s = sceny.find((x) => x.kamera === "laptop");
-        return s ? (
-          <Karta t={t} od={c.polska - 0.2} do={s.koniec + 0.2} wiersze={[{ tekst: "Cała Polska", t: c.polska }, { tekst: "100% zdalnie", t: c.zdalnie }]} />
-        ) : null;
-      })()}
-      {c.otwarty ? (
-        <Karta
-          t={t}
-          od={sl(c.otwarty, "Sprawdzamy") - 0.15}
-          do={c.otwarty.koniec + 0.4}
-          tytul="KROK PO KROKU"
-          wiersze={[
-            { tekst: "Analiza statutu", t: sl(c.otwarty, "Sprawdzamy") },
-            { tekst: "Dokumenty na walne", t: sl(c.otwarty, "dokumenty") },
-            { tekst: "Wniosek do KRS", t: sl(c.otwarty, "wniosek") },
-          ]}
-        />
-      ) : null}
-      {(() => {
-        const s = sceny.find((x) => x.kamera === "helm");
-        return s ? (
+      {sceny.map((s, i) =>
+        s.karta ? (
           <Karta
+            key={i}
             t={t}
-            od={sl(s, "strażakom") - 0.1}
+            od={Math.min(...s.karta.wiersze.map((w) => sl(s, w.slowo))) - 0.2}
             do={s.koniec + 0.3}
-            tytul="POMAGAMY TEŻ STRAŻAKOM"
-            wiersze={[
-              { tekst: "Sprawy prawne", t: sl(s, "prawnych") },
-              { tekst: "Sprawy podatkowe", t: sl(s, "podatkowych") },
-            ]}
+            tytul={s.karta.tytul}
+            wiersze={s.karta.wiersze.map((w) => ({ tekst: w.tekst, t: sl(s, w.slowo) }))}
           />
-        ) : null;
-      })()}
+        ) : null,
+      )}
       {c.monety ? <Licznik t={t} od={sl(c.monety, "1,5%")} do={c.monety.koniec + 0.4} /> : null}
     </AbsoluteFill>
   );
@@ -568,11 +673,9 @@ export const dzwiekiStolu = (sceny: ScenaOSP[]): ZdarzenieDzwiekowe[] => {
     if (s.kamera && s.kamera !== sceny[i].kamera) z.push({ t: s.start - 0.35, plik: "swist", glosnosc: 0.22 });
   });
   z.push({ t: c.stos - 0.2, plik: "papier", glosnosc: 0.55 });
-  if (c.lista) ["Statut", "walne", "wnioski", "sprawozdania"].forEach((w) => z.push({ t: czasSlowa(c.lista!, w) ?? 0, plik: "tik", glosnosc: 0.4 }));
-  z.push({ t: c.polska, plik: "tik", glosnosc: 0.4 }, { t: c.zdalnie, plik: "tik", glosnosc: 0.4 });
+  sceny.forEach((s) => s.karta?.wiersze.forEach((w) => z.push({ t: (czasSlowa(s, w.slowo) ?? s.start) + 0.05, plik: "tik", glosnosc: 0.35 })));
+  z.push({ t: c.oddala, plik: "stempel", glosnosc: 0.4 }, { t: c.traci + 0.2, plik: "blad", glosnosc: 0.25 });
   if (c.otwarty) z.push({ t: c.otwarcie + 0.3, plik: "papier", glosnosc: 0.5 });
-  const helm = sceny.find((x) => x.kamera === "helm");
-  if (helm) ["prawnych", "podatkowych"].forEach((w) => z.push({ t: czasSlowa(helm, w) ?? 0, plik: "tik", glosnosc: 0.4 }));
   if (c.monety) z.push({ t: c.dostawac + 0.3, plik: "dzwonek", glosnosc: 0.4 });
   return z.filter((e) => e.t > 0 && e.t < 900);
 };
