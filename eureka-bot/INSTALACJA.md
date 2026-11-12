@@ -107,10 +107,9 @@ rclone mkdir gdrive:EUREKA && rclone lsd gdrive:
 ```
 
 Po zakończeniu:
-- trafne PDF-y: `~/eureka-dane/<profil>/<rok>/`, estoński CIT: `~/eureka-dane/Estoński CIT/<rok>/`
-- odrzucone PDF-y (do sprawdzenia oceny): `~/eureka-dane/_odrzucone/<profil>/<rok>/`
-  i `~/eureka-dane/Estoński CIT/_odrzucone/<rok>/`
-- raporty Excel: `~/eureka-dane/_raporty/` i `~/eureka-dane/Estoński CIT/_raporty/`
+- potwierdzone PDF-y: `~/eureka-dane/<profil>/<rok>/`, estoński CIT: `~/eureka-dane/Estoński CIT/<rok>/`
+- do weryfikacji (pobrane, treść nie potwierdza tematu): `~/eureka-dane/_do_weryfikacji/<profil>/<rok>/`
+- raporty Excel i pliki STRESZCZENIA: `~/eureka-dane/_raporty/` i `~/eureka-dane/Estoński CIT/_raporty/`
 - kopia wszystkiego na Dysku, mail z podsumowaniem.
 
 Pierwszy bieg sprawdza 45 dni wstecz, więc pobierze więcej (limit 400 PDF-ów na bieg,
@@ -156,19 +155,6 @@ Upewnij się, że strefa czasowa serwera to Polska (`timedatectl`); jeśli nie:
 sudo timedatectl set-timezone Europe/Warsaw
 ```
 
-## Jak działa bot (w skrócie)
+## Jak działa bot
 
-1. **Wyszukiwanie frazami z profili** (`profiles.py`), z filtrem daty wydania z ostatnich
-   45 dni (EUREKA nie pozwala filtrować po dacie publikacji — sprawdzone). Nowe
-   interpretacje rozpoznaje po tym, że ich ID nie ma w rejestrze.
-2. **Filtr przed pobraniem:** jeśli interpretacja powołuje się wyłącznie na inne ustawy niż
-   o CIT/PIT (np. tylko VAT), nie jest pobierana — trafia do arkusza „Pominięte – inna ustawa”.
-3. **Pobranie PDF** każdej pozostałej nowej interpretacji.
-4. **Ocena pełnej treści** względem wszystkich profili: ile razy pada artykuł ulgi (bez
-   wyliczeń „z zastrzeżeniem art. …”), ile razy frazy profilu (z odmianą), czy tekst
-   dotyczy CIT/PIT czy VAT/akcyzy. Trafna → folder profilu. Nietrafna → `_odrzucone`.
-   Progi są w `config.py` (`PROG_ART`, `PROG_FRAZ_Z_ART`, `PROG_FRAZ`) i można je
-   zmienić w `eureka.env` bez ruszania kodu.
-5. Przerwa ~15 s między każdym zapytaniem (zalecenia KIS/MF). Po odpowiedzi 403/429
-   czeka 15 minut (lub tyle, ile każe serwer), próbuje raz, a przy kolejnej blokadzie
-   kończy bieg i informuje mailem.
+Patrz `ZMIANY.md` (przebieg biegu, foldery, uruchamianie ręczne).

@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS interpretacje (
     link                TEXT,
     plik_sciezka        TEXT,
     data_pobrania       TEXT,
-    status_pobrania     TEXT NOT NULL,   -- 'pobrano' | 'blad' | 'do_weryfikacji'
+    status_pobrania     TEXT NOT NULL,   -- 'pobrano' | 'blad' | 'do_weryfikacji' | 'odrzucone'
     tresc_skrot         TEXT
 );
 
@@ -91,8 +91,7 @@ CREATE TABLE IF NOT EXISTS bledy_pobierania (
     czas                TEXT
 );
 
--- Wyniki konkretnego biegu (do raportu). Nowa tabela — istniejące dane
--- nie są ruszane. `dane` to JSON z wierszem raportu.
+-- Wyniki konkretnego biegu (do raportu Excel). `dane` to JSON z wierszem raportu.
 CREATE TABLE IF NOT EXISTS wyniki_biegu (
     bieg_id             INTEGER NOT NULL,
     id_informacji       TEXT NOT NULL,
@@ -133,35 +132,16 @@ def teraz() -> str:
 # DEDUPLIKACJA / REJESTR INTERPRETACJI
 # ---------------------------------------------------------------------------
 def znane_id(conn: sqlite3.Connection) -> set[str]:
-    """ID, których bot nie ocenia drugi raz: pobrane, do weryfikacji
-    i odrzucone. Rekordy ze statusem 'blad' NIE są tu ujęte, więc kolejny
-    bieg spróbuje je pobrać ponownie."""
+    """Zbiór ID już POBRANYCH (status='pobrano') — to jest właściwy test
+    „czy pomijamy jako duplikat". Rekordy 'do_weryfikacji' NIE liczą się
+    jako pobrane w tym sensie (patrz zapisz_interpretacje) — jeśli coś
+    wcześniej trafiło tylko do innego profilu jako do_weryfikacji, a teraz
+    inny profil je POTWIERDZA, wciąż chcemy je mieć w tamtym rekordzie
+    głównym, ale bez ponownego pobierania PDF (ten sam plik, patrz logika
+    w scraper.py: dopasowanie dopisujemy zawsze, plik pobieramy raz)."""
     return {r["id"] for r in conn.execute(
-        "SELECT id FROM interpretacje WHERE status_pobrania IN ('pobrano', 'do_weryfikacji', 'odrzucona')"
+        "SELECT id FROM interpretacje WHERE status_pobrania IN ('pobrano', 'do_weryfikacji')"
     )}
-
-
-def zapisz_wynik_biegu(conn: sqlite3.Connection, bieg_id: int, id_informacji: str, dane: dict) -> None:
-    conn.execute(
-        "INSERT OR REPLACE INTO wyniki_biegu (bieg_id, id_informacji, dane) VALUES (?, ?, ?)",
-        (bieg_id, id_informacji, json.dumps(dane, ensure_ascii=False)),
-    )
-
-
-def wyniki_biegu(conn: sqlite3.Connection, bieg_id: int) -> list[dict]:
-    return [json.loads(r["dane"]) for r in conn.execute(
-        "SELECT dane FROM wyniki_biegu WHERE bieg_id = ? ORDER BY id_informacji", (bieg_id,)
-    )]
-
-
-def bieg(conn: sqlite3.Connection, bieg_id: int) -> sqlite3.Row | None:
-    return conn.execute("SELECT * FROM biegi WHERE id = ?", (bieg_id,)).fetchone()
-
-
-def bledy_biegu(conn: sqlite3.Connection, bieg_id: int) -> list[dict]:
-    return [dict(r) for r in conn.execute(
-        "SELECT * FROM bledy_pobierania WHERE bieg_id = ? ORDER BY czas", (bieg_id,)
-    )]
 
 
 def zapisz_interpretacje(conn: sqlite3.Connection, wiersz: dict) -> None:
@@ -279,3 +259,55 @@ def ostatni_niedokonczony_postep(conn: sqlite3.Connection) -> sqlite3.Row | None
 def oznacz_bieg_jako_przerwany(conn: sqlite3.Connection, bieg_id: int) -> None:
     conn.execute("UPDATE biegi SET status='przerwany', koniec_czas=? WHERE id=? AND status='w_toku'",
                  (teraz(), bieg_id))
+
+
+# ---------------------------------------------------------------------------
+# DODANE 2026-11-12: REKORDY ODRZUCONE I PODNOSZENIE STATUSU
+# ---------------------------------------------------------------------------
+def zapisz_odrzucona(conn: sqlite3.Connection, wiersz: dict) -> None:
+    """Wpis o rekordzie, który wyszukiwarka zwróciła, ale który nie pasuje do
+    żadnego profilu. PDF NIE jest pobierany. INSERT OR IGNORE: nigdy nie
+    nadpisuje istniejącego wpisu, więc nie cofnie statusu rekordu już
+    pobranego. Status 'odrzucone' nie wchodzi do znane_id(), więc po zmianie
+    reguł taki rekord zostanie oceniony ponownie i w razie potrzeby pobrany."""
+    conn.execute("""
+        INSERT OR IGNORE INTO interpretacje
+            (id, sygnatura, tytul, data_wydania, data_publikacji, organ,
+             link, plik_sciezka, data_pobrania, status_pobrania, tresc_skrot)
+        VALUES (:id, :sygnatura, :tytul, :data_wydania, :data_publikacji, :organ,
+                :link, :plik_sciezka, :data_pobrania, :status_pobrania, :tresc_skrot)
+    """, wiersz)
+
+
+def potwierdz_znana(conn: sqlite3.Connection, id_informacji: str, plik_sciezka: str | None = None) -> None:
+    """Rekord już pobrany jako 'do_weryfikacji', który przy kolejnym biegu
+    został potwierdzony przez pole PRZEPISY, dostaje status 'pobrano'.
+    Ścieżkę pliku uzupełnia tylko wtedy, gdy jej dotąd nie było."""
+    conn.execute("""
+        UPDATE interpretacje
+        SET status_pobrania = 'pobrano', plik_sciezka = COALESCE(plik_sciezka, ?)
+        WHERE id = ? AND status_pobrania = 'do_weryfikacji'
+    """, (plik_sciezka, id_informacji))
+
+
+# ---------------------------------------------------------------------------
+# WERSJA SERWEROWA: wyniki biegu do raportu, sprawdzenie czy ID już w rejestrze
+# ---------------------------------------------------------------------------
+def zapisz_wynik_biegu(conn: sqlite3.Connection, bieg_id: int, id_informacji: str, dane: dict) -> None:
+    conn.execute(
+        "INSERT OR REPLACE INTO wyniki_biegu (bieg_id, id_informacji, dane) VALUES (?, ?, ?)",
+        (bieg_id, id_informacji, json.dumps(dane, ensure_ascii=False)),
+    )
+
+
+def wyniki_biegu(conn: sqlite3.Connection, bieg_id: int) -> list[dict]:
+    return [json.loads(r["dane"]) for r in conn.execute(
+        "SELECT dane FROM wyniki_biegu WHERE bieg_id = ? ORDER BY id_informacji", (bieg_id,)
+    )]
+
+
+def wszystkie_id(conn: sqlite3.Connection) -> set[str]:
+    """Każde ID z rejestru, także 'odrzucone' i 'blad'. Status 'odrzucone' celowo
+    NIE wchodzi do znane_id() (po zmianie reguł rekord jest oceniany ponownie),
+    ale do raportu trafia tylko to, czego w rejestrze jeszcze nie było."""
+    return {r["id"] for r in conn.execute("SELECT id FROM interpretacje")}

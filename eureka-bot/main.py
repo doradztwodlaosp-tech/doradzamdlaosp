@@ -8,6 +8,7 @@ main.py — punkt wejścia bota EUREKA
   python main.py --okno 14               # okno 14 dni zamiast domyślnego
   python main.py --od 2026-10-01 --do 2026-10-31   # konkretny zakres dat wydania
   python main.py --bez-wysylki           # bez maila i bez Dysku
+  python main.py --tylko-raport 7        # odtwórz raporty i mail z zapisanego biegu nr 7
   python main.py --test-maila            # wyślij próbny mail (sprawdzenie konfiguracji)
   python main.py --lista-profili
 
@@ -36,6 +37,7 @@ def _parser() -> argparse.ArgumentParser:
     p.add_argument("--od", metavar="RRRR-MM-DD")
     p.add_argument("--do", metavar="RRRR-MM-DD")
     p.add_argument("--bez-wysylki", action="store_true", help="bez maila i bez Dysku Google")
+    p.add_argument("--tylko-raport", type=int, metavar="BIEG", help="odtwórz raporty (i wyślij) z zapisanego biegu")
     p.add_argument("--test-maila", action="store_true", help="wyślij próbny mail i zakończ")
     p.add_argument("--lista-profili", action="store_true")
     return p
@@ -60,6 +62,13 @@ def main(argv: list[str] | None = None) -> int:
         ok = wysylka.wyslij_mail("EUREKA — mail testowy",
                                  "<p>Konfiguracja wysyłki działa.</p>", [])
         return 0 if ok else 1
+
+    if args.tylko_raport:
+        wynik = wynik_z_rejestru(args.tylko_raport)
+        if wynik is None:
+            print(f"BŁĄD: brak biegu nr {args.tylko_raport} w rejestrze.")
+            return 1
+        return _raporty_i_wysylka(wynik, args.bez_wysylki)
 
     ostrzezenia = sprawdz_profile()
     if ostrzezenia:
@@ -88,26 +97,51 @@ def main(argv: list[str] | None = None) -> int:
         return 3
 
     print(f"--- START {datetime.now():%Y-%m-%d %H:%M:%S} ---")
-    wynik = uruchom_przeglad(od, do, args.profil, tryb="reczny" if args.profil else "automatyczny")
+    reczny = bool(args.profil or args.od or args.do or args.okno)
+    wynik = uruchom_przeglad(od, do, args.profil, tryb="reczny" if reczny else "automatyczny")
     l = wynik["licznik"]
     print(f"\n=== PODSUMOWANIE (bieg #{wynik['bieg_id']}, status: {wynik['status']}) ===")
     print(f"  Zapytań: {l['zapytania']} | nowych znalezionych: {l['znaleziono']} | już w rejestrze: {l['duplikaty']}")
-    print(f"  Trafne: {l['trafne']} | odrzucone po ocenie treści: {l['odrzucone']} | błędy: {l['bledy']}")
+    print(f"  Potwierdzone: {l['potwierdzone']} | do weryfikacji: {l['do_weryfikacji']} | "
+          f"odrzucone bez pobierania: {l['odrzucone']} | błędy: {l['bledy']}")
 
     if wynik["podglad"]:
         print("Podgląd: nie tworzę raportów i niczego nie wysyłam.")
         return 0
+    kod = _raporty_i_wysylka(wynik, args.bez_wysylki)
+    print(f"--- KONIEC {datetime.now():%Y-%m-%d %H:%M:%S} ---")
+    return kod if kod else (0 if wynik["status"] == "sukces" else 2)
 
+
+def _raporty_i_wysylka(wynik: dict, bez_wysylki: bool) -> int:
     sciezki = reports.zapisz_raporty(wynik)
     for s in sciezki:
         print(f"Raport: {s}")
-
-    if not args.bez_wysylki:
+    if not bez_wysylki:
         drive_ok = wysylka.synchronizuj_dysk()
         wysylka.wyslij_mail(reports.temat_maila(wynik), reports.tresc_maila_html(wynik, drive_ok), sciezki)
+    return 0
 
-    print(f"--- KONIEC {datetime.now():%Y-%m-%d %H:%M:%S} ---")
-    return 0 if wynik["status"] == "sukces" else 2
+
+def wynik_z_rejestru(bieg_id: int) -> dict | None:
+    """Odtwarza strukturę wyniku biegu z tabel biegi / wyniki_biegu / bledy_pobierania."""
+    import db
+    import json
+    with db.polacz(config.SCIEZKA_DB) as conn:
+        b = conn.execute("SELECT * FROM biegi WHERE id = ?", (bieg_id,)).fetchone()
+        if b is None:
+            return None
+        wiersze = db.wyniki_biegu(conn, bieg_id)
+        bledy = [dict(r) for r in conn.execute(
+            "SELECT id_informacji AS id, profil_klucz AS profil, komunikat, czas FROM bledy_pobierania WHERE bieg_id = ?",
+            (bieg_id,))]
+        lata = json.loads(b["lata_json"] or "[]")
+    licznik = {"zapytania": 0, "znaleziono": b["znaleziono"] or 0, "duplikaty": b["duplikaty"] or 0,
+               "odrzucone": sum(w["status"] == "odrzucona" for w in wiersze),
+               "potwierdzone": b["nowe"] or 0, "do_weryfikacji": b["do_weryfikacji"] or 0, "bledy": b["bledy"] or 0}
+    return {"bieg_id": bieg_id, "status": b["status"] or "blad", "od": lata[0] if lata else "", "do": lata[-1] if lata else "",
+            "profile": json.loads(b["profile_json"] or "[]"), "licznik": licznik, "wiersze": wiersze,
+            "bledy": bledy, "komunikat": "", "podglad": False}
 
 
 if __name__ == "__main__":

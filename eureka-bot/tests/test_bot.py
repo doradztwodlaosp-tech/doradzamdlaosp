@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Testy bez sieci: ocena treści + pełny bieg na symulowanym API.
-Uruchom z folderu eureka-bot:  python -m unittest discover -s tests -v"""
+"""Testy bez sieci. Uruchom z folderu eureka-bot:  python -m unittest discover -s tests -v"""
 from __future__ import annotations
 
 import os
@@ -19,105 +18,102 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import config  # noqa: E402
 import eureka_client  # noqa: E402
+import matcher  # noqa: E402
 import przeglad  # noqa: E402
 import reports  # noqa: E402
-from klasyfikator import ocen, profile_z_przepisow, tekst_z_pdf, wzorzec_frazy  # noqa: E402
+from klasyfikator import bez_zastrzezen, ocen, tekst_z_pdf, wzorzec_frazy  # noqa: E402
+from profiles import PROFILE  # noqa: E402
+from streszczenie import streszcz  # noqa: E402
 
-CIT = "[CIT] Ustawa z dnia 15 lutego 1992 r. o podatku dochodowym od osób prawnych"
-VAT = "[VAT] Ustawa z dnia 11 marca 2004 r. o podatku od towarów i usług"
+CIT = "[CIT] Ustawa o podatku dochodowym od osób prawnych"
+PIT = "[PIT] Ustawa o podatku dochodowym od osób fizycznych"
+VAT = "[VAT] Ustawa o podatku od towarów i usług"
 
-TEKST_VAT_Z_GRA = ("Interpretacja indywidualna w zakresie podatku od towarów i usług. Stawka VAT dla "
-                   "sprzedaży licencji. Wnioskodawca prowadzi sprzedaż, m.in. gra komputerowa. Zgodnie z art. 41 "
-                   "ustawy o podatku od towarów i usług stawka VAT wynosi 23%. Podatek VAT należy rozliczyć.")
-TEKST_IP_BOX = ("Interpretacja w zakresie podatku dochodowego od osób fizycznych. Wnioskodawca tworzy gra "
-                "komputerowa i chce stosować preferencyjne opodatkowanie IP Box. Zgodnie z art. 30ca ust. 1 "
-                "ustawy o podatku dochodowym od osób fizycznych dochód z kwalifikowanych praw własności "
-                "intelektualnej opodatkowany jest stawką 5%. Art. 30ca ust. 2 wymienia autorskie prawo do "
-                "programu komputerowego. Ewidencja zgodnie z art. 30cb.")
+TEKST_IP_BOX = ("Interpretacja indywidualna – stanowisko prawidłowe\nData publikacji: 2026-11-05T10:00:00\n"
+                "Opis stanu faktycznego\nWnioskodawca prowadzi działalność programistyczną i tworzy gra komputerowa.\n"
+                "Pytania\n1. Czy dochód z kwalifikowanego prawa może być opodatkowany stawką 5% (IP Box)?\n"
+                "2. Czy ewidencja prowadzona przez Wnioskodawcę spełnia wymogi art. 30cb?\n"
+                "Państwa stanowisko w sprawie\nTak.\nOcena stanowiska\n"
+                "Stanowisko, które przedstawili Państwo we wniosku jest prawidłowe.\n"
+                "Uzasadnienie interpretacji indywidualnej\nZgodnie z art. 30ca ust. 1 ustawy o podatku dochodowym "
+                "od osób fizycznych dochód z kwalifikowanych praw własności intelektualnej opodatkowany jest stawką 5%. "
+                "Art. 30ca ust. 2 wymienia autorskie prawo do programu komputerowego. Tym samym mogą Państwo stosować "
+                "preferencyjną stawkę na podstawie art. 30ca.\nPouczenie o funkcji ochronnej interpretacji\n...")
+TEKST_SSE = ("Interpretacja indywidualna – stanowisko nieprawidłowe\nOpis stanu faktycznego\nSpółka działa w PSI.\n"
+             "Pytanie\nCzy dochody zwolnione należy uwzględnić we wskaźniku art. 24ca?\nOcena stanowiska\n"
+             "Stanowisko, które przedstawili Państwo we wniosku jest nieprawidłowe.\nUzasadnienie interpretacji indywidualnej\n"
+             "Zgodnie z art. 7 ust. 2 ustawy o CIT, dochodem ze źródła przychodów, z zastrzeżeniem art. 11c, art. 11i, "
+             "art. 24a, art. 24b, art. 24ca, art. 24d i art. 24f, jest nadwyżka sumy przychodów. " * 2
+             + "Zwolnienie na podstawie art. 17 ust. 1 pkt 34a ustawy o podatku dochodowym od osób prawnych.\n"
+             "Informacja o zakresie rozstrzygnięcia\n")
 
 
-def rek(id_, przepisy=None, teza="", dt="2026-11-02"):
-    return {"ID_INFORMACJI": id_, "SYG": f"0111-KDIB1-3.4010.{id_}.2026.1.AB", "DT_WYD": dt,
-            "AUTOR": "Dyrektor KIS", "TEZA": teza, "SLOWA_KLUCZOWE": None, "PRZEPISY": przepisy}
+def rek(id_, przepisy=None, teza="", dt="2026-11-02", syg_kod="4010", slowa=None):
+    return {"ID_INFORMACJI": id_, "SYG": f"0111-KDIB1-3.{syg_kod}.{id_}.2026.1.AB", "DT_WYD": dt,
+            "AUTOR": "Dyrektor KIS", "TEZA": teza, "SLOWA_KLUCZOWE": slowa, "ZAGADNIENIA": None, "PRZEPISY": przepisy}
 
 
-class TestOcena(unittest.TestCase):
+class TestMatcher(unittest.TestCase):
+    def test_przepis_potwierdza_dowolny_profil(self):
+        d = matcher.ocen_rekord(rek(1, [f"{PIT}-Rozdział 7a-art. 30ca-ust. 2"]), PROFILE["ulga_br"], "prace rozwojowe")
+        self.assertEqual([(x.profil_klucz, x.pewnosc) for x in d], [("ip_box_pit", "POTWIERDZONE")])
+
+    def test_vat_z_tematem_odrzucony(self):
+        d = matcher.ocen_rekord(rek(2, [f"{VAT}-art. 86"], teza="Odliczenie VAT od działalności badawczo-rozwojowej",
+                                    syg_kod="4012"), PROFILE["ulga_br"], "działalność badawczo-rozwojowa")
+        self.assertEqual(d, [])
+
+    def test_cit_bez_ulgi_bez_tematu_odrzucony(self):
+        d = matcher.ocen_rekord(rek(3, [f"{CIT}-art. 15-ust. 1"], teza="Zaliczenie do kosztów uzyskania przychodów "
+                                    "wydatków na najem powierzchni biurowej"), PROFILE["ulga_br"], "art. 18d")
+        self.assertEqual(d, [])
+
+    def test_krotka_teza_watpliwosc_na_korzysc_pobrania(self):
+        d = matcher.ocen_rekord(rek(3, [f"{CIT}-art. 15-ust. 1"], teza="Koszty najmu"), PROFILE["ulga_br"], "art. 18d")
+        self.assertEqual(d[0].pewnosc, "DO_WERYFIKACJI")
+
+    def test_temat_w_tezie_do_weryfikacji(self):
+        d = matcher.ocen_rekord(rek(4, [f"{CIT}-art. 15-ust. 1"], teza="Ulga na robotyzację a leasing robota"),
+                                PROFILE["ulga_br"], "prace rozwojowe")
+        self.assertEqual([(x.profil_klucz, x.pewnosc) for x in d], [("ulga_robotyzacja", "DO_WERYFIKACJI")])
+
+    def test_estonski_potwierdzony_mimo_frazy_wykluczajacej(self):
+        d = matcher.ocen_rekord(rek(5, [f"{CIT}-Rozdział 6b-art. 28j-ust. 1"],
+                                    teza="Przejście z ryczałtu od przychodów ewidencjonowanych na estoński CIT"),
+                                PROFILE["estonski_cit"], "estoński CIT")
+        self.assertEqual(d[0].profil_klucz, "estonski_cit")
+        self.assertEqual(d[0].pewnosc, "POTWIERDZONE")
+
+
+class TestTresc(unittest.TestCase):
     def test_odmiana_frazy(self):
-        w = wzorzec_frazy("ulga badawczo-rozwojowa")
-        self.assertTrue(w.search("skorzystania z ulgi badawczo-rozwojowej"))
-        self.assertTrue(wzorzec_frazy("IP Box").search("opodatkowanie IP Box"))
-        self.assertFalse(wzorzec_frazy("IP Box").search("IP Boxer"[:2]))
+        self.assertTrue(wzorzec_frazy("ulga badawczo-rozwojowa").search("z ulgi badawczo-rozwojowej"))
 
-    def test_vat_z_jedna_wzmianka_odrzucony(self):
-        o = ocen(TEKST_VAT_Z_GRA, "ip_box_pit", z_przepisow=False)
-        self.assertFalse(o.trafna, o)
+    def test_zastrzezenie_nie_liczy_sie(self):
+        self.assertEqual(ocen(TEKST_SSE, "ip_box_cit").art, 0)
+        self.assertFalse(ocen(TEKST_SSE, "ip_box_cit").trafna)
+        self.assertEqual(bez_zastrzezen("x, z zastrzeżeniem art. 24 ust. 1 pkt 2, art. 30ca oraz art. 30da, jest"), "x,  jest")
 
-    def test_ip_box_trafny(self):
-        o = ocen(TEKST_IP_BOX, "ip_box_pit", z_przepisow=False)
+    def test_ip_box_potwierdzony_trescia(self):
+        o = ocen(TEKST_IP_BOX, "ip_box_pit")
         self.assertTrue(o.trafna, o)
-        self.assertGreaterEqual(o.art, 3)
+        self.assertFalse(ocen(TEKST_IP_BOX, "ip_box_cit").trafna)
 
-    def test_metadane_przesadzaja(self):
-        self.assertTrue(ocen("", "ulga_br", z_przepisow=True).trafna)
-
-    def test_profile_z_przepisow(self):
-        self.assertEqual(profile_z_przepisow(rek(1, [f"{CIT} - art. 18d ust. 1"])), ["ulga_br"])
-        self.assertEqual(profile_z_przepisow(rek(1, [f"{VAT} - art. 18d"])), [])
-        self.assertEqual(profile_z_przepisow(rek(1, None)), [])
-
-    def test_18da_nie_lapie_18d(self):
-        self.assertEqual(ocen("art. 18da ust. 1, art. 18da", "ulga_br", False).art, 2)
-        self.assertEqual(ocen("art. 18da ust. 1", "innowacyjni_pracownicy", False).art, 0)
-
-    def test_cytat_art_7_nie_liczy_sie_jako_ip_box(self):
-        # Przypadek z prawdziwych interpretacji 0111-KDIB1-3.4010.555.2026.1.DW i ...465.2026.1.SH
-        # (zwolnienie SSE/PSI), znalezionych frazą „art. 24d” tylko przez cytat art. 7 ust. 2.
-        cytat = ("Zgodnie z art. 7 ust. 2 ustawy o CIT, dochodem ze źródła przychodów, z zastrzeżeniem "
-                 "art. 11c, art. 11i, art. 24a, art. 24b, art. 24ca, art. 24d i art. 24f, jest nadwyżka. ")
-        tekst = "Interpretacja w zakresie podatku dochodowego od osób prawnych. " + cytat * 2 + \
-                "Zwolnienie na podstawie art. 17 ust. 1 pkt 34a. Decyzja o wsparciu. " * 3
-        o = ocen(tekst, "ip_box_cit", z_przepisow=False)
-        self.assertEqual(o.art, 0)
-        self.assertFalse(o.trafna)
-
-    def test_vat_tylko_pomijany_przed_pobraniem(self):
-        from klasyfikator import inna_ustawa
-        self.assertEqual(inna_ustawa(rek(1, [f"{VAT}-Dział VIII-art. 86-ust. 1"])), "VAT")
-        self.assertIsNone(inna_ustawa(rek(1, [f"{VAT}-art. 86", f"{CIT}-Rozdział 2-art. 12"])))
-        self.assertIsNone(inna_ustawa(rek(1, None)))
-
-    def test_prawdziwy_format_przepisow(self):
-        self.assertEqual(profile_z_przepisow(rek(1, [f"{CIT}-Rozdział 4a-art. 18d-ust. 1"])), ["ulga_br"])
-        self.assertEqual(profile_z_przepisow(rek(1, [f"{CIT}-Rozdział 6b-art. 28m-ust. 1-pkt 2"])), ["estonski_cit"])
-        self.assertEqual(profile_z_przepisow(rek(1, [f"{CIT}-Rozdział 2-art. 12-ust. 1-pkt 1"])), [])
-
-    def test_estonski_wykluczenie(self):
-        o = ocen("ryczałt od przychodów ewidencjonowanych; ukryte zyski ukryte zyski ukryte zyski "
-                 "ukryte zyski ukryte zyski", "estonski_cit", False)
-        self.assertFalse(o.trafna)
-
-    def test_pdf_tekst(self):
+    def test_pdf_uszkodzony(self):
         self.assertEqual(tekst_z_pdf(b"to nie jest pdf"), "")
-        self.assertIn("art. 18d", tekst_z_pdf(_maly_pdf("Ulga B+R art. 18d updop")))
 
-
-def _maly_pdf(tekst: str) -> bytes:
-    strumien = f"BT /F1 12 Tf 50 700 Td ({tekst}) Tj ET".encode()
-    obiekty = [b"<< /Type /Catalog /Pages 2 0 R >>",
-               b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-               b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R "
-               b"/Resources << /Font << /F1 5 0 R >> >> >>",
-               b"<< /Length " + str(len(strumien)).encode() + b" >>stream\n" + strumien + b"\nendstream",
-               b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>"]
-    out, pozycje = b"%PDF-1.4\n", []
-    for i, o in enumerate(obiekty, 1):
-        pozycje.append(len(out))
-        out += f"{i} 0 obj\n".encode() + o + b"\nendobj\n"
-    xref = len(out)
-    out += f"xref\n0 {len(obiekty) + 1}\n0000000000 65535 f \n".encode()
-    out += b"".join(f"{p:010d} 00000 n \n".encode() for p in pozycje)
-    out += f"trailer << /Size {len(obiekty) + 1} /Root 1 0 R >>\nstartxref\n{xref}\n%%EOF".encode()
-    return out
+    def test_streszczenie(self):
+        s = streszcz(TEKST_IP_BOX, ["ip_box_pit"])
+        self.assertEqual(s.rozstrzygniecie, "prawidłowe")
+        self.assertEqual(len(s.pytania), 2)
+        self.assertIn("stawką 5%", s.pytania[0])
+        self.assertIn("programistyczną", s.stan_faktyczny)
+        self.assertIn("prawidłowe", s.ocena)
+        self.assertTrue(any("art. 30ca" in z for z in s.kluczowe_zdania))
+        self.assertIn("ROZSTRZYGNIĘCIE", s.tekst())
+        s2 = streszcz(TEKST_SSE, ["ip_box_cit"])
+        self.assertEqual(s2.rozstrzygniecie, "nieprawidłowe")
+        self.assertEqual(s2.kluczowe_zdania, [])
 
 
 class TestZapytanie(unittest.TestCase):
@@ -127,8 +123,7 @@ class TestZapytanie(unittest.TestCase):
         self.assertEqual(c["filter"], {"DT_WYD_start": "2026-10-01", "DT_WYD_end": "2026-11-12"})
 
     def test_kazda_fraza_raz(self):
-        f = przeglad.frazy_do_wyszukania(["ip_box_cit", "ip_box_pit"])
-        self.assertEqual(f["IP Box"], ["ip_box_cit", "ip_box_pit"])
+        self.assertEqual(przeglad.frazy_do_wyszukania(["ip_box_cit", "ip_box_pit"])["IP Box"], ["ip_box_cit", "ip_box_pit"])
 
     def _odp(self, kod, json_=None, retry=None):
         o = mock.Mock(status_code=kod, headers={"Retry-After": retry} if retry else {})
@@ -151,20 +146,16 @@ class TestZapytanie(unittest.TestCase):
         spij.assert_called_once_with(120.0)
 
 
-# Symulowana EUREKA: która fraza zwraca które rekordy + treść PDF-ów
+# Symulowana EUREKA: fraza -> rekordy; ID -> treść PDF
 API = {
-    "IP Box": [rek(201, teza="IP Box programisty"), rek(202, teza="Stawka VAT na licencje")],
-    "gra komputerowa": [rek(202, teza="Stawka VAT na licencje")],
-    "art. 18d": [rek(203, [f"{CIT} - art. 18d ust. 2"], teza="Koszty kwalifikowane")],
-    "ryczałt od dochodów spółek": [rek(204, teza="Estoński CIT — ukryte zyski")],
-    # VAT-owa interpretacja z „działalnością badawczo-rozwojową” — pomijana bez pobierania
-    "działalność badawczo-rozwojowa": [rek(205, [f"{VAT}-Dział IX-art. 86-ust. 1"], teza="Odliczenie VAT")],
-    # IP Box znaleziony frazą B+R (bez przepisów) — ma trafić do IP Box PIT, nie do odrzuconych
-    "prace rozwojowe": [rek(206, None, teza="Preferencyjne opodatkowanie")],
+    "art. 18d": [rek(201, [f"{CIT}-Rozdział 4a-art. 18d-ust. 2"], teza="Koszty kwalifikowane B+R")],
+    "prace rozwojowe": [rek(202, [f"{PIT}-art. 9"], teza="Preferencyjne opodatkowanie IP Box", syg_kod="4011"),   # DO_WERYF → treść potwierdza
+                        rek(203, [f"{VAT}-art. 86"], teza="Odliczenie VAT, działalność badawczo-rozwojowa", syg_kod="4012"),  # odrzucona
+                        rek(204, [f"{CIT}-art. 17-ust. 1-pkt 34a"], teza="Zwolnienie SSE a ulga B+R", syg_kod="4010")],  # DO_WERYF → treść nie potwierdza
+    "ryczałt od dochodów spółek": [rek(205, [f"{CIT}-Rozdział 6b-art. 28m-ust. 1"], teza="Estoński CIT — ukryte zyski")],
 }
-PDF = {"201": TEKST_IP_BOX, "202": TEKST_VAT_Z_GRA, "203": "krótki tekst",
-       "204": "Ryczałt od dochodów spółek, art. 28m ust. 1 updop, ukryte zyski, art. 28m ust. 3, art. 28c.",
-       "206": "Data publikacji: 2026-11-05T10:00:00\n" + TEKST_IP_BOX}
+PDF = {"201": "krótki tekst", "202": TEKST_IP_BOX, "204": TEKST_SSE,
+       "205": "Ryczałt od dochodów spółek, art. 28m ust. 1 updop, ukryte zyski."}
 
 
 def falszywe_wyszukaj(sesja, fraza, strona, rozmiar, zakres_dat=None, **_):
@@ -176,58 +167,69 @@ class TestBieg(unittest.TestCase):
     def setUp(self):
         config.TRYB_PODGLAD = False
 
-    def _bieg(self):
-        with mock.patch.object(przeglad, "pobierz_pdf", lambda s, i: i.encode()):
-            return self._bieg_bez_patcha_pdf()
-
-    def _bieg_bez_patcha_pdf(self):
+    def _bieg(self, pobrane=None):
+        def pdf(s, i):
+            if pobrane is not None:
+                pobrane.append(i)
+            return i.encode()
         with mock.patch.object(przeglad, "wyszukaj", falszywe_wyszukaj), \
+             mock.patch.object(przeglad, "pobierz_pdf", pdf), \
              mock.patch.object(przeglad, "tekst_z_pdf", lambda b: PDF[b.decode()]), \
              mock.patch.object(przeglad, "pauza", lambda *a, **k: None):
             return przeglad.uruchom_przeglad(date(2026, 10, 1), date(2026, 11, 12))
 
     def test_1_podglad_nic_nie_pobiera_ani_nie_zapisuje(self):
         config.TRYB_PODGLAD = True
-        with mock.patch.object(przeglad, "pobierz_pdf", side_effect=AssertionError("pobrał w podglądzie")):
-            w = self._bieg()
-        self.assertEqual((w["licznik"]["znaleziono"], w["licznik"]["pominiete"]), (6, 1))
+        pobrane = []
+        w = self._bieg(pobrane)
+        self.assertEqual((w["licznik"]["znaleziono"], w["licznik"]["odrzucone"]), (5, 1))
+        self.assertEqual(pobrane, [])
         con = sqlite3.connect(config.SCIEZKA_DB)
         self.assertEqual(con.execute("select count(*) from interpretacje").fetchone()[0], 0)
         self.assertEqual(con.execute("select count(*) from biegi").fetchone()[0], 0)
 
-    def test_2_bieg_foldery_raport_powtorka(self):
+    def test_2_bieg_foldery_raporty_powtorka(self):
         pobrane = []
-        with mock.patch.object(przeglad, "pobierz_pdf", lambda s, i: pobrane.append(i) or i.encode()):
-            w = self._bieg_bez_patcha_pdf()
+        w = self._bieg(pobrane)
         l = w["licznik"]
-        self.assertEqual((l["znaleziono"], l["pominiete"], l["trafne"], l["odrzucone"]), (6, 1, 4, 1))
-        self.assertNotIn("205", pobrane)                      # VAT-only: bez pobierania
+        self.assertEqual((l["znaleziono"], l["odrzucone"], l["potwierdzone"], l["do_weryfikacji"]), (5, 1, 3, 1))
+        self.assertNotIn("203", pobrane)
         pdfy = sorted(p.relative_to(TMP).as_posix() for p in Path(TMP).rglob("*.pdf"))
-        self.assertEqual(len(pdfy), 5)
-        self.assertTrue(any(p.startswith("IP Box — PIT") and "ID206" in p for p in pdfy), pdfy)
-        w206 = next(x for x in w["wiersze"] if x["id"] == "206")
-        self.assertEqual(w206["data_publikacji"], "2026-11-05")
-        self.assertTrue(any(p.startswith("Estoński CIT/2026/") for p in pdfy), pdfy)
-        self.assertTrue(any(p.startswith("_odrzucone/") and "ID202" in p for p in pdfy), pdfy)
-        self.assertTrue(any(p.startswith("IP Box — PIT") and "ID201" in p for p in pdfy), pdfy)
+        self.assertEqual(len(pdfy), 4, pdfy)
+        self.assertTrue(any(p.startswith("Estoński CIT/2026/") and "ID205" in p for p in pdfy), pdfy)
+        self.assertTrue(any(p.startswith("IP Box — PIT") and "ID202" in p for p in pdfy), pdfy)
+        self.assertTrue(any(p.startswith("_do_weryfikacji/Ulga B+R") and "ID204" in p for p in pdfy), pdfy)
+        w202 = next(x for x in w["wiersze"] if x["id"] == "202")
+        self.assertEqual(w202["data_publikacji"], "2026-11-05")
+        self.assertIn("ROZSTRZYGNIĘCIE: prawidłowe", w202["streszczenie"])
 
         sciezki = reports.zapisz_raporty(w)
+        self.assertEqual(len(sciezki), 4)
         self.assertTrue(all(s.exists() for s in sciezki))
-        self.assertIn("Estoński CIT", str(sciezki[1]))
-        self.assertIn("estoński CIT 1 nowych", reports.temat_maila(w))
+        self.assertIn("ID202", sciezki[2].read_text(encoding="utf-8"))
+        self.assertIn("estoński CIT 1", reports.temat_maila(w))
+        html = reports.tresc_maila_html(w, True)
+        self.assertIn("ROZSTRZYGNIĘCIE", html)
 
         w2 = self._bieg()
-        self.assertEqual((w2["licznik"]["znaleziono"], w2["licznik"]["duplikaty"]), (0, 6))
+        self.assertEqual((w2["licznik"]["znaleziono"], w2["licznik"]["duplikaty"]), (1, 4))  # 203 oceniana ponownie,
+        self.assertEqual(w2["licznik"]["odrzucone"], 0)                                      # ale nie raportowana drugi raz
 
     def test_3_blokada_konczy_bieg_czysto(self):
         def blokada(*a, **k):
             raise eureka_client.BlokadaError("HTTP 429")
-        with mock.patch.object(przeglad, "wyszukaj", blokada), \
-             mock.patch.object(przeglad, "pauza", lambda *a, **k: None):
+        with mock.patch.object(przeglad, "wyszukaj", blokada), mock.patch.object(przeglad, "pauza", lambda *a, **k: None):
             w = przeglad.uruchom_przeglad(date(2026, 11, 1), date(2026, 11, 12))
         self.assertEqual(w["status"], "przerwany")
         con = sqlite3.connect(config.SCIEZKA_DB)
         self.assertEqual(con.execute("select status from biegi order by id desc").fetchone()[0], "przerwany")
+
+    def test_4_tylko_raport_z_rejestru(self):
+        import main
+        w = main.wynik_z_rejestru(1)
+        self.assertIsNotNone(w)
+        self.assertEqual(len(w["wiersze"]), 5)
+        self.assertTrue(all(s.exists() for s in reports.zapisz_raporty(w)))
 
 
 if __name__ == "__main__":

@@ -2,17 +2,22 @@
 """
 przeglad.py — jeden bieg bota
 ==============================
-1. WYSZUKIWANIE: każda fraza z profili (profiles.py) jest wysyłana do EUREKI
-   z filtrem daty wydania [dziś - OKNO_DNI, dziś]. Ta sama fraza w kilku
-   profilach (np. „IP Box” w CIT i PIT) idzie tylko raz. Interpretacje już
-   znane z rejestru (po ID) są pomijane.
-2. POBRANIE: każda nowa znaleziona interpretacja jest pobierana (PDF).
-3. OCENA TREŚCI (klasyfikator.py): osobno dla każdego profilu, który ją
-   znalazł. Trafne -> folder profilu. Nietrafne -> folder `_odrzucone`
-   (nic nie jest kasowane, żeby dało się sprawdzić ocenę).
+1. WYSZUKIWANIE: każda fraza z profili (profiles.py) z filtrem daty wydania
+   [od, do]. Ta sama fraza w kilku profilach idzie raz. Interpretacje znane
+   z rejestru (pobrane / do weryfikacji) są pomijane.
+2. OCENA NA METADANYCH (matcher.ocen_rekord — przed pobraniem, bez kosztu),
+   względem WSZYSTKICH profili:
+     POTWIERDZONE   artykuł ulgi w polu PRZEPISY
+     DO_WERYFIKACJI temat w tezie/słowach kluczowych albo przepis pomocniczy
+     ODRZUCONE      nic z powyższych (np. interpretacja VAT) — bez pobierania,
+                    sam wpis w rejestrze i w arkuszu „Odrzucone”
+3. POBRANIE PDF każdej potwierdzonej i każdej do weryfikacji — plik zawsze
+   leży u Ciebie. Dla DO_WERYFIKACJI dodatkowo ocena pełnej treści
+   (klasyfikator.ocen): gdy treść potwierdza temat → folder profilu;
+   gdy nie → folder `_do_weryfikacji/<profil>/<rok>`.
+4. STRESZCZENIE z treści PDF (streszczenie.py) do raportu i maila.
 
-Tryb podglądu wykonuje tylko wyszukiwanie i pokazuje, co by pobrał —
-nie pobiera PDF-ów i niczego nie zapisuje.
+Tryb podglądu: tylko wyszukiwanie i ocena metadanych; nie pobiera, nie zapisuje.
 """
 from __future__ import annotations
 
@@ -23,10 +28,11 @@ from pathlib import Path
 
 import config
 import db
+import matcher
 from eureka_client import BlokadaError, nowa_sesja, pauza, pobierz_pdf, wyszukaj
-from klasyfikator import (Ocena, data_publikacji, dopasowanie_z_oceny, inna_ustawa, kolejnosc_profili,
-                          lista_przepisow, ocen, profile_z_przepisow, tekst_z_pdf)
+from klasyfikator import data_publikacji, kolejnosc_profili, ocen, tekst_z_pdf
 from profiles import PROFILE
+from streszczenie import streszcz
 
 LINK_EUREKA = "https://eureka.mf.gov.pl/informacje/{id}"
 
@@ -38,8 +44,8 @@ class LimitPobranError(Exception):
 @dataclass
 class Znaleziona:
     rekord: dict
-    profile: set[str] = field(default_factory=set)        # profile, których fraza ją znalazła
-    frazy: dict[str, str] = field(default_factory=dict)   # profil -> pierwsza fraza, która ją znalazła
+    profile: list[str] = field(default_factory=list)       # profile, których fraza ją znalazła (kolejność)
+    frazy: dict[str, str] = field(default_factory=dict)    # profil -> pierwsza fraza, która ją znalazła
 
 
 # ===========================================================================
@@ -49,13 +55,17 @@ def bezpieczna_nazwa(tekst: str) -> str:
     return re.sub(r'[\\/:*?"<>|]', "_", str(tekst)).strip()
 
 
-def folder_dla(profil_klucz: str, rekord: dict, trafna: bool) -> Path:
+def folder_dla(profil_klucz: str, rekord: dict, status: str) -> Path:
+    """pobrano -> <profil>/<rok>; do_weryfikacji -> _do_weryfikacji/<profil>/<rok>.
+    Estoński CIT ma własne drzewo w FOLDER_ESTONSKI_CIT."""
     rok = (str(rekord.get("DT_WYD") or "") or "brak-daty")[:4]
     if profil_klucz == "estonski_cit":
         baza = config.FOLDER_ESTONSKI_CIT
-        return baza / rok if trafna else baza / "_odrzucone" / rok
+        return baza / rok if status == "pobrano" else baza / "_do_weryfikacji" / rok
     nazwa = bezpieczna_nazwa(PROFILE[profil_klucz].nazwa)
-    return config.BAZA_DANYCH / nazwa / rok if trafna else config.BAZA_DANYCH / "_odrzucone" / nazwa / rok
+    if status == "pobrano":
+        return config.BAZA_DANYCH / nazwa / rok
+    return config.BAZA_DANYCH / "_do_weryfikacji" / nazwa / rok
 
 
 def nazwa_pliku(rekord: dict) -> str:
@@ -96,50 +106,40 @@ def szukaj_frazy(sesja, fraza: str, od: str, do: str) -> list[dict]:
 # ===========================================================================
 # WIERSZ RAPORTU
 # ===========================================================================
-def wiersz_raportu(z: Znaleziona, oceny: list[Ocena], profil_glowny: str, trafna: bool,
-                   status: str, plik: Path | None) -> dict:
+def _lista(wartosc) -> list[str]:
+    if not wartosc:
+        return []
+    return [wartosc] if isinstance(wartosc, str) else [str(x) for x in wartosc]
+
+
+def wiersz_raportu(z: Znaleziona, dopasowania: list, status: str, plik: Path | None,
+                   ocena=None, podsumowanie: str = "", data_pub: str = "", powod: str = "") -> dict:
     r = z.rekord
     id_inf = str(r.get("ID_INFORMACJI"))
-    glowna = next(o for o in oceny if o.profil_klucz == profil_glowny)
-    trafne_profile = [o.profil_klucz for o in oceny if o.trafna]
-    pokaz = trafne_profile if trafna else [profil_glowny]
+    profile = kolejnosc_profili(d.profil_klucz for d in dopasowania) if dopasowania else kolejnosc_profili(z.profile)
+    glowny = profile[0]
     return {
         "id": id_inf,
         "sygnatura": r.get("SYG") or "",
         "data_wydania": (str(r.get("DT_WYD") or ""))[:10],
+        "data_publikacji": data_pub,
         "organ": r.get("AUTOR") or "",
         "teza": r.get("TEZA") or "",
-        "trafna": trafna,
-        "profile": pokaz,
-        "profile_nazwy": [PROFILE[k].nazwa for k in pokaz],
-        "podstawa": PROFILE[profil_glowny].podstawa_prawna,
-        "frazy": sorted({z.frazy[k] for k in z.frazy}),
-        "art": glowna.art, "fraz": glowna.frazy, "dochodowe": glowna.dochodowe, "vat": glowna.vat,
-        "powod": glowna.powod,
-        "grupa": "estonski_cit" if profil_glowny == "estonski_cit" else "ulgi",
+        "slowa_kluczowe": ", ".join(_lista(r.get("SLOWA_KLUCZOWE"))),
+        "profile": profile,
+        "profile_nazwy": [PROFILE[k].nazwa for k in profile],
+        "podstawa": PROFILE[glowny].podstawa_prawna,
+        "dopasowania": "; ".join(f"{d.profil_klucz}: {d.etykieta_artykulu} [{d.pewnosc}]" for d in dopasowania),
+        "frazy": sorted(set(z.frazy.values())),
         "status": status,
-        "przepisy": "; ".join(p[:120] for p in lista_przepisow(r)[:4]),
+        "powod": powod,
+        "art": ocena.art if ocena else "", "fraz": ocena.frazy if ocena else "",
+        "dochodowe": ocena.dochodowe if ocena else "", "vat": ocena.vat if ocena else "",
+        "streszczenie": podsumowanie,
+        "grupa": "estonski_cit" if glowny == "estonski_cit" else "ulgi",
+        "przepisy": "; ".join(p[:120] for p in _lista(r.get("PRZEPISY"))[:6]),
         "plik": str(plik.relative_to(config.BAZA_DANYCH)) if plik else "",
         "link": LINK_EUREKA.format(id=id_inf),
-    }
-
-
-def wiersz_pominiety(z: Znaleziona, ustawy: str) -> dict:
-    """Interpretacja pominięta przed pobraniem (przepisy tylko spoza CIT/PIT)."""
-    r = z.rekord
-    id_inf = str(r.get("ID_INFORMACJI"))
-    profil = kolejnosc_profili(z.profile)[0]
-    return {
-        "id": id_inf, "sygnatura": r.get("SYG") or "", "data_wydania": (str(r.get("DT_WYD") or ""))[:10],
-        "organ": r.get("AUTOR") or "", "teza": r.get("TEZA") or "", "trafna": False,
-        "profile": [profil], "profile_nazwy": [PROFILE[k].nazwa for k in kolejnosc_profili(z.profile)],
-        "podstawa": PROFILE[profil].podstawa_prawna, "frazy": sorted(set(z.frazy.values())),
-        "art": "", "fraz": "", "dochodowe": "", "vat": "",
-        "powod": f"przepisy wyłącznie z: {ustawy}",
-        "grupa": "estonski_cit" if profil == "estonski_cit" else "ulgi",
-        "status": "pominieta",
-        "przepisy": "; ".join(p[:120] for p in lista_przepisow(r)[:4]),
-        "plik": "", "link": LINK_EUREKA.format(id=id_inf),
     }
 
 
@@ -153,8 +153,8 @@ def uruchom_przeglad(od: date, do: date, profile_klucze: list[str] | None = None
     if not podglad:
         config.upewnij_sie_ze_foldery_istnieja()
 
-    licznik = {"zapytania": 0, "znaleziono": 0, "duplikaty": 0, "pominiete": 0,
-               "trafne": 0, "odrzucone": 0, "bledy": 0}
+    licznik = {"zapytania": 0, "znaleziono": 0, "duplikaty": 0, "odrzucone": 0,
+               "potwierdzone": 0, "do_weryfikacji": 0, "bledy": 0}
     wiersze: list[dict] = []
     bledy: list[dict] = []
     komunikat = ""
@@ -164,11 +164,12 @@ def uruchom_przeglad(od: date, do: date, profile_klucze: list[str] | None = None
 
     with db.polacz(config.SCIEZKA_DB) as conn:
         znane = db.znane_id(conn)
+        w_rejestrze = db.wszystkie_id(conn)
         bieg_id = 0 if podglad else db.rozpocznij_bieg(conn, tryb, profile_klucze, [od.isoformat(), do.isoformat()])
         conn.commit()
         print(f"Rejestr: {len(znane)} znanych. Okno dat wydania: {od} .. {do}. "
               f"Fraz do sprawdzenia: {len(frazy)} (profile: {len(profile_klucze)})."
-              + (" [PODGLĄD — tylko wyszukiwanie]" if podglad else ""))
+              + (" [PODGLĄD — nic nie pobieram, nic nie zapisuję]" if podglad else ""))
 
         def blad(id_inf, profil, tekst):
             licznik["bledy"] += 1
@@ -198,35 +199,45 @@ def uruchom_przeglad(od: date, do: date, profile_klucze: list[str] | None = None
                         continue
                     z = znalezione.setdefault(id_inf, Znaleziona(r))
                     for k in profile_frazy:
-                        z.profile.add(k)
+                        if k not in z.profile:
+                            z.profile.append(k)
                         z.frazy.setdefault(k, fraza)
-                print(f"  '{fraza}' [{', '.join(profile_frazy)}]: {len(wyniki)} w oknie, "
-                      f"nowych łącznie: {len(znalezione)}")
+                print(f"  '{fraza}' [{', '.join(profile_frazy)}]: {len(wyniki)} w oknie, nowych łącznie: {len(znalezione)}")
 
             licznik["znaleziono"] = len(znalezione)
             licznik["duplikaty"] = len(juz_znane)
-            print(f"\nNowych interpretacji do pobrania i oceny: {len(znalezione)}")
+            print(f"\nNowych interpretacji do oceny: {len(znalezione)}")
 
-            # --- 2+3. FILTR PO PRZEPISACH, POBRANIE I OCENA ---
+            # --- 2. OCENA METADANYCH, 3. POBRANIE, 4. STRESZCZENIE ---
             for id_inf, z in znalezione.items():
-                ustawy = inna_ustawa(z.rekord)
-                if ustawy:
-                    licznik["pominiete"] += 1
-                    wiersz = wiersz_pominiety(z, ustawy)
+                profil_szukajacy = PROFILE[kolejnosc_profili(z.profile)[0]]
+                dopasowania = matcher.ocen_rekord(z.rekord, profil_szukajacy, z.frazy[profil_szukajacy.klucz])
+
+                if not dopasowania:
+                    if id_inf in w_rejestrze:
+                        continue  # odrzucona już wcześniej — nie powtarzamy w raporcie
+                    licznik["odrzucone"] += 1
+                    wiersz = wiersz_raportu(z, [], "odrzucona", None,
+                                            powod="metadane: brak przepisu ulgi i tematu profilu w opisie")
                     wiersze.append(wiersz)
                     if podglad:
-                        print(f"  [POMINIĘTA — {ustawy}] {z.rekord.get('SYG')}")
+                        print(f"  [ODRZUCONA] {z.rekord.get('SYG')} — {(z.rekord.get('TEZA') or '')[:80]}")
                     else:
-                        _zapisz_pominieta(conn, bieg_id, z, wiersz, znane)
+                        db.zapisz_odrzucona(conn, _wiersz_rejestru(z.rekord, "odrzucone", None, None))
+                        db.zapisz_wynik_biegu(conn, bieg_id, id_inf, wiersz)
+                        conn.commit()
+                        w_rejestrze.add(id_inf)
                     continue
+
                 if podglad:
                     print(f"  [PODGLĄD] {z.rekord.get('SYG')} ({z.rekord.get('DT_WYD')}) — "
-                          f"{', '.join(kolejnosc_profili(z.profile))} — fraza: {', '.join(sorted(set(z.frazy.values())))}")
+                          + "; ".join(f"{d.profil_klucz} {d.etykieta_artykulu} [{d.pewnosc}]" for d in dopasowania))
                     continue
-                if config.LIMIT_NOWYCH_NA_RUN and (licznik["trafne"] + licznik["odrzucone"]) >= config.LIMIT_NOWYCH_NA_RUN:
+                pobranych = licznik["potwierdzone"] + licznik["do_weryfikacji"]
+                if config.LIMIT_NOWYCH_NA_RUN and pobranych >= config.LIMIT_NOWYCH_NA_RUN:
                     raise LimitPobranError(f"Osiągnięto limit {config.LIMIT_NOWYCH_NA_RUN} pobrań w biegu — "
                                            f"pozostałe zostaną pobrane w kolejnym.")
-                _pobierz_ocen_zapisz(conn, sesja, bieg_id, z, licznik, wiersze, znane, blad)
+                _pobierz_ocen_zapisz(conn, sesja, bieg_id, z, dopasowania, licznik, wiersze, znane, blad)
                 pauza(config.PRZERWA, powod=f"po pobraniu {id_inf}")
 
         except BlokadaError as e:
@@ -249,10 +260,9 @@ def uruchom_przeglad(od: date, do: date, profile_klucze: list[str] | None = None
             status = "blad"
         finally:
             if not podglad:
-                # Tabela `biegi` ma stare nazwy kolumn: „nowe” = trafne, „do_weryfikacji” = odrzucone.
                 db.zakoncz_bieg(conn, bieg_id, status, {
-                    "znaleziono": licznik["znaleziono"], "nowe": licznik["trafne"],
-                    "do_weryfikacji": licznik["odrzucone"], "duplikaty": licznik["duplikaty"],
+                    "znaleziono": licznik["znaleziono"], "nowe": licznik["potwierdzone"],
+                    "do_weryfikacji": licznik["do_weryfikacji"], "duplikaty": licznik["duplikaty"],
                     "bledy": licznik["bledy"]})
                 conn.commit()
 
@@ -261,69 +271,64 @@ def uruchom_przeglad(od: date, do: date, profile_klucze: list[str] | None = None
             "komunikat": komunikat, "podglad": podglad}
 
 
-def _zapisz_pominieta(conn, bieg_id, z: Znaleziona, wiersz: dict, znane) -> None:
-    r = z.rekord
-    id_inf = wiersz["id"]
-    db.zapisz_interpretacje(conn, {
+def _wiersz_rejestru(r: dict, status: str, plik: Path | None, data_pub: str | None) -> dict:
+    id_inf = str(r.get("ID_INFORMACJI"))
+    return {
         "id": id_inf, "sygnatura": r.get("SYG"), "tytul": (r.get("TEZA") or "")[:300],
-        "data_wydania": wiersz["data_wydania"], "data_publikacji": None, "organ": r.get("AUTOR"),
-        "link": wiersz["link"], "plik_sciezka": None, "data_pobrania": None,
-        "status_pobrania": "odrzucona", "tresc_skrot": (r.get("TEZA") or "")[:400],
-    })
-    db.zapisz_wynik_biegu(conn, bieg_id, id_inf, wiersz)
-    conn.commit()
-    znane.add(id_inf)
+        "data_wydania": (str(r.get("DT_WYD") or ""))[:10], "data_publikacji": data_pub or None,
+        "organ": r.get("AUTOR"), "link": LINK_EUREKA.format(id=id_inf),
+        "plik_sciezka": str(plik) if plik else None,
+        "data_pobrania": db.teraz() if plik else None,
+        "status_pobrania": status, "tresc_skrot": (r.get("TEZA") or "")[:400],
+    }
 
 
-def _pobierz_ocen_zapisz(conn, sesja, bieg_id, z: Znaleziona, licznik, wiersze, znane, blad) -> None:
+def _pobierz_ocen_zapisz(conn, sesja, bieg_id, z: Znaleziona, dopasowania: list,
+                         licznik, wiersze, znane, blad) -> None:
     r = z.rekord
     id_inf = str(r["ID_INFORMACJI"])
-    z_przepisow = profile_z_przepisow(r)
-    # Treść oceniamy względem WSZYSTKICH profili (fraza B+R często znajduje IP Box itp.).
-    kandydaci = kolejnosc_profili(PROFILE)
-    znalazcy = kolejnosc_profili(z.profile | set(z_przepisow))
+    profile = kolejnosc_profili(d.profil_klucz for d in dopasowania)
+    potwierdzone_meta = [d.profil_klucz for d in dopasowania if d.pewnosc == "POTWIERDZONE"]
 
     try:
         dane = pobierz_pdf(sesja, id_inf)
     except BlokadaError:
         raise
     except Exception as e:  # noqa: BLE001
-        blad(id_inf, znalazcy[0], f"Pobieranie PDF: {e}")
+        blad(id_inf, profile[0], f"Pobieranie PDF: {e}")
         return
 
     tekst = tekst_z_pdf(dane)
-    oceny = [ocen(tekst, k, k in z_przepisow) for k in kandydaci]
-    # Kolejność: estoński CIT (gdy trafny) zawsze pierwszy, potem najsilniejsze dopasowanie.
-    trafne = sorted((o for o in oceny if o.trafna),
-                    key=lambda o: (o.profil_klucz != "estonski_cit", tuple(-x for x in o.sila)))
-    trafna = bool(trafne)
-    if trafna:
-        profil_glowny = trafne[0].profil_klucz
+    data_pub = data_publikacji(tekst)
+    ocena = None
+    if potwierdzone_meta:
+        status = "pobrano"
+        glowny = kolejnosc_profili(potwierdzone_meta)[0]
+        powod = "przepis ulgi w metadanych: " + "; ".join(
+            f"{d.profil_klucz} {d.etykieta_artykulu}" for d in dopasowania if d.pewnosc == "POTWIERDZONE")
     else:
-        # Odrzucona: do folderu _odrzucone profilu, którego fraza ją znalazła.
-        profil_glowny = max((o for o in oceny if o.profil_klucz in znalazcy), key=lambda o: o.sila).profil_klucz
+        # DO_WERYFIKACJI wg metadanych → decyduje pełna treść PDF
+        oceny = sorted((ocen(tekst, k) for k in profile),
+                       key=lambda o: (o.profil_klucz != "estonski_cit", tuple(-x for x in o.sila)))
+        trafne = [o for o in oceny if o.trafna]
+        ocena = trafne[0] if trafne else oceny[0]
+        glowny = ocena.profil_klucz
+        status = "pobrano" if trafne else "do_weryfikacji"
+        powod = ("treść PDF potwierdza: " if trafne else "treść PDF nie potwierdza: ") + ocena.powod
 
-    plik = folder_dla(profil_glowny, r, trafna) / nazwa_pliku(r)
+    plik = folder_dla(glowny, r, status) / nazwa_pliku(r)
     plik.parent.mkdir(parents=True, exist_ok=True)
     plik.write_bytes(dane)
-    licznik["trafne" if trafna else "odrzucone"] += 1
-    glowna = next(o for o in oceny if o.profil_klucz == profil_glowny)
-    print(f"  [{'TRAFNA' if trafna else 'odrzucona'}] {r.get('SYG')} — {profil_glowny}: {glowna.powod}")
+    licznik["potwierdzone" if status == "pobrano" else "do_weryfikacji"] += 1
+    print(f"  [{'POTWIERDZONA' if status == 'pobrano' else 'do weryfikacji'}] {r.get('SYG')} — {glowny}: {powod}")
 
-    status = "pobrano" if trafna else "odrzucona"
-    wiersz = wiersz_raportu(z, oceny, profil_glowny, trafna, status, plik)
-    wiersz["data_publikacji"] = data_publikacji(tekst)
+    podsumowanie = streszcz(tekst, profile).tekst()
+    wiersz = wiersz_raportu(z, dopasowania, status, plik, ocena, podsumowanie, data_pub, powod)
     wiersze.append(wiersz)
 
-    db.zapisz_interpretacje(conn, {
-        "id": id_inf, "sygnatura": r.get("SYG"), "tytul": (r.get("TEZA") or "")[:300],
-        "data_wydania": (str(r.get("DT_WYD") or ""))[:10], "data_publikacji": wiersz["data_publikacji"] or None,
-        "organ": r.get("AUTOR"), "link": LINK_EUREKA.format(id=id_inf),
-        "plik_sciezka": str(plik), "data_pobrania": db.teraz(),
-        "status_pobrania": status, "tresc_skrot": (r.get("TEZA") or "")[:400],
-    })
-    for o in trafne:
-        db.dopisz_dopasowanie(conn, id_inf, dopasowanie_z_oceny(o, z.frazy.get(o.profil_klucz, "(treść PDF)")))
+    db.zapisz_interpretacje(conn, _wiersz_rejestru(r, status, plik, data_pub))
+    for d in dopasowania:
+        db.dopisz_dopasowanie(conn, id_inf, d)
     db.zapisz_wynik_biegu(conn, bieg_id, id_inf, wiersz)
     conn.commit()
     znane.add(id_inf)

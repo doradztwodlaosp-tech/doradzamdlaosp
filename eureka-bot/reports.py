@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-reports.py — raporty biegu: Excel (osobno ulgi i estoński CIT) + treść maila
-=============================================================================
-Każdy bieg daje DWA pliki Excel (zawsze, nawet pusty):
-  _raporty/RAPORT_<data>_bieg<id>_ulgi.xlsx
-  Estoński CIT/_raporty/RAPORT_<data>_bieg<id>_estonski_cit.xlsx
-
-Arkusze: Podsumowanie | Trafne | Odrzucone | Błędy.
-W „Trafne” i „Odrzucone” są liczby wzmianek (artykuł, frazy, CIT/PIT, VAT)
-i powód decyzji, a w „Odrzucone” kolumna na Twoją ocenę — to materiał do
-kalibracji progów.
+reports.py — raporty biegu: Excel + plik ze streszczeniami + treść maila
+=========================================================================
+Osobno dla ulg i dla estońskiego CIT (zawsze oba, nawet puste):
+  _raporty/RAPORT_<data>_bieg<id>_ulgi.xlsx                 arkusze: Podsumowanie |
+  Estoński CIT/_raporty/RAPORT_<data>_bieg<id>_estonski_cit.xlsx   Potwierdzone | Do weryfikacji |
+                                                                   Odrzucone (bez PDF) | Błędy
+  _raporty/STRESZCZENIA_<data>_bieg<id>_ulgi.txt            czytelny tekst: jedna interpretacja
+  Estoński CIT/_raporty/STRESZCZENIA_<data>_bieg<id>_estonski_cit.txt   = jeden blok ze streszczeniem
 """
 from __future__ import annotations
 
@@ -32,11 +30,14 @@ _NAGLOWEK_FONT = Font(bold=True, color="FFFFFF")
 _LINK_FONT = Font(color="0563C1", underline="single")
 
 KOLUMNY = [
-    ("Data wydania", 12), ("Data publikacji", 12), ("Sygnatura", 30), ("Profil", 32), ("Podstawa prawna", 30),
-    ("Organ", 20), ("Teza", 70), ("Wzmianki artykułu", 10), ("Wzmianki fraz", 10),
-    ("CIT/PIT", 9), ("VAT/akcyza", 9), ("Powód decyzji", 34), ("Fraza wyszukiwania", 26),
-    ("Link EUREKA", 12), ("Plik", 45), ("Przepisy (metadane EUREKA)", 60),
+    ("Data wydania", 12), ("Data publikacji", 12), ("Sygnatura", 30), ("Profil", 30),
+    ("Podstawa prawna profilu", 28), ("Teza", 60), ("Streszczenie", 100), ("Słowa kluczowe", 30),
+    ("Dlaczego pobrano / odrzucono", 40), ("Dopasowania (profil: przepis [pewność])", 40),
+    ("Fraza wyszukiwania", 24), ("Przepisy (metadane EUREKA)", 50),
+    ("Wzm. artykułu w treści", 9), ("Wzm. fraz w treści", 9), ("CIT/PIT", 8), ("VAT", 8),
+    ("Link EUREKA", 12), ("Plik", 50),
 ]
+_ZAWIJANE = {4, 5, 6, 7, 8, 9, 10, 12}
 
 
 def _naglowki(ws, kolumny) -> None:
@@ -50,18 +51,20 @@ def _naglowki(ws, kolumny) -> None:
 
 def _arkusz(wb: Workbook, tytul: str, wiersze: list[dict], z_ocena: bool) -> None:
     ws = wb.create_sheet(tytul)
-    kolumny = KOLUMNY + ([("Twoja ocena (TAK = powinna być trafna)", 16)] if z_ocena else [])
+    kolumny = KOLUMNY + ([("Twoja ocena (TAK/NIE)", 14)] if z_ocena else [])
     _naglowki(ws, kolumny)
     for n, w in enumerate(sorted(wiersze, key=lambda x: (x["data_wydania"], x["sygnatura"]), reverse=True), start=2):
         wartosci = [w["data_wydania"], w.get("data_publikacji", ""), w["sygnatura"], "\n".join(w["profile_nazwy"]),
-                    w["podstawa"], w["organ"], w["teza"], w["art"], w["fraz"], w["dochodowe"], w["vat"], w["powod"],
-                    ", ".join(w["frazy"]), "otwórz", w["plik"], w.get("przepisy", "")]
+                    w["podstawa"], w["teza"], w.get("streszczenie", ""), w.get("slowa_kluczowe", ""),
+                    w.get("powod", ""), w.get("dopasowania", ""), ", ".join(w["frazy"]), w.get("przepisy", ""),
+                    w["art"], w["fraz"], w["dochodowe"], w["vat"], "otwórz", w["plik"]]
         if z_ocena:
             wartosci.append("")
         for k, v in enumerate(wartosci, start=1):
-            ws.cell(row=n, column=k, value=v).alignment = Alignment(vertical="top", wrap_text=k in (4, 5, 7, 12, 16))
-        link = ws.cell(row=n, column=14)
+            ws.cell(row=n, column=k, value=v).alignment = Alignment(vertical="top", wrap_text=k in _ZAWIJANE)
+        link = ws.cell(row=n, column=17)
         link.hyperlink, link.font = w["link"], _LINK_FONT
+        ws.row_dimensions[n].height = min(400, 15 * max(3, len(w.get("streszczenie", "")) // 90 + 1))
     if wiersze:
         ws.auto_filter.ref = f"A1:{get_column_letter(len(kolumny))}{len(wiersze) + 1}"
     else:
@@ -78,16 +81,15 @@ def _arkusz_bledow(wb: Workbook, bledy: list[dict]) -> None:
         ws.cell(row=2, column=1, value="(brak błędów)")
 
 
-def _grupa(wynik: dict, grupa: str) -> tuple[list[dict], list[dict], list[dict]]:
-    """(trafne, odrzucone po ocenie treści, pominięte przed pobraniem)."""
+def _grupa(wynik: dict, grupa: str) -> dict[str, list[dict]]:
     w = [x for x in wynik["wiersze"] if x["grupa"] == grupa]
-    return ([x for x in w if x["trafna"]],
-            [x for x in w if not x["trafna"] and x["status"] != "pominieta"],
-            [x for x in w if x["status"] == "pominieta"])
+    return {"pobrano": [x for x in w if x["status"] == "pobrano"],
+            "do_weryfikacji": [x for x in w if x["status"] == "do_weryfikacji"],
+            "odrzucona": [x for x in w if x["status"] == "odrzucona"]}
 
 
 def zapisz_xlsx(wynik: dict, grupa: str, sciezka: Path) -> Path:
-    trafne, odrzucone, pominiete = _grupa(wynik, grupa)
+    g = _grupa(wynik, grupa)
     l = wynik["licznik"]
     wb = Workbook()
     ws = wb.active
@@ -98,40 +100,70 @@ def zapisz_xlsx(wynik: dict, grupa: str, sciezka: Path) -> Path:
         ("Status biegu", STATUSY.get(wynik["status"], wynik["status"])),
         ("Okno dat wydania", f"{wynik['od']} .. {wynik['do']}"),
         ("", ""),
-        (f"Trafne ({GRUPY[grupa]})", len(trafne)),
-        (f"Odrzucone po ocenie treści ({GRUPY[grupa]}) — PDF w folderze _odrzucone", len(odrzucone)),
-        (f"Pominięte bez pobierania — przepisy tylko spoza CIT/PIT (np. VAT)", len(pominiete)),
+        (f"POTWIERDZONE ({GRUPY[grupa]}) — PDF w folderze profilu", len(g["pobrano"])),
+        (f"DO WERYFIKACJI ({GRUPY[grupa]}) — PDF w folderze _do_weryfikacji", len(g["do_weryfikacji"])),
+        (f"ODRZUCONE ({GRUPY[grupa]}) — bez pobierania, tylko lista", len(g["odrzucona"])),
         ("", ""),
-        ("Cały bieg: zapytań (fraz)", l["zapytania"]),
+        ("Cały bieg: zapytań do EUREKI (fraz)", l["zapytania"]),
         ("Cały bieg: nowych interpretacji znalezionych", l["znaleziono"]),
-        ("Cały bieg: znalezionych, ale już w rejestrze", l["duplikaty"]),
+        ("Cały bieg: znalezionych, ale już w rejestrze (pominięte)", l["duplikaty"]),
         ("Cały bieg: błędy", l["bledy"]),
         ("", ""),
-        ("Progi oceny", f"artykuł ≥ {config.PROG_ART}; albo artykuł ≥ 1 i frazy ≥ {config.PROG_FRAZ_Z_ART}; "
-                        f"albo frazy ≥ {config.PROG_FRAZ} (gdy CIT/PIT ≥ VAT)"),
+        ("Jak czytać", "POTWIERDZONE: przepis ulgi w metadanych EUREKI albo treść PDF potwierdza temat. "
+                       "DO WERYFIKACJI: temat tylko w tezie/słowach kluczowych, treść PDF go nie potwierdza — "
+                       "plik jest pobrany, oceń sam. ODRZUCONE: ani przepisu ulgi, ani tematu profilu w opisie."),
+        ("Progi oceny treści", f"artykuł ≥ {config.PROG_ART}; albo artykuł ≥ 1 i frazy ≥ {config.PROG_FRAZ_Z_ART}; "
+                               f"albo frazy ≥ {config.PROG_FRAZ} (gdy CIT/PIT ≥ VAT)"),
     ]
     if wynik.get("komunikat"):
         dane.append(("Uwaga", wynik["komunikat"]))
-    ws.column_dimensions["A"].width = 60
-    ws.column_dimensions["B"].width = 70
+    ws.column_dimensions["A"].width = 62
+    ws.column_dimensions["B"].width = 90
     for n, (k, v) in enumerate(dane, start=1):
         ws.cell(row=n, column=1, value=k).font = Font(bold=True)
-        ws.cell(row=n, column=2, value=v)
+        ws.cell(row=n, column=2, value=v).alignment = Alignment(wrap_text=True, vertical="top")
 
-    _arkusz(wb, "Trafne", trafne, z_ocena=False)
-    _arkusz(wb, "Odrzucone", odrzucone, z_ocena=True)
-    _arkusz(wb, "Pominięte – inna ustawa", pominiete, z_ocena=True)
+    _arkusz(wb, "Potwierdzone", g["pobrano"], z_ocena=False)
+    _arkusz(wb, "Do weryfikacji", g["do_weryfikacji"], z_ocena=True)
+    _arkusz(wb, "Odrzucone (bez PDF)", g["odrzucona"], z_ocena=True)
     _arkusz_bledow(wb, wynik["bledy"])
     sciezka.parent.mkdir(parents=True, exist_ok=True)
     wb.save(sciezka)
     return sciezka
 
 
+def zapisz_streszczenia(wynik: dict, grupa: str, sciezka: Path) -> Path:
+    g = _grupa(wynik, grupa)
+    linie = [f"STRESZCZENIA — {GRUPY[grupa]} — bieg #{wynik['bieg_id']} ({wynik['od']} .. {wynik['do']})",
+             "=" * 100, ""]
+    for naglowek, klucz in (("POTWIERDZONE", "pobrano"), ("DO WERYFIKACJI", "do_weryfikacji")):
+        linie += [f"##### {naglowek}: {len(g[klucz])} #####", ""]
+        for w in sorted(g[klucz], key=lambda x: (x["data_wydania"], x["sygnatura"]), reverse=True):
+            linie += [
+                f"{w['sygnatura']}   wydana {w['data_wydania']}" + (f", opublikowana {w['data_publikacji']}" if w.get("data_publikacji") else ""),
+                f"Profil: {', '.join(w['profile_nazwy'])}",
+                f"Teza: {w['teza']}",
+                f"Dlaczego: {w.get('powod', '')}",
+                f"Plik: {w['plik']}",
+                f"Link: {w['link']}",
+                "",
+                w.get("streszczenie") or "(brak tekstu w PDF)",
+                "",
+                "-" * 100,
+                "",
+            ]
+    sciezka.parent.mkdir(parents=True, exist_ok=True)
+    sciezka.write_text("\n".join(linie), encoding="utf-8")
+    return sciezka
+
+
 def zapisz_raporty(wynik: dict) -> list[Path]:
-    przedrostek = f"RAPORT_{date.today().isoformat()}_bieg{wynik['bieg_id']}"
+    przedrostek = f"{date.today().isoformat()}_bieg{wynik['bieg_id']}"
     return [
-        zapisz_xlsx(wynik, "ulgi", config.FOLDER_RAPORTOW / f"{przedrostek}_ulgi.xlsx"),
-        zapisz_xlsx(wynik, "estonski_cit", config.FOLDER_RAPORTOW_ESTONSKI / f"{przedrostek}_estonski_cit.xlsx"),
+        zapisz_xlsx(wynik, "ulgi", config.FOLDER_RAPORTOW / f"RAPORT_{przedrostek}_ulgi.xlsx"),
+        zapisz_xlsx(wynik, "estonski_cit", config.FOLDER_RAPORTOW_ESTONSKI / f"RAPORT_{przedrostek}_estonski_cit.xlsx"),
+        zapisz_streszczenia(wynik, "ulgi", config.FOLDER_RAPORTOW / f"STRESZCZENIA_{przedrostek}_ulgi.txt"),
+        zapisz_streszczenia(wynik, "estonski_cit", config.FOLDER_RAPORTOW_ESTONSKI / f"STRESZCZENIA_{przedrostek}_estonski_cit.txt"),
     ]
 
 
@@ -139,10 +171,20 @@ def zapisz_raporty(wynik: dict) -> list[Path]:
 # MAIL
 # ===========================================================================
 def temat_maila(wynik: dict) -> str:
-    tu, _, _ = _grupa(wynik, "ulgi")
-    te, _, _ = _grupa(wynik, "estonski_cit")
+    u, e = _grupa(wynik, "ulgi"), _grupa(wynik, "estonski_cit")
     znacznik = "" if wynik["status"] == "sukces" else f"[{STATUSY.get(wynik['status'], wynik['status'])}] "
-    return f"{znacznik}EUREKA {date.today().isoformat()}: ulgi {len(tu)} nowych, estoński CIT {len(te)} nowych"
+    return (f"{znacznik}EUREKA {date.today().isoformat()}: ulgi {len(u['pobrano'])} potwierdzonych"
+            f" (+{len(u['do_weryfikacji'])} do weryf.), estoński CIT {len(e['pobrano'])}"
+            f" (+{len(e['do_weryfikacji'])} do weryf.)")
+
+
+def _blok(w: dict) -> str:
+    s = escape(w.get("streszczenie") or "").replace("\n", "<br>")
+    return (f"<li style='margin-bottom:14px'><b><a href='{escape(w['link'])}'>{escape(w['sygnatura'])}</a></b> "
+            f"({w['data_wydania']}) — <i>{escape(', '.join(w['profile_nazwy']))}</i>"
+            f"<br><b>Teza:</b> {escape(w['teza'])}"
+            f"<br><small style='color:#555'>{escape(w.get('powod', ''))} · plik: {escape(w['plik'])}</small>"
+            f"<div style='margin:6px 0 0 10px;padding:6px 10px;border-left:3px solid #ccc;font-size:90%'>{s}</div></li>")
 
 
 def tresc_maila_html(wynik: dict, drive_ok: bool | None) -> str:
@@ -150,27 +192,27 @@ def tresc_maila_html(wynik: dict, drive_ok: bool | None) -> str:
     czesci = [f"<h2>EUREKA — raport z biegu #{wynik['bieg_id']}</h2>",
               f"<p><b>Status:</b> {escape(STATUSY.get(wynik['status'], wynik['status']))}<br>"
               f"<b>Okno dat wydania:</b> {wynik['od']} .. {wynik['do']}<br>"
-              f"<b>Nowych znalezionych:</b> {l['znaleziono']} — trafnych {l['trafne']}, "
-              f"odrzuconych po ocenie treści {l['odrzucone']}, pominiętych (tylko VAT/inne ustawy, "
-              f"bez pobierania) {l['pominiete']}, błędów {l['bledy']}</p>"]
+              f"<b>Nowych znalezionych:</b> {l['znaleziono']} — potwierdzonych {l['potwierdzone']}, "
+              f"do weryfikacji {l['do_weryfikacji']}, odrzuconych bez pobierania {l['odrzucone']}, "
+              f"błędów {l['bledy']}</p>"]
     if wynik.get("komunikat"):
         czesci.append(f"<p style='color:#b00'><b>Uwaga:</b> {escape(wynik['komunikat'])}</p>")
 
-    for grupa in ("ulgi", "estonski_cit"):
-        trafne, odrzucone, _ = _grupa(wynik, grupa)
-        czesci.append(f"<h3>{GRUPY[grupa]}: {len(trafne)} nowych</h3>")
-        if trafne:
-            czesci.append("<ul>")
-            for w in sorted(trafne, key=lambda x: x["data_wydania"], reverse=True)[:50]:
-                czesci.append(
-                    f"<li><a href='{escape(w['link'])}'>{escape(w['sygnatura'])}</a> ({w['data_wydania']}) — "
-                    f"<i>{escape(', '.join(w['profile_nazwy']))}</i><br><small>{escape(w['teza'][:220])}</small></li>")
-            if len(trafne) > 50:
-                czesci.append(f"<li>… i {len(trafne) - 50} więcej — pełna lista w Excelu.</li>")
-            czesci.append("</ul>")
-        if odrzucone:
-            czesci.append(f"<p><small>Odrzuconych: {len(odrzucone)} — lista z powodami w Excelu "
-                          f"(arkusz „Odrzucone”), PDF-y w folderze _odrzucone.</small></p>")
+    for grupa in ("estonski_cit", "ulgi"):
+        g = _grupa(wynik, grupa)
+        czesci.append(f"<h3>{GRUPY[grupa]}: {len(g['pobrano'])} potwierdzonych, "
+                      f"{len(g['do_weryfikacji'])} do weryfikacji</h3>")
+        for naglowek, klucz in (("Potwierdzone", "pobrano"), ("Do weryfikacji (PDF pobrany, oceń sam)", "do_weryfikacji")):
+            if g[klucz]:
+                czesci.append(f"<h4>{naglowek}</h4><ul style='list-style:none;padding-left:0'>")
+                for w in sorted(g[klucz], key=lambda x: x["data_wydania"], reverse=True)[:30]:
+                    czesci.append(_blok(w))
+                if len(g[klucz]) > 30:
+                    czesci.append(f"<li>… i {len(g[klucz]) - 30} więcej — w załączonym Excelu i pliku STRESZCZENIA.</li>")
+                czesci.append("</ul>")
+        if g["odrzucona"]:
+            czesci.append(f"<p><small>Odrzuconych bez pobierania: {len(g['odrzucona'])} — lista w Excelu "
+                          f"(arkusz „Odrzucone (bez PDF)”).</small></p>")
 
     if drive_ok is True and config.DRIVE_LINK:
         czesci.append(f"<p>Pliki PDF i raporty: <a href='{escape(config.DRIVE_LINK)}'>folder na Dysku Google</a></p>")

@@ -1,45 +1,76 @@
-# Co zmieniło się względem Twojej wersji bota
+# Jak działa bot i co jest skąd
 
-## Bez zmian
-- **`profiles.py`** — te same 12 profili, frazy i wzorce artykułów. Kalibracja profili
-  jeszcze przed nami (na Twoich przykładowych PDF-ach).
-- **Sposób wyszukiwania** — jak u Ciebie: każda fraza z profili jest wysyłana do EUREKI.
-- **Limity** — przerwa 15 s (±30%) między zapytaniami, 15 minut czekania po 403/429.
-- **Rejestr SQLite** (`db.py`) — te same tabele; dodana tylko nowa tabela `wyniki_biegu`
-  (do raportów). Istniejąca baza nie jest ruszana.
-- **Nazwy plików PDF** — `<data>_<sygnatura>_ID<id>.pdf`, jak w v6.
+## Cel
+Baza wiedzy dla doradcy podatkowego o ulgach podatkowych. Bot raz w tygodniu (sobota 00:00)
+albo na żądanie wyszukuje w EUREKA nowe interpretacje z dziedziny każdego profilu, pobiera
+PDF-y **tylko tych, które dotyczą ulg**, segreguje je po profilach (estoński CIT osobno),
+robi streszczenia i wysyła raport na Gmaila, a pliki na Dysk Google.
 
-## Zmienione
-| Co | Było | Jest | Dlaczego |
-|---|---|---|---|
-| Zakres dat | całe lata 2019..dziś | ostatnie 45 dni (`EUREKA_OKNO_DNI`) | archiwum już masz; bot ma łapać nowe |
-| Frazy w profilach | szerokie, żeby nic nie pominąć | **bez zmian** — filtrujemy wyniki, nie frazy | profile mają łapać wszystko z dziedziny |
-| Filtr przed pobraniem | brak | jeśli PRZEPISY powołują się **wyłącznie** na inne ustawy niż CIT/PIT (np. tylko VAT) → bez pobierania; lista w Excelu (arkusz „Pominięte – inna ustawa”) z linkiem | interpretacja wyłącznie z VAT nie może dotyczyć ulgi z CIT/PIT; puste PRZEPISY → pobieramy |
-| Ocena trafności | regex na metadanych PRZEPISY; wszystko inne „do weryfikacji” i też pobierane | pełna treść PDF: liczba wzmianek artykułu i fraz, CIT/PIT czy VAT; wyliczenia „z zastrzeżeniem art. …” (cytat art. 7 ust. 2 CIT) nie liczą się | Twoje przykłady: interpretacje SSE/PSI złapane frazą „art. 24d” tylko przez ten cytat |
-| Względem których profili oceniamy | profil, którego fraza znalazła | **wszystkie** profile; plik w folderze najsilniejszego dopasowania | fraza B+R często znajduje IP Box — ma trafić do IP Box, nie do odrzuconych |
-| Data publikacji | brak | odczytywana z nagłówka PDF, w raporcie i rejestrze | API jej nie udostępnia, PDF tak |
-| Foldery | wg roku | trafne: `<profil>/<rok>`; nietrafne: `_odrzucone/<profil>/<rok>`; estoński CIT osobno | żeby dało się sprawdzić odrzucone |
-| Ta sama fraza w kilku profilach | wysyłana kilka razy | wysyłana raz | mniej zapytań do EUREKI |
-| Raport | JSON + CSV + TXT dziennie | Excel na bieg: ulgi i estoński CIT osobno; arkusze Trafne / Odrzucone (z liczbą wzmianek i powodem) / Błędy | czytelność + materiał do kalibracji |
-| Uruchamianie | ręcznie / Harmonogram zadań Windows | systemd na serwerze, sobota 00:00 | serwer |
-| Ścieżki | `C:\Users\...\EUREKA` | `~/eureka-dane` (Linux) | serwer |
+## Przebieg jednego biegu
+1. **Wyszukiwanie** — każda fraza z `profiles.py` (78 unikalnych fraz, szerokie celowo),
+   z filtrem daty wydania z ostatnich 45 dni. Interpretacje znane z rejestru są pomijane.
+2. **Ocena na metadanych, przed pobraniem** — Twój `matcher.py` + `tematy.py`, względem
+   WSZYSTKICH profili:
+   - **POTWIERDZONE** — artykuł ulgi w polu PRZEPISY (np. art. 30ca PIT → IP Box PIT, nawet
+     jeśli znalazła go fraza B+R);
+   - **DO WERYFIKACJI** — temat profilu w tezie / słowach kluczowych / zagadnieniach albo
+     przepis pomocniczy (definicja B+R); także rekord bez czytelnego opisu;
+   - **ODRZUCONE** — nic z powyższych (np. interpretacja VAT, w której pada „działalność
+     badawczo-rozwojowa”). **Bez pobierania.** Zostaje wpis w rejestrze i wiersz w arkuszu
+     „Odrzucone (bez PDF)”, żeby dało się sprawdzić, że nic nie ginie.
+3. **Pobranie PDF** każdej potwierdzonej i każdej do weryfikacji — plik zawsze leży u Ciebie.
+4. **Ocena treści PDF** (`klasyfikator.py`) tylko dla DO WERYFIKACJI: liczy wzmianki
+   artykułu ulgi (bez wyliczeń „z zastrzeżeniem art. …” z art. 7 ust. 2 CIT), fraz profilu
+   (z odmianą), odwołania do CIT/PIT i VAT. Treść potwierdza → folder profilu jak
+   potwierdzona. Nie potwierdza → folder `_do_weryfikacji/<profil>/<rok>`.
+5. **Streszczenie** (`streszczenie.py`) z treści PDF: rozstrzygnięcie (prawidłowe /
+   nieprawidłowe), pytania podatnika, początek stanu faktycznego, ocena KIS, konkluzja
+   uzasadnienia, kluczowe zdania z artykułem ulgi.
+6. **Raporty** — osobno ulgi i estoński CIT: Excel (Podsumowanie / Potwierdzone /
+   Do weryfikacji / Odrzucone (bez PDF) / Błędy, ze streszczeniami) i czytelny plik
+   `STRESZCZENIA_*.txt`. Mail ze streszczeniami i załącznikami, pliki na Dysk (rclone).
 
-## Poprawione błędy
-1. `--podglad` zapisywał interpretacje do bazy jako pobrane — prawdziwy bieg by ich potem nie pobrał.
-   Teraz podgląd tylko wyszukuje i niczego nie zapisuje.
-2. Blokada 403/429 wywracała bieg z błędem i zostawiała go w stanie „w toku”. Teraz bieg kończy
-   się czysto ze statusem „przerwany”, raportem i mailem.
-3. Pole `TEZA` = null wywracało bota (`TypeError`).
-4. Pusta lista przepisów była wysyłana jako `"PRZEPISY": []` — strona EUREKA tego nie robi.
-5. Kolumna `DATA_PUBLIKACJI` (nieistniejąca w API) usunięta z zapytania.
+## Foldery
+```
+eureka-dane/
+  Ulga B+R (badawczo-rozwojowa)/2026/…pdf        potwierdzone
+  IP Box — PIT (…)/2026/…pdf
+  _do_weryfikacji/<profil>/2026/…pdf             pobrane, treść nie potwierdza — oceń sam
+  _raporty/RAPORT_<data>_bieg<id>_ulgi.xlsx
+  _raporty/STRESZCZENIA_<data>_bieg<id>_ulgi.txt
+  Estoński CIT/2026/…pdf                          osobne drzewo
+  Estoński CIT/_do_weryfikacji/2026/…pdf
+  Estoński CIT/_raporty/RAPORT_…_estonski_cit.xlsx, STRESZCZENIA_…txt
+  _rejestr/eureka.sqlite3                         rejestr (nie trafia na Dysk)
+```
 
-## Dodane
-- `wysylka.py` — mail przez Gmail i kopia na Dysk Google (rclone).
-- `sprawdz_api.py` — test na prawdziwej EUREKA (1 wyszukiwanie + 1 PDF).
-- `uruchom.sh`, `serwer/` (usługa i harmonogram), `INSTALACJA.md`, testy w `tests/`.
+## Skąd co pochodzi
+| Plik | Źródło |
+|---|---|
+| `profiles.py` | Twój, bez zmian |
+| `matcher.py`, `tematy.py` | Twoje z 12.11.2026; jedna zmiana w `matcher.py`: frazy wykluczające sprawdzane tylko w stopniu 2 (interpretacja z art. 28j w PRZEPISY to estoński CIT, nawet gdy teza wspomina ryczałt ewidencjonowany) |
+| `db.py` | Twój z 12.11.2026 + tabela `wyniki_biegu` i dwie funkcje do raportów |
+| `eureka_client.py` | Twój kształt żądań; przerwa 15 s, po 403/429 czekanie 15 min i jedna próba |
+| `przeglad.py` | nowy: okno dat zamiast lat, spina kroki 1-5 (zastępuje `scraper.py` na serwerze) |
+| `klasyfikator.py`, `streszczenie.py`, `reports.py`, `wysylka.py`, `main.py` | nowe |
+| `scraper.py` (Twój, po latach) | nadal do uzupełniania archiwum na Twoim komputerze — nie wchodzi na serwer |
 
-## Usunięte
-- `scraper.py`, `matcher.py` → zastąpione przez `przeglad.py` i `klasyfikator.py`.
-- `migracja_v6.py`, `calosc.py`, `nauka.py` — niepotrzebne na serwerze.
-- Opcje `--rok`, `--automatyczny`, `--raport`, plik `harmonogram.json` — zastąpione przez
-  `--okno` / `--od` / `--do` i harmonogram systemd. `--profil` zostało.
+## Uruchamianie ręczne (na serwerze, z folderu `~/eureka-bot`)
+```
+./uruchom.sh                               # pełny bieg jak w sobotę (45 dni, wszystkie profile, raport, Dysk, mail)
+./uruchom.sh --profil estonski_cit         # tylko wybrane profile
+./uruchom.sh --okno 7                      # ostatnie 7 dni
+./uruchom.sh --od 2026-10-01 --do 2026-10-31
+./uruchom.sh --podglad --profil ulga_br    # tylko wyszukiwanie i werdykty matchera, nic nie pobiera
+./uruchom.sh --bez-wysylki                 # bieg bez maila i Dysku
+./uruchom.sh --tylko-raport 7              # odtwórz raporty i mail z biegu nr 7
+./uruchom.sh --test-maila
+./uruchom.sh sprawdz_api.py "IP Box" ip_box_pit   # test na żywej EUREKA: 1 wyszukiwanie + 1 PDF
+sudo systemctl start eureka-bot.service    # bieg jak z harmonogramu, w tle; log: journalctl -u eureka-bot -f
+```
+Dwa biegi naraz się nie uruchomią (blokada w `_rejestr/bot.lock`).
+
+## Progi oceny treści (do kalibracji na Twoich przykładach)
+`EUREKA_PROG_ART=2`, `EUREKA_PROG_FRAZ_Z_ART=2`, `EUREKA_PROG_FRAZ=5` w `eureka.env`.
+Materiał do kalibracji: arkusz „Do weryfikacji” (kolumny z liczbą wzmianek, Twoja ocena TAK/NIE)
+i folder `_do_weryfikacji`.
