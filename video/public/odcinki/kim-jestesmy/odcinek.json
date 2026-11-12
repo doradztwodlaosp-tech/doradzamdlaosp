@@ -200,10 +200,10 @@
       ]
     },
     {
-      "tekst": "Tym zajmujemy się my. Doradztwo dla OSP.",
-      "lektor": "Tym zajmujemy się my. Doradztwo dla o-es-pe.",
+      "tekst": "Jesteśmy prawnikami. Doradztwo dla OSP.",
+      "lektor": "Jesteśmy prawnikami. Doradztwo dla o-es-pe.",
       "akcent": [
-        "my."
+        "prawnikami."
       ],
       "mapa": "stol-osp",
       "kamera": "marka",
@@ -217,148 +217,80 @@
         }
       },
       "start": 15.185,
-      "koniec": 18.569,
+      "koniec": 18.492,
       "slowa": [
         {
-          "w": "Tym",
+          "w": "Jesteśmy",
           "s": 15.185,
-          "e": 15.498
+          "e": 15.833
         },
         {
-          "w": "zajmujemy",
-          "s": 15.498,
-          "e": 16.187
-        },
-        {
-          "w": "się",
-          "s": 16.187,
-          "e": 16.501
-        },
-        {
-          "w": "my.",
-          "s": 16.501,
-          "e": 17.002
+          "w": "prawnikami.",
+          "s": 15.833,
+          "e": 16.871
         },
         {
           "w": "Doradztwo",
-          "s": 17.002,
-          "e": 17.692
+          "s": 16.871,
+          "e": 17.584
         },
         {
           "w": "dla",
-          "s": 17.692,
-          "e": 18.005
+          "s": 17.584,
+          "e": 17.909
         },
         {
           "w": "OSP.",
-          "s": 18.005,
-          "e": 18.569
+          "s": 17.909,
+          "e": 18.492
         }
       ]
     },
     {
-      "tekst": "Pomagamy jednostkom z całej Polski, w pełni zdalnie.",
-      "akcent": [
-        "Polski,"
-      ],
-      "mapa": "stol-osp",
-      "kamera": "laptop",
-      "start": 19.169,
-      "koniec": 23.169,
-      "slowa": [
-        {
-          "w": "Pomagamy",
-          "s": 19.169,
-          "e": 19.766
-        },
-        {
-          "w": "jednostkom",
-          "s": 19.766,
-          "e": 20.483
-        },
-        {
-          "w": "z",
-          "s": 20.483,
-          "e": 20.662
-        },
-        {
-          "w": "całej",
-          "s": 20.662,
-          "e": 21.08
-        },
-        {
-          "w": "Polski,",
-          "s": 21.08,
-          "e": 21.796
-        },
-        {
-          "w": "w",
-          "s": 21.796,
-          "e": 21.975
-        },
-        {
-          "w": "pełni",
-          "s": 21.975,
-          "e": 22.393
-        },
-        {
-          "w": "zdalnie.",
-          "s": 22.393,
-          "e": 23.169
-        }
-      ]
-    },
-    {
-      "tekst": "Najczęściej prowadzimy OSP do statusu organizacji pożytku publicznego.",
-      "lektor": "Najczęściej prowadzimy o-es-pe do statusu organizacji pożytku publicznego.",
+      "tekst": "Prowadzimy jednostki do statusu organizacji pożytku publicznego.",
       "akcent": [
         "pożytku",
         "publicznego."
       ],
       "mapa": "stol-osp",
       "kamera": "statut",
-      "start": 23.769,
-      "koniec": 29.462,
+      "start": 19.092,
+      "koniec": 24.015,
       "slowa": [
         {
-          "w": "Najczęściej",
-          "s": 23.769,
-          "e": 24.672
+          "w": "Prowadzimy",
+          "s": 19.092,
+          "e": 19.88
         },
         {
-          "w": "prowadzimy",
-          "s": 24.672,
-          "e": 25.505
-        },
-        {
-          "w": "OSP",
-          "s": 25.505,
-          "e": 25.852
+          "w": "jednostki",
+          "s": 19.88,
+          "e": 20.602
         },
         {
           "w": "do",
-          "s": 25.852,
-          "e": 26.129
+          "s": 20.602,
+          "e": 20.865
         },
         {
           "w": "statusu",
-          "s": 26.129,
-          "e": 26.754
+          "s": 20.865,
+          "e": 21.455
         },
         {
           "w": "organizacji",
-          "s": 26.754,
-          "e": 27.657
+          "s": 21.455,
+          "e": 22.309
         },
         {
           "w": "pożytku",
-          "s": 27.657,
-          "e": 28.281
+          "s": 22.309,
+          "e": 22.899
         },
         {
           "w": "publicznego.",
-          "s": 28.281,
-          "e": 29.462
+          "s": 22.899,
+          "e": 24.015
         }
       ]
     },
@@ -370,136 +302,235 @@
       ],
       "mapa": "stol-osp",
       "kamera": "statut-otwarty",
-      "start": 30.062,
-      "koniec": 36.6,
+      "start": 24.615,
+      "koniec": 31.154,
       "slowa": [
         {
           "w": "Sprawdzamy",
-          "s": 30.062,
-          "e": 30.87
+          "s": 24.615,
+          "e": 25.424
         },
         {
           "w": "statut,",
-          "s": 30.87,
-          "e": 31.679
+          "s": 25.424,
+          "e": 26.233
         },
         {
           "w": "przygotowujemy",
-          "s": 31.679,
-          "e": 32.758
+          "s": 26.233,
+          "e": 27.312
         },
         {
           "w": "dokumenty",
-          "s": 32.758,
-          "e": 33.499
+          "s": 27.312,
+          "e": 28.053
         },
         {
           "w": "na",
-          "s": 33.499,
-          "e": 33.769
+          "s": 28.053,
+          "e": 28.323
         },
         {
           "w": "walne",
-          "s": 33.769,
-          "e": 34.241
+          "s": 28.323,
+          "e": 28.795
         },
         {
           "w": "i",
-          "s": 34.241,
-          "e": 34.443
+          "s": 28.795,
+          "e": 28.997
         },
         {
           "w": "składamy",
-          "s": 34.443,
-          "e": 35.117
+          "s": 28.997,
+          "e": 29.671
         },
         {
           "w": "wniosek",
-          "s": 35.117,
-          "e": 35.724
+          "s": 29.671,
+          "e": 30.278
         },
         {
           "w": "do",
-          "s": 35.724,
-          "e": 35.993
+          "s": 30.278,
+          "e": 30.547
         },
         {
           "w": "KRS.",
-          "s": 35.993,
-          "e": 36.6
+          "s": 30.547,
+          "e": 31.154
         }
       ]
     },
     {
-      "tekst": "Dzięki temu Wasza jednostka może co roku dostawać 1,5% podatku od mieszkańców.",
-      "lektor": "Dzięki temu Wasza jednostka może co roku dostawać półtora procent podatku od mieszkańców.",
+      "tekst": "Dzięki temu OSP może co roku dostawać 1,5% podatku od mieszkańców.",
+      "lektor": "Dzięki temu o-es-pe może co roku dostawać półtora procent podatku od mieszkańców.",
       "akcent": [
         "1,5%"
       ],
       "mapa": "stol-osp",
       "kamera": "monety",
-      "start": 37.2,
-      "koniec": 44.046,
+      "start": 31.754,
+      "koniec": 37.985,
       "slowa": [
         {
           "w": "Dzięki",
-          "s": 37.2,
-          "e": 37.783
+          "s": 31.754,
+          "e": 32.369
         },
         {
           "w": "temu",
-          "s": 37.783,
-          "e": 38.22
+          "s": 32.369,
+          "e": 32.831
         },
         {
-          "w": "Wasza",
-          "s": 38.22,
-          "e": 38.729
-        },
-        {
-          "w": "jednostka",
-          "s": 38.729,
-          "e": 39.531
+          "w": "OSP",
+          "s": 32.831,
+          "e": 33.215
         },
         {
           "w": "może",
-          "s": 39.531,
-          "e": 39.968
+          "s": 33.215,
+          "e": 33.677
         },
         {
           "w": "co",
-          "s": 39.968,
-          "e": 40.259
+          "s": 33.677,
+          "e": 33.985
         },
         {
           "w": "roku",
-          "s": 40.259,
-          "e": 40.696
+          "s": 33.985,
+          "e": 34.446
         },
         {
           "w": "dostawać",
-          "s": 40.696,
-          "e": 41.424
+          "s": 34.446,
+          "e": 35.215
         },
         {
           "w": "1,5%",
-          "s": 41.424,
-          "e": 41.861
+          "s": 35.215,
+          "e": 35.677
         },
         {
           "w": "podatku",
-          "s": 41.861,
-          "e": 42.517
+          "s": 35.677,
+          "e": 36.369
         },
         {
           "w": "od",
-          "s": 42.517,
-          "e": 42.808
+          "s": 36.369,
+          "e": 36.677
         },
         {
           "w": "mieszkańców.",
-          "s": 42.808,
-          "e": 44.046
+          "s": 36.677,
+          "e": 37.985
+        }
+      ]
+    },
+    {
+      "tekst": "Pomagamy też samym strażakom, w sprawach prawnych i podatkowych.",
+      "akcent": [
+        "strażakom,"
+      ],
+      "mapa": "stol-osp",
+      "kamera": "helm",
+      "start": 38.585,
+      "koniec": 43.508,
+      "slowa": [
+        {
+          "w": "Pomagamy",
+          "s": 38.585,
+          "e": 39.2
+        },
+        {
+          "w": "też",
+          "s": 39.2,
+          "e": 39.508
+        },
+        {
+          "w": "samym",
+          "s": 39.508,
+          "e": 39.938
+        },
+        {
+          "w": "strażakom,",
+          "s": 39.938,
+          "e": 40.862
+        },
+        {
+          "w": "w",
+          "s": 40.862,
+          "e": 41.046
+        },
+        {
+          "w": "sprawach",
+          "s": 41.046,
+          "e": 41.662
+        },
+        {
+          "w": "prawnych",
+          "s": 41.662,
+          "e": 42.277
+        },
+        {
+          "w": "i",
+          "s": 42.277,
+          "e": 42.462
+        },
+        {
+          "w": "podatkowych.",
+          "s": 42.462,
+          "e": 43.508
+        }
+      ]
+    },
+    {
+      "tekst": "Działamy w całej Polsce, w pełni zdalnie.",
+      "akcent": [
+        "zdalnie."
+      ],
+      "mapa": "stol-osp",
+      "kamera": "laptop",
+      "start": 44.108,
+      "koniec": 47.262,
+      "slowa": [
+        {
+          "w": "Działamy",
+          "s": 44.108,
+          "e": 44.681
+        },
+        {
+          "w": "w",
+          "s": 44.681,
+          "e": 44.853
+        },
+        {
+          "w": "całej",
+          "s": 44.853,
+          "e": 45.255
+        },
+        {
+          "w": "Polsce,",
+          "s": 45.255,
+          "e": 45.943
+        },
+        {
+          "w": "w",
+          "s": 45.943,
+          "e": 46.115
+        },
+        {
+          "w": "pełni",
+          "s": 46.115,
+          "e": 46.516
+        },
+        {
+          "w": "zdalnie.",
+          "s": 46.516,
+          "e": 47.262
         }
       ]
     },
@@ -511,48 +542,48 @@
       ],
       "mapa": "stol-osp",
       "kamera": "calosc",
-      "start": 44.646,
-      "koniec": 48.646,
+      "start": 47.862,
+      "koniec": 51.862,
       "slowa": [
         {
           "w": "Wy",
-          "s": 44.646,
-          "e": 44.885
+          "s": 47.862,
+          "e": 48.1
         },
         {
           "w": "zajmujecie",
-          "s": 44.885,
-          "e": 45.601
+          "s": 48.1,
+          "e": 48.817
         },
         {
           "w": "się",
-          "s": 45.601,
-          "e": 45.9
+          "s": 48.817,
+          "e": 49.115
         },
         {
           "w": "strażą.",
-          "s": 45.9,
-          "e": 46.616
+          "s": 49.115,
+          "e": 49.832
         },
         {
           "w": "My",
-          "s": 46.616,
-          "e": 46.855
+          "s": 49.832,
+          "e": 50.07
         },
         {
           "w": "zajmiemy",
-          "s": 46.855,
-          "e": 47.452
+          "s": 50.07,
+          "e": 50.668
         },
         {
           "w": "się",
-          "s": 47.452,
-          "e": 47.751
+          "s": 50.668,
+          "e": 50.966
         },
         {
           "w": "papierami.",
-          "s": 47.751,
-          "e": 48.646
+          "s": 50.966,
+          "e": 51.862
         }
       ]
     },
@@ -567,43 +598,43 @@
         "plan": "pelny",
         "poza": "tlumaczy"
       },
-      "start": 49.246,
-      "koniec": 52.554,
+      "start": 52.462,
+      "koniec": 55.769,
       "slowa": [
         {
           "w": "Z",
-          "s": 49.246,
-          "e": 49.445
+          "s": 52.462,
+          "e": 52.66
         },
         {
           "w": "czym",
-          "s": 49.445,
-          "e": 49.842
+          "s": 52.66,
+          "e": 53.057
         },
         {
           "w": "Wasza",
-          "s": 49.842,
-          "e": 50.305
+          "s": 53.057,
+          "e": 53.52
         },
         {
           "w": "OSP",
-          "s": 50.305,
-          "e": 50.635
+          "s": 53.52,
+          "e": 53.851
         },
         {
           "w": "ma",
-          "s": 50.635,
-          "e": 50.9
+          "s": 53.851,
+          "e": 54.115
         },
         {
           "w": "najwięcej",
-          "s": 50.9,
-          "e": 51.628
+          "s": 54.115,
+          "e": 54.843
         },
         {
           "w": "papierów?",
-          "s": 51.628,
-          "e": 52.554
+          "s": 54.843,
+          "e": 55.769
         }
       ]
     },
@@ -613,43 +644,43 @@
         "Zaobserwuj"
       ],
       "plansza": true,
-      "start": 53.154,
-      "koniec": 57.154,
+      "start": 56.369,
+      "koniec": 60.369,
       "slowa": [
         {
           "w": "Zaobserwuj",
-          "s": 53.154,
-          "e": 53.849
+          "s": 56.369,
+          "e": 57.065
         },
         {
           "w": "nas.",
-          "s": 53.849,
-          "e": 54.371
+          "s": 57.065,
+          "e": 57.587
         },
         {
           "w": "Pomagamy",
-          "s": 54.371,
-          "e": 54.951
+          "s": 57.587,
+          "e": 58.166
         },
         {
           "w": "tym,",
-          "s": 54.951,
-          "e": 55.473
+          "s": 58.166,
+          "e": 58.688
         },
         {
           "w": "którzy",
-          "s": 55.473,
-          "e": 55.936
+          "s": 58.688,
+          "e": 59.152
         },
         {
           "w": "pomagają",
-          "s": 55.936,
-          "e": 56.516
+          "s": 59.152,
+          "e": 59.732
         },
         {
           "w": "innym.",
-          "s": 56.516,
-          "e": 57.154
+          "s": 59.732,
+          "e": 60.369
         }
       ]
     }

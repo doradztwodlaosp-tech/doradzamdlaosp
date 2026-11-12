@@ -25,6 +25,7 @@ const STACJE: Record<string, Stacja> = {
   statut: { cel: [0.1, 0.15, 1.95], kat: 0.42, odl: 8.8, wys: 5.0 },
   "statut-otwarty": { cel: [-0.2, 0.1, 1.75], kat: 0.24, odl: 7.6, wys: 7.6 },
   monety: { cel: [-3.0, 0.35, 2.2], kat: 0.22, odl: 7.4, wys: 3.6 },
+  helm: { cel: [-1.3, 0.35, 0.5], kat: 0.5, odl: 6.4, wys: 3.0 },
   calosc: { cel: [-0.2, 0.0, 0.5], kat: 0.32, odl: 22, wys: 15 },
 };
 
@@ -75,7 +76,7 @@ const czasy = (sceny: ScenaOSP[]) => {
     lista: papiery[1] ?? papiery[0],
     marka: sc("marka")?.start ?? 999,
     laptop: sc("laptop")?.start ?? 999,
-    polska: slowo("laptop", "Polski", 1),
+    polska: slowo("laptop", "Pols", 1),
     zdalnie: slowo("laptop", "zdalnie", 2),
     statut: sc("statut")?.start ?? 999,
     otwarty: sc("statut-otwarty"),
@@ -540,6 +541,21 @@ export const StolOSP: React.FC<PropsMapy> = ({ sceny, klatkaStartu }) => {
           ]}
         />
       ) : null}
+      {(() => {
+        const s = sceny.find((x) => x.kamera === "helm");
+        return s ? (
+          <Karta
+            t={t}
+            od={sl(s, "strażakom") - 0.1}
+            do={s.koniec + 0.3}
+            tytul="POMAGAMY TEŻ STRAŻAKOM"
+            wiersze={[
+              { tekst: "Sprawy prawne", t: sl(s, "prawnych") },
+              { tekst: "Sprawy podatkowe", t: sl(s, "podatkowych") },
+            ]}
+          />
+        ) : null;
+      })()}
       {c.monety ? <Licznik t={t} od={sl(c.monety, "1,5%")} do={c.monety.koniec + 0.4} /> : null}
     </AbsoluteFill>
   );
@@ -555,6 +571,8 @@ export const dzwiekiStolu = (sceny: ScenaOSP[]): ZdarzenieDzwiekowe[] => {
   if (c.lista) ["Statut", "walne", "wnioski", "sprawozdania"].forEach((w) => z.push({ t: czasSlowa(c.lista!, w) ?? 0, plik: "tik", glosnosc: 0.4 }));
   z.push({ t: c.polska, plik: "tik", glosnosc: 0.4 }, { t: c.zdalnie, plik: "tik", glosnosc: 0.4 });
   if (c.otwarty) z.push({ t: c.otwarcie + 0.3, plik: "papier", glosnosc: 0.5 });
+  const helm = sceny.find((x) => x.kamera === "helm");
+  if (helm) ["prawnych", "podatkowych"].forEach((w) => z.push({ t: czasSlowa(helm, w) ?? 0, plik: "tik", glosnosc: 0.4 }));
   if (c.monety) z.push({ t: c.dostawac + 0.3, plik: "dzwonek", glosnosc: 0.4 });
   return z.filter((e) => e.t > 0 && e.t < 900);
 };
