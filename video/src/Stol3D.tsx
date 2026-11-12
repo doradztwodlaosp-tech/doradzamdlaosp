@@ -18,15 +18,15 @@ const PRZEJAZD = 2.2; // sekundy przejazdu kamery między miejscami (spokojnie)
 
 type Stacja = { cel: [number, number, number]; kat: number; odl: number; wys: number };
 const STACJE: Record<string, Stacja> = {
-  remiza: { cel: [-3.0, 0.55, -1.0], kat: 0.32, odl: 11.5, wys: 4.2 },
-  papiery: { cel: [0.25, 0.3, -0.7], kat: 0.12, odl: 8.2, wys: 5.6 },
-  marka: { cel: [2.35, 0.55, -1.05], kat: -0.18, odl: 6.6, wys: 2.0 },
-  laptop: { cel: [3.3, 0.55, 2.1], kat: 0.38, odl: 8.4, wys: 3.4 },
-  statut: { cel: [0.1, 0.15, 1.95], kat: 0.42, odl: 8.8, wys: 5.0 },
-  "statut-otwarty": { cel: [-0.2, 0.1, 1.75], kat: 0.24, odl: 7.6, wys: 7.6 },
-  monety: { cel: [-3.0, 0.35, 2.2], kat: 0.22, odl: 7.4, wys: 3.6 },
-  helm: { cel: [-1.3, 0.35, 0.5], kat: 0.5, odl: 6.4, wys: 3.0 },
-  calosc: { cel: [-0.2, 0.0, 0.5], kat: 0.32, odl: 22, wys: 15 },
+  remiza: { cel: [-6.0, 0.6, -2.6], kat: 0.3, odl: 12, wys: 5.0 },
+  papiery: { cel: [0.0, 0.25, -3.0], kat: 0.12, odl: 6.2, wys: 5.0 },
+  marka: { cel: [5.55, -0.25, -2.4], kat: -0.18, odl: 5.6, wys: 2.1 },
+  laptop: { cel: [6.0, 0.55, 3.5], kat: 0.36, odl: 8.6, wys: 3.8 },
+  statut: { cel: [0.1, 0.15, 3.45], kat: 0.42, odl: 7.4, wys: 4.8 },
+  "statut-otwarty": { cel: [-0.2, 0.1, 3.25], kat: 0.24, odl: 7.6, wys: 7.6 },
+  monety: { cel: [-6.0, 0.4, 3.8], kat: 0.22, odl: 6.0, wys: 3.0 },
+  helm: { cel: [-3.0, 0.35, 0.3], kat: 0.5, odl: 6.8, wys: 3.4 },
+  calosc: { cel: [-0.5, 0.0, 0.3], kat: 0.3, odl: 19, wys: 13.5 },
 };
 
 // Gdzie stoi kamera w chwili t (sekundy filmu): płynny przejazd do miejsca bieżącej sceny + lekki dryf
@@ -206,7 +206,7 @@ const Remiza: React.FC<{ t: number; c: ReturnType<typeof czasy>; tx: TeksturySto
     </mesh>
   );
   return (
-    <group position={[-3.2, 0, -1.7]}>
+    <group position={[-6.0, 0, -3.5]}>
       {/* budynek */}
       <mesh position={[0, 0.55, 0]} castShadow receiveShadow>
         <boxGeometry args={[2.6, 1.1, 1.6]} />
@@ -296,7 +296,7 @@ const Papiery: React.FC<{ t: number; c: ReturnType<typeof czasy> }> = ({ t, c })
     [],
   );
   return (
-    <group position={[0.25, 0, -0.8]}>
+    <group position={[0.0, 0, -3.0]}>
       {kartki.map((k, i) => {
         const odKiedy = c.stos - 0.6 + (i - 6) * 0.11;
         const spad = i < 6 ? 1 : interpolate(t, [odKiedy, odKiedy + 0.55], [0, 1], { ...Z, easing: Easing.out(Easing.cubic) });
@@ -327,7 +327,7 @@ const Papiery: React.FC<{ t: number; c: ReturnType<typeof czasy> }> = ({ t, c })
 const Tabliczka: React.FC<{ t: number; c: ReturnType<typeof czasy>; tx: TeksturyStolu }> = ({ t, c, tx }) => {
   const blask = interpolate(t, [c.marka, c.marka + 1.4], [0, 1], Z);
   return (
-    <group position={[2.45, 0, -1.05]} rotation={[0, -0.18, 0]}>
+    <group position={[5.5, 0, -2.5]} rotation={[0, -0.18, 0]} scale={0.6}>
       <mesh position={[0, 0.06, 0]} castShadow receiveShadow>
         <boxGeometry args={[2.5, 0.12, 0.55]} />
         <meshStandardMaterial color="#17181D" roughness={0.5} />
@@ -349,7 +349,7 @@ const Laptop: React.FC<{ t: number; c: ReturnType<typeof czasy>; tx: TeksturySto
   const otwarcie = interpolate(t, [c.laptop - 0.3, c.laptop + 1.6], [0.15, 1], { ...Z, easing: PLYNNIE });
   const kat = -Math.PI / 2 + otwarcie * (Math.PI / 2 + 0.28);
   return (
-    <group position={[3.3, 0, 2.1]} rotation={[0, -0.25, 0]}>
+    <group position={[6.0, 0, 3.5]} rotation={[0, -0.25, 0]}>
       <mesh position={[0, 0.035, 0]} castShadow receiveShadow>
         <boxGeometry args={[1.7, 0.07, 1.15]} />
         <meshStandardMaterial color="#3A3D46" metalness={0.5} roughness={0.4} />
@@ -383,7 +383,7 @@ const Monety: React.FC<{ t: number; c: ReturnType<typeof czasy> }> = ({ t, c }) 
   ].map((p) => p as [number, number, number]);
   const wysokosci = [9, 14, 7, 4];
   return (
-    <group position={[-3.0, 0, 2.2]}>
+    <group position={[-6.0, 0, 3.8]}>
       {stosy.map((p, s) =>
         Array.from({ length: wysokosci[s] }, (_, i) => {
           const kiedy = c.dostawac + s * 0.25 + i * 0.07;
@@ -392,7 +392,7 @@ const Monety: React.FC<{ t: number; c: ReturnType<typeof czasy> }> = ({ t, c }) 
           return (
             <mesh key={`${s}-${i}`} position={[p[0] + Math.sin(i * 7.7) * 0.015, 0.03 + i * 0.062 + (1 - w) * 0.9, p[2]]} castShadow receiveShadow>
               <cylinderGeometry args={[0.26, 0.26, 0.055, 40]} />
-              <meshStandardMaterial color={MARKA.zloto} metalness={0.85} roughness={0.28} />
+              <meshStandardMaterial color={MARKA.zloto} metalness={0.45} roughness={0.35} emissive="#5a3c08" emissiveIntensity={0.35} />
             </mesh>
           );
         }),
@@ -409,14 +409,14 @@ const Swiat: React.FC<{ sceny: ScenaOSP[]; t: number; tx: TeksturyStolu; ts: Tek
     <>
       <Kamera sceny={sceny} t={t} />
       <color attach="background" args={[MARKA.tlo]} />
-      <fog attach="fog" args={[MARKA.tlo, 26, 60]} />
-      <ambientLight intensity={0.5} color="#9aa0b8" />
-      <hemisphereLight args={["#ffe2b0", "#15161B", 0.45]} />
+      <fog attach="fog" args={[MARKA.tlo, 42, 95]} />
+      <ambientLight intensity={1.0} color="#9aa0b8" />
+      <hemisphereLight args={["#ffe2b0", "#15161B", 1.1]} />
       <spotLight
-        position={[3, 16, 9]}
-        angle={0.62}
+        position={[3, 26, 14]}
+        angle={0.7}
         penumbra={0.75}
-        intensity={420}
+        intensity={2600}
         decay={2}
         color="#FFD9A0"
         castShadow
@@ -427,16 +427,16 @@ const Swiat: React.FC<{ sceny: ScenaOSP[]; t: number; tx: TeksturyStolu; ts: Tek
       <pointLight position={[-7, 3, -5]} intensity={10} color={MARKA.zloto} />
       <mesh position={[0, -0.05, 0]} receiveShadow>
         <boxGeometry args={[60, 0.1, 40]} />
-        <meshStandardMaterial map={tx.drewno} color="#5A4636" roughness={0.75} />
+        <meshStandardMaterial map={tx.drewno} color="#8A6E56" roughness={0.75} />
       </mesh>
       <Remiza t={t} c={c} tx={tx} />
       <Papiery t={t} c={c} />
       <Tabliczka t={t} c={c} tx={tx} />
       <Laptop t={t} c={c} tx={tx} />
-      <Segregator t={ts} otwarcie={otw} blask={blask} pozycja={[0.1, 0.06, 2.0]} obrot={0.42} />
+      <Segregator t={ts} otwarcie={otw} blask={blask} pozycja={[0.1, 0.06, 3.5]} obrot={0.42} />
       <Monety t={t} c={c} />
-      <Helm pozycja={[-1.3, 0.06, 0.5]} obrot={0.3} />
-      <Dlugopis pozycja={[1.6, 0.1, 2.9]} obrot={0.9} />
+      <Helm pozycja={[-3.0, 0.06, 0.3]} obrot={0.3} />
+      <Dlugopis pozycja={[1.7, 0.1, 4.6]} obrot={0.9} />
     </>
   );
 };

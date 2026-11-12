@@ -15,7 +15,8 @@ if (!dane.szkic) policzGlosnosc(katalog, dane.glos || "lektor.mp3");
 
 // W chmurze Claude Code używamy przeglądarki zainstalowanej w systemie (Remotion nie może pobrać własnej)
 const PRZEGLADARKA = "/opt/pw-browsers/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell";
-const przegladarka = fs.existsSync(PRZEGLADARKA) ? [`--browser-executable=${PRZEGLADARKA}`] : [];
+// --gl=swangle: programowe 3D (sceny three.js) na serwerze bez karty graficznej
+const przegladarka = fs.existsSync(PRZEGLADARKA) ? [`--browser-executable=${PRZEGLADARKA}`, "--gl=swangle"] : [];
 const props = `--props=${JSON.stringify({ odcinek: nazwa })}`;
 const uruchom = (argumenty) => execFileSync("npx", ["remotion", ...argumenty], { cwd: KATALOG_VIDEO, stdio: "inherit" });
 
