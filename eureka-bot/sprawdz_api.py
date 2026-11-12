@@ -2,29 +2,44 @@
 """
 sprawdz_api.py — test na prawdziwej EUREKA przed pierwszym biegiem
 ====================================================================
-Wysyła JEDNO zapytanie (ostatnie 7 dni, 10 rekordów) i pokazuje:
-  - czy API odpowiada i ile jest interpretacji w tygodniu,
-  - jak naprawdę wygląda pole PRZEPISY (od tego zależy klasyfikacja),
-  - jak bot oceniłby każdy z tych rekordów.
-Nic nie zapisuje i nie pobiera PDF-ów.
+Dwa żądania (z przerwą 15 s): jedno wyszukiwanie frazą z profilu i jeden PDF.
+Pokazuje:
+  - ile interpretacji znajduje fraza w ostatnich 45 dniach,
+  - jak wygląda pole PRZEPISY,
+  - czy z PDF-a da się wyciągnąć tekst i jak bot oceniłby tę interpretację.
+Nic nie zapisuje.
 
-    python sprawdz_api.py
+    ./uruchom.sh sprawdz_api.py                 # domyślnie fraza "art. 18d" (ulga B+R)
+    ./uruchom.sh sprawdz_api.py "IP Box" ip_box_pit
 """
+import sys
 from datetime import date, timedelta
 
-from eureka_client import nowa_sesja, wyszukaj
-from klasyfikator import klasyfikuj, lista_przepisow
+import config
+from eureka_client import nowa_sesja, pauza, pobierz_pdf, wyszukaj
+from klasyfikator import lista_przepisow, ocen, profile_z_przepisow, tekst_z_pdf
 
+fraza = sys.argv[1] if len(sys.argv) > 1 else "art. 18d"
+profil = sys.argv[2] if len(sys.argv) > 2 else "ulga_br"
 do = date.today()
-od = do - timedelta(days=6)
-wynik = wyszukaj(nowa_sesja(), "", 0, 10, zakres_dat=(od.isoformat(), do.isoformat()))
-print(f"Interpretacji wydanych {od}..{do}: {wynik.get('totalHits')}")
-print(f"Klucze odpowiedzi: {list(wynik.keys())}\n")
+od = do - timedelta(days=config.OKNO_DNI - 1)
 
-for r in wynik.get("results") or []:
-    w = klasyfikuj(r)
-    print(f"[{w.kategoria}] {r.get('SYG')}  (wydana {r.get('DT_WYD')}, kategoria: {r.get('KATEGORIA_INFORMACJI')})")
-    print(f"    profile: {', '.join(w.profile) or '-'}  | powód: {w.powod}")
-    for p in lista_przepisow(r)[:4]:
+sesja = nowa_sesja()
+wynik = wyszukaj(sesja, fraza, 0, 10, zakres_dat=(od.isoformat(), do.isoformat()))
+rekordy = wynik.get("results") or []
+print(f"Fraza '{fraza}', wydane {od}..{do}: {wynik.get('totalHits')} interpretacji\n")
+for r in rekordy[:5]:
+    print(f"{r.get('SYG')} (wydana {r.get('DT_WYD')}), profile z PRZEPISY: {profile_z_przepisow(r) or '-'}")
+    for p in lista_przepisow(r)[:3]:
         print(f"    PRZEPIS: {p[:140]}")
     print(f"    TEZA: {(r.get('TEZA') or '')[:140]}\n")
+
+if rekordy:
+    r = rekordy[0]
+    pauza(config.PRZERWA, powod="przed pobraniem jednego PDF")
+    tekst = tekst_z_pdf(pobierz_pdf(sesja, str(r["ID_INFORMACJI"])))
+    o = ocen(tekst, profil, profil in profile_z_przepisow(r))
+    print(f"PDF {r.get('SYG')}: {len(tekst)} znaków tekstu")
+    print(f"Ocena dla profilu {profil}: {'TRAFNA' if o.trafna else 'ODRZUCONA'} — {o.powod}")
+    print(f"    wzmianki artykułu: {o.art}, fraz: {o.frazy}, CIT/PIT: {o.dochodowe}, VAT/akcyza: {o.vat}")
+    print(f"    początek tekstu: {tekst[:300]!r}")

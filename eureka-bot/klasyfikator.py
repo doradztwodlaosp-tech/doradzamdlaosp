@@ -1,83 +1,89 @@
 # -*- coding: utf-8 -*-
 """
-klasyfikator.py — ocena rekordu EUREKA względem WSZYSTKICH profili ulg naraz
+klasyfikator.py — czy pobrana interpretacja NAPRAWDĘ dotyczy ulgi z profilu?
 =============================================================================
-Wejście: rekord z odpowiedzi API (słownik z polami PRZEPISY, TEZA, ...).
-Wyjście: `Wynik` z jedną z trzech kategorii:
+Bot wyszukuje frazami z profili (profiles.py). Każdą znalezioną interpretację
+pobiera (PDF) i ocenia jej PEŁNĄ TREŚĆ osobno dla każdego profilu, którego
+fraza ją znalazła:
 
-  POTWIERDZONE    pole PRZEPISY cytuje artykuł ulgi z ustawy CIT/PIT zgodnej z
-                  regułą profilu. Tylko takie rekordy mają pobierany PDF.
-  DO_WERYFIKACJI  PRZEPISY nie potwierdza żadnego profilu, ale rekord dotyczy
-                  podatków dochodowych (lub PRZEPISY jest puste), a TEZA/słowa
-                  kluczowe zawierają frazę z profilu. Trafia TYLKO do raportu
-                  (bez PDF) — człowiek decyduje.
-  ODRZUCONE       rekord dotyczy wyłącznie innych ustaw (VAT, akcyza, PCC...)
-                  albo nie ma ani przepisu, ani frazy ulgi. Zapamiętywany
-                  w rejestrze (żeby nie oceniać go drugi raz), bez PDF.
+  art      — ile razy w treści pada artykuł ulgi z profilu (np. „art. 18d”)
+  frazy    — ile razy padają frazy profilu (z odmianą: „ulgi badawczo-rozwojowej”
+             też liczy się jako „ulga badawczo-rozwojowa”)
+  dochodowe / vat — ile razy treść odwołuje się do ustaw o CIT/PIT,
+             a ile do VAT/akcyzy
 
-Dzięki temu "1-2 słowa o grze komputerowej w interpretacji VAT" nigdy nie
-kończy jako pobrany plik: decyduje, co interpretacja CYTUJE, a nie to, co
-wspomina.
+Decyzja (progi w config.py, do kalibracji na Twoich przykładach):
+  TRAFNA, gdy:
+    - pole PRZEPISY w metadanych cytuje artykuł ulgi z właściwej ustawy, albo
+    - art >= PROG_ART, albo
+    - art >= 1 i frazy >= PROG_FRAZ_Z_ART, albo
+    - frazy >= PROG_FRAZ i treść dotyczy bardziej CIT/PIT niż VAT/akcyzy.
+  ODRZUCONA w pozostałych przypadkach — np. interpretacja VAT, w której
+  „gra komputerowa” pada raz czy dwa razy.
+
+Odrzucone PDF-y NIE są kasowane — trafiają do folderu `_odrzucone`, żeby
+można było sprawdzić, czy progi są dobre.
 """
 from __future__ import annotations
 
+import io
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
+import config
 from profiles import PROFILE, Profil
+
+# ---------------------------------------------------------------------------
+# USTAWY W TREŚCI
+# ---------------------------------------------------------------------------
+_CIT = re.compile(r"osób prawnych|u\.?\s?p\.?\s?d\.?\s?o\.?\s?p\b|\bcit\b", re.IGNORECASE)
+_PIT = re.compile(r"osób fizycznych|u\.?\s?p\.?\s?d\.?\s?o\.?\s?f\b|\bpit\b", re.IGNORECASE)
+_VAT_AKCYZA = re.compile(r"towarów i usług|\bvat\b|u\.?\s?p\.?\s?t\.?\s?u\b|akcyz", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
 class Dopasowanie:
+    """Wiersz tabeli `dopasowania` w rejestrze (zgodny z db.dopisz_dopasowanie)."""
     profil_klucz: str
     fraza: str
     ustawa: str
     etykieta_artykulu: str
-    pewnosc: str                 # "POTWIERDZONE" | "DO_WERYFIKACJI"
+    pewnosc: str
 
 
 @dataclass
-class Wynik:
-    kategoria: str               # "POTWIERDZONE" | "DO_WERYFIKACJI" | "ODRZUCONE"
-    dopasowania: list[Dopasowanie] = field(default_factory=list)
+class Ocena:
+    profil_klucz: str
+    art: int = 0
+    frazy: int = 0
+    cit: int = 0
+    pit: int = 0
+    vat: int = 0
+    przepisy: bool = False        # potwierdzone w metadanych PRZEPISY
+    trafna: bool = False
     powod: str = ""
 
     @property
-    def profil_glowny(self) -> str | None:
-        return self.dopasowania[0].profil_klucz if self.dopasowania else None
+    def dochodowe(self) -> int:
+        return self.cit + self.pit
 
     @property
-    def profile(self) -> list[str]:
-        widziane: list[str] = []
-        for d in self.dopasowania:
-            if d.profil_klucz not in widziane:
-                widziane.append(d.profil_klucz)
-        return widziane
+    def sila(self) -> tuple:
+        """Do wyboru profilu głównego, gdy trafnych jest kilka."""
+        return (self.przepisy, self.art, self.frazy)
 
 
 # ---------------------------------------------------------------------------
 # POMOCNICZE
 # ---------------------------------------------------------------------------
 def ustawa_wpisu(przepis: str) -> str | None:
-    """'CIT' / 'PIT' / None (inna ustawa) dla jednego wpisu pola PRZEPISY.
-    Wpisy zaczynają się od np. '[CIT] Ustawa o podatku dochodowym od osób
-    prawnych...' albo '[VAT] Ustawa o podatku od towarów i usług...'."""
+    """'CIT' / 'PIT' / None dla wpisu pola PRZEPISY ('[CIT] Ustawa o podatku...')."""
     p = przepis.lower()
     if "[cit]" in p or "osób prawnych" in p:
         return "CIT"
     if "[pit]" in p or "osób fizycznych" in p:
         return "PIT"
     return None
-
-
-def etykieta_z_wzorca(wzorzec: str, awaryjnie: str) -> str:
-    surowy = wzorzec.replace(r"\s*", "")
-    zakres = re.search(r"(\d+)\[([a-z])-([a-z])\]", surowy)
-    if zakres:
-        cyfry, od, do = zakres.groups()
-        return f"art. {cyfry}{od}–{cyfry}{do}"
-    pojedynczy = re.search(r"(\d+[a-z]*)", surowy)
-    return f"art. {pojedynczy.group(1)}" if pojedynczy else awaryjnie
 
 
 def lista_przepisow(rekord: dict) -> list[str]:
@@ -89,69 +95,99 @@ def lista_przepisow(rekord: dict) -> list[str]:
     return [str(p) for p in surowe if p]
 
 
-def tekst_pomocniczy(rekord: dict) -> str:
-    """TEZA + SŁOWA KLUCZOWE, odporne na null-e i na to, że słowa kluczowe
-    bywają listą albo pojedynczym tekstem."""
-    teza = rekord.get("TEZA") or ""
-    slowa = rekord.get("SLOWA_KLUCZOWE") or []
-    if isinstance(slowa, str):
-        slowa = [slowa]
-    return " ".join([str(teza)] + [str(s) for s in slowa if s]).lower()
+def wzorzec_frazy(fraza: str) -> re.Pattern:
+    """Fraza -> regex tolerancyjny na odmianę: każde dłuższe słowo skracamy
+    do rdzenia ('rozwojowa' -> 'rozwojo' + dowolna końcówka). Krótkie słowa,
+    skróty i liczby ('IP', 'B+R', '5%') muszą wystąpić dokładnie."""
+    czesci = []
+    for slowo in fraza.split():
+        if len(slowo) <= 3 or re.search(r"\d", slowo):
+            czesci.append(re.escape(slowo))
+        else:
+            rdzen = slowo[:-2] if len(slowo) >= 6 else slowo[:-1]
+            czesci.append(re.escape(rdzen) + r"[\w-]*")
+    return re.compile(r"\b" + r"\s+".join(czesci), re.IGNORECASE)
 
 
-def _kolejnosc_profili() -> list[Profil]:
-    """Estoński CIT zawsze pierwszy (ma osobny folder i raport), reszta wg priorytetu."""
-    return sorted(PROFILE.values(),
-                  key=lambda p: (p.klucz != "estonski_cit", p.priorytet, p.klucz))
+def _czy_fraza_artykulu(fraza: str) -> bool:
+    return bool(re.match(r"art\.?\s*\d", fraza.strip(), re.IGNORECASE))
 
 
-_PROFILE_W_KOLEJNOSCI = _kolejnosc_profili()
+_WZORCE_FRAZ: dict[str, list[re.Pattern]] = {
+    k: [wzorzec_frazy(f) for f in p.frazy() if not _czy_fraza_artykulu(f)] for k, p in PROFILE.items()
+}
+_WZORCE_ART: dict[str, list[re.Pattern]] = {
+    k: [re.compile(w, re.IGNORECASE) for w in dict.fromkeys(r.wzorzec for r in p.reguly)]
+    for k, p in PROFILE.items()
+}
+
+
+def kolejnosc_profili(klucze) -> list[str]:
+    """Estoński CIT zawsze pierwszy (osobny folder i raport), reszta wg priorytetu."""
+    return sorted(set(klucze), key=lambda k: (k != "estonski_cit", PROFILE[k].priorytet, k))
 
 
 # ---------------------------------------------------------------------------
-# GŁÓWNA FUNKCJA
+# METADANE (PRZEPISY) — przed pobraniem, bez kosztu
 # ---------------------------------------------------------------------------
-def klasyfikuj(rekord: dict) -> Wynik:
+def profile_z_przepisow(rekord: dict) -> list[str]:
+    """Profile, których artykuł (z właściwej ustawy) jest w polu PRZEPISY."""
     przepisy = lista_przepisow(rekord)
-
-    # 1) POTWIERDZONE: artykuł ulgi w PRZEPISY, z właściwej ustawy.
-    potwierdzone: list[Dopasowanie] = []
-    for profil in _PROFILE_W_KOLEJNOSCI:
-        widziane: set[tuple[str, str]] = set()
+    wynik = []
+    for klucz, profil in PROFILE.items():
         for regula in profil.reguly:
-            klucz = (regula.wzorzec, regula.ustawa)
-            if klucz in widziane:
-                continue
-            widziane.add(klucz)
             if any(ustawa_wpisu(p) == regula.ustawa and re.search(regula.wzorzec, p, re.IGNORECASE)
                    for p in przepisy):
-                potwierdzone.append(Dopasowanie(
-                    profil_klucz=profil.klucz, fraza=regula.fraza, ustawa=regula.ustawa,
-                    etykieta_artykulu=etykieta_z_wzorca(regula.wzorzec, regula.fraza),
-                    pewnosc="POTWIERDZONE"))
-    if potwierdzone:
-        return Wynik("POTWIERDZONE", potwierdzone, "przepis ulgi w polu PRZEPISY")
+                wynik.append(klucz)
+                break
+    return kolejnosc_profili(wynik)
 
-    # 2) Rekord cytuje przepisy, ale ŻADEN nie jest z ustawy CIT/PIT -> to VAT,
-    #    akcyza, PCC, ordynacja itd. Nie interesuje nas.
-    if przepisy and all(ustawa_wpisu(p) is None for p in przepisy):
-        return Wynik("ODRZUCONE", [], "przepisy wyłącznie spoza ustaw o CIT/PIT")
 
-    # 3) Rekord o podatkach dochodowych (albo bez przepisów): szukamy fraz
-    #    z profili w tezie i słowach kluczowych. Tylko do weryfikacji, bez PDF.
-    tekst = tekst_pomocniczy(rekord)
-    slabe: list[Dopasowanie] = []
-    for profil in _PROFILE_W_KOLEJNOSCI:
-        if any(fw.lower() in tekst for fw in profil.frazy_wykluczajace):
-            continue
-        for fraza in profil.frazy():
-            if fraza.lower() in tekst:
-                regula = next(r for r in profil.reguly if r.fraza == fraza)
-                slabe.append(Dopasowanie(
-                    profil_klucz=profil.klucz, fraza=fraza, ustawa=regula.ustawa,
-                    etykieta_artykulu=profil.podstawa_prawna, pewnosc="DO_WERYFIKACJI"))
-                break  # jedna fraza na profil wystarczy
-    if slabe:
-        return Wynik("DO_WERYFIKACJI", slabe, "fraza profilu w tezie/słowach kluczowych")
+# ---------------------------------------------------------------------------
+# TREŚĆ PDF
+# ---------------------------------------------------------------------------
+def tekst_z_pdf(dane: bytes) -> str:
+    try:
+        from pypdf import PdfReader
+        return "\n".join((s.extract_text() or "") for s in PdfReader(io.BytesIO(dane)).pages)
+    except Exception:  # noqa: BLE001 — uszkodzony PDF nie może przerwać biegu
+        return ""
 
-    return Wynik("ODRZUCONE", [], "brak przepisu ulgi i fraz z profili")
+
+def ocen(tekst: str, profil_klucz: str, z_przepisow: bool) -> Ocena:
+    profil: Profil = PROFILE[profil_klucz]
+    o = Ocena(profil_klucz, przepisy=z_przepisow)
+    o.art = sum(len(w.findall(tekst)) for w in _WZORCE_ART[profil_klucz])
+    o.frazy = sum(len(w.findall(tekst)) for w in _WZORCE_FRAZ[profil_klucz])
+    o.cit = len(_CIT.findall(tekst))
+    o.pit = len(_PIT.findall(tekst))
+    o.vat = len(_VAT_AKCYZA.findall(tekst))
+    t = tekst.lower()
+    # Czy treść dotyczy ustawy właściwej dla profilu (IP Box CIT vs IP Box PIT itd.)
+    zgodna_ustawa = {"CIT": o.cit >= o.pit, "PIT": o.pit >= o.cit}.get(profil.podatek, True)
+
+    if z_przepisow:
+        o.trafna, o.powod = True, "artykuł ulgi w metadanych PRZEPISY"
+    elif not tekst.strip():
+        o.trafna, o.powod = True, "brak tekstu w PDF (np. skan) — sprawdź ręcznie"
+    elif profil.frazy_wykluczajace and o.art == 0 and any(fw.lower() in t for fw in profil.frazy_wykluczajace):
+        o.powod = "fraza wykluczająca profilu, brak artykułu"
+    elif o.vat > 2 * o.dochodowe and o.art < config.PROG_ART + 1:
+        o.powod = "interpretacja dotyczy głównie VAT/akcyzy"
+    elif o.art >= config.PROG_ART:
+        o.trafna, o.powod = True, f"artykuł ulgi wymieniony {o.art}×"
+    elif o.art >= 1 and o.frazy >= config.PROG_FRAZ_Z_ART and zgodna_ustawa:
+        o.trafna, o.powod = True, f"artykuł {o.art}× i frazy {o.frazy}×"
+    elif o.frazy >= config.PROG_FRAZ and o.dochodowe >= o.vat and zgodna_ustawa:
+        o.trafna, o.powod = True, f"frazy profilu {o.frazy}×"
+    elif not zgodna_ustawa:
+        o.powod = f"treść dotyczy innej ustawy niż profil ({profil.podatek}); artykuł {o.art}×, frazy {o.frazy}×"
+    else:
+        o.powod = f"za mało wzmianek (artykuł {o.art}×, frazy {o.frazy}×)"
+    return o
+
+
+def dopasowanie_z_oceny(o: Ocena, fraza: str) -> Dopasowanie:
+    profil = PROFILE[o.profil_klucz]
+    return Dopasowanie(o.profil_klucz, fraza, profil.podatek.split("+")[0],
+                       profil.podstawa_prawna, "POTWIERDZONE")

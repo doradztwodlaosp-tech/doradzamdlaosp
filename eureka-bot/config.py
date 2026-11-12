@@ -26,12 +26,11 @@ PLIK_BLOKADY = BAZA_DANYCH / "_rejestr" / "bot.lock"
 # OKNO PRZESUWNE
 # ---------------------------------------------------------------------------
 # EUREKA nie pozwala filtrować po dacie publikacji (filtr po DATA_REJESTRACJI
-# zwraca 0 wyników — sprawdzone w DevTools). Dlatego bot pyta o wszystkie
-# interpretacje WYDANE w ostatnich OKNO_DNI dniach, a nowe rozpoznaje po tym,
-# że ich ID nie ma jeszcze w rejestrze. Interpretacja publikowana jest kilka do
-# kilkunastu dni po wydaniu, stąd zapas.
+# zwraca 0 wyników — sprawdzone w DevTools). Dlatego każda fraza z profili
+# jest wyszukiwana z filtrem daty WYDANIA z ostatnich OKNO_DNI dni, a nowe
+# interpretacje rozpoznajemy po tym, że ich ID nie ma jeszcze w rejestrze.
+# Interpretacja publikowana jest kilka do kilkunastu dni po wydaniu, stąd zapas.
 OKNO_DNI = int(os.environ.get("EUREKA_OKNO_DNI", "45"))
-KROK_DNI = int(os.environ.get("EUREKA_KROK_DNI", "7"))   # na ile dni dzielimy okno przy zapytaniach
 
 # ---------------------------------------------------------------------------
 # LIMITY API (zalecenia KIS/MF): 10 wyszukiwań/min, 10 eksportów/min,
@@ -48,7 +47,16 @@ COOLDOWN_BLEDY_POLACZENIA = [
     float(x) for x in os.environ.get("EUREKA_COOLDOWN_POLACZENIA", "45,120,300").split(",")
 ]
 # Zabezpieczenie: tyle PDF-ów maksymalnie pobieramy w jednym biegu (0 = bez limitu).
-LIMIT_NOWYCH_NA_RUN = int(os.environ.get("EUREKA_LIMIT_NOWYCH", "300"))
+# Reszta zostanie pobrana w kolejnym biegu (jest nadal w oknie dat).
+LIMIT_NOWYCH_NA_RUN = int(os.environ.get("EUREKA_LIMIT_NOWYCH", "400"))
+
+# ---------------------------------------------------------------------------
+# PROGI OCENY TREŚCI (klasyfikator.py) — WARTOŚCI STARTOWE, DO KALIBRACJI
+# na przykładowych PDF-ach (dobrych i złych).
+# ---------------------------------------------------------------------------
+PROG_ART = int(os.environ.get("EUREKA_PROG_ART", "2"))                 # tyle wzmianek artykułu ulgi wystarcza
+PROG_FRAZ_Z_ART = int(os.environ.get("EUREKA_PROG_FRAZ_Z_ART", "2"))   # 1 artykuł + tyle fraz
+PROG_FRAZ = int(os.environ.get("EUREKA_PROG_FRAZ", "5"))               # same frazy (bez artykułu)
 
 BAZA_API = "https://eureka.mf.gov.pl/api"
 URL_WYSZUKIWARKA = BAZA_API + "/public/v1/wyszukiwarka/informacje/"

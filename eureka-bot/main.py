@@ -2,8 +2,9 @@
 """
 main.py — punkt wejścia bota EUREKA
 ====================================
-  python main.py                         # bieg standardowy: ostatnie OKNO_DNI dni, raport, Dysk, mail
-  python main.py --podglad               # pokaż, co by zrobił — nic nie zapisuje, nic nie wysyła
+  python main.py                         # bieg standardowy: wszystkie profile, ostatnie OKNO_DNI dni
+  python main.py --profil ulga_br estonski_cit   # tylko wybrane profile
+  python main.py --podglad               # tylko wyszukiwanie: pokaż, co by pobrał — nic nie zapisuje
   python main.py --okno 14               # okno 14 dni zamiast domyślnego
   python main.py --od 2026-10-01 --do 2026-10-31   # konkretny zakres dat wydania
   python main.py --bez-wysylki           # bez maila i bez Dysku
@@ -29,7 +30,8 @@ from przeglad import uruchom_przeglad
 def _parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Bot monitorujący interpretacje w EUREKA (ulgi podatkowe).",
                                 formatter_class=argparse.RawDescriptionHelpFormatter, epilog=__doc__)
-    p.add_argument("--podglad", action="store_true", help="nic nie zapisuje i nic nie wysyła")
+    p.add_argument("--profil", nargs="+", metavar="KLUCZ", help="tylko te profile (patrz --lista-profili)")
+    p.add_argument("--podglad", action="store_true", help="tylko wyszukiwanie; nic nie pobiera i nie zapisuje")
     p.add_argument("--okno", type=int, metavar="DNI", help=f"ile dni wstecz (domyślnie {config.OKNO_DNI})")
     p.add_argument("--od", metavar="RRRR-MM-DD")
     p.add_argument("--do", metavar="RRRR-MM-DD")
@@ -71,6 +73,10 @@ def main(argv: list[str] | None = None) -> int:
     if od > do:
         print("BŁĄD: data --od jest późniejsza niż --do.")
         return 1
+    nieznane = [k for k in (args.profil or []) if k not in PROFILE]
+    if nieznane:
+        print(f"BŁĄD: nieznane profile: {', '.join(nieznane)}. Dostępne: {', '.join(PROFILE_DO_PRZETWORZENIA)}")
+        return 1
 
     # Blokada: jeśli poprzedni bieg jeszcze trwa (np. bardzo długi), nowy nie startuje.
     config.PLIK_BLOKADY.parent.mkdir(parents=True, exist_ok=True)
@@ -82,11 +88,11 @@ def main(argv: list[str] | None = None) -> int:
         return 3
 
     print(f"--- START {datetime.now():%Y-%m-%d %H:%M:%S} ---")
-    wynik = uruchom_przeglad(od, do)
+    wynik = uruchom_przeglad(od, do, args.profil, tryb="reczny" if args.profil else "automatyczny")
     l = wynik["licznik"]
     print(f"\n=== PODSUMOWANIE (bieg #{wynik['bieg_id']}, status: {wynik['status']}) ===")
-    print(f"  Przejrzano: {l['znaleziono']} | już znane: {l['duplikaty']} | odrzucone: {l['odrzucone']}")
-    print(f"  Nowe (PDF): {l['nowe']} | do weryfikacji: {l['do_weryfikacji']} | błędy: {l['bledy']}")
+    print(f"  Zapytań: {l['zapytania']} | nowych znalezionych: {l['znaleziono']} | już w rejestrze: {l['duplikaty']}")
+    print(f"  Trafne: {l['trafne']} | odrzucone po ocenie treści: {l['odrzucone']} | błędy: {l['bledy']}")
 
     if wynik["podglad"]:
         print("Podgląd: nie tworzę raportów i niczego nie wysyłam.")

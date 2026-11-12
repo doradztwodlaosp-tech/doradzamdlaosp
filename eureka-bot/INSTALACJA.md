@@ -43,12 +43,18 @@ Uzupełnij adresy Gmail (hasło aplikacji w kroku 5). Zapis w nano: `Ctrl+O`, `E
 ~/eureka-bot/uruchom.sh sprawdz_api.py
 ```
 
-Jedno zapytanie, nic nie zapisuje. **Wyślij mi wynik** — pokaże, jak
-naprawdę wygląda pole `PRZEPISY`, i potwierdzi, że klasyfikacja działa.
-Potem podgląd pełnego biegu (nic nie zapisuje, trwa kilkanaście minut przez przerwy 15 s):
+Dwa żądania (wyszukiwanie „art. 18d” i jeden PDF), nic nie zapisuje. **Wyślij mi wynik** —
+pokaże, jak wygląda pole `PRZEPISY`, czy z PDF-a da się odczytać tekst i jak bot
+ocenił tę interpretację. Inną frazę/profil sprawdzisz tak:
 
 ```bash
-~/eureka-bot/uruchom.sh --podglad --okno 7
+~/eureka-bot/uruchom.sh sprawdz_api.py "IP Box" ip_box_pit
+```
+
+Potem podgląd jednego profilu (tylko wyszukiwanie, nic nie pobiera i nie zapisuje):
+
+```bash
+~/eureka-bot/uruchom.sh --podglad --profil ulga_br
 ```
 
 ## 5. Gmail — hasło aplikacji
@@ -100,11 +106,17 @@ rclone mkdir gdrive:EUREKA && rclone lsd gdrive:
 ~/eureka-bot/uruchom.sh
 ```
 
-Po zakończeniu: PDF-y w `~/eureka-dane/<profil>/<rok>/`, estoński CIT w
-`~/eureka-dane/Estoński CIT/`, raporty Excel w `~/eureka-dane/_raporty/` i
-`~/eureka-dane/Estoński CIT/_raporty/`, kopia na Dysku, mail z podsumowaniem.
+Po zakończeniu:
+- trafne PDF-y: `~/eureka-dane/<profil>/<rok>/`, estoński CIT: `~/eureka-dane/Estoński CIT/<rok>/`
+- odrzucone PDF-y (do sprawdzenia oceny): `~/eureka-dane/_odrzucone/<profil>/<rok>/`
+  i `~/eureka-dane/Estoński CIT/_odrzucone/<rok>/`
+- raporty Excel: `~/eureka-dane/_raporty/` i `~/eureka-dane/Estoński CIT/_raporty/`
+- kopia wszystkiego na Dysku, mail z podsumowaniem.
 
-## 8. Automatyczne uruchamianie (wtorek i piątek 6:40)
+Pierwszy bieg sprawdza 45 dni wstecz, więc pobierze więcej (limit 400 PDF-ów na bieg,
+przy przerwach 15 s to ok. 2 godziny). Kolejne biegi pobierają tylko to, czego jeszcze nie ma.
+
+## 8. Automatyczne uruchamianie (sobota 00:00)
 
 Wstaw swoją nazwę użytkownika do plików usługi i zainstaluj je:
 
@@ -146,12 +158,15 @@ sudo timedatectl set-timezone Europe/Warsaw
 
 ## Jak działa bot (w skrócie)
 
-- Każdy bieg przegląda **wszystkie** interpretacje wydane w ostatnich 45 dniach
-  (EUREKA nie pozwala filtrować po dacie publikacji — sprawdzone). Nowe rozpoznaje
-  po tym, że ich ID nie ma w rejestrze; opóźnione publikacje też łapie.
-- Ocena po polu PRZEPISY: cytuje artykuł ulgi z ustawy o CIT/PIT → **pobierany PDF**;
-  tylko fraza w tezie → **„do weryfikacji”** (w raporcie, bez PDF);
-  wyłącznie VAT/akcyza/inne → **odrzucone**.
-- Przerwa ~15 s między każdym zapytaniem (zalecenia KIS/MF). Po odpowiedzi 403/429
-  czeka 15 minut (lub tyle, ile każe serwer), próbuje raz, a przy kolejnej blokadzie
-  kończy bieg i informuje mailem.
+1. **Wyszukiwanie frazami z profili** (`profiles.py`), z filtrem daty wydania z ostatnich
+   45 dni (EUREKA nie pozwala filtrować po dacie publikacji — sprawdzone). Nowe
+   interpretacje rozpoznaje po tym, że ich ID nie ma w rejestrze.
+2. **Pobranie PDF** każdej nowej znalezionej interpretacji.
+3. **Ocena pełnej treści** dla każdego profilu, który ją znalazł: ile razy pada artykuł
+   ulgi, ile razy frazy profilu (z odmianą), czy tekst dotyczy CIT/PIT czy VAT/akcyzy.
+   Trafna → folder profilu. Nietrafna → folder `_odrzucone` (nic nie jest kasowane).
+   Progi są w `config.py` (`PROG_ART`, `PROG_FRAZ_Z_ART`, `PROG_FRAZ`) i można je
+   zmienić w `eureka.env` bez ruszania kodu.
+4. Przerwa ~15 s między każdym zapytaniem (zalecenia KIS/MF). Po odpowiedzi 403/429
+   czeka 15 minut (lub tyle, ile każe serwer), próbuje raz, a przy kolejnej blokadzie
+   kończy bieg i informuje mailem.

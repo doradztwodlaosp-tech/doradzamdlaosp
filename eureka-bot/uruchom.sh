@@ -7,6 +7,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 set -a; [ -f eureka.env ] && . ./eureka.env; set +a
 if [ "${1:-}" = "sprawdz_api.py" ]; then
-  exec ./venv/bin/python sprawdz_api.py
+  shift
+  exec ./venv/bin/python sprawdz_api.py "$@"
 fi
 exec ./venv/bin/python main.py "$@"

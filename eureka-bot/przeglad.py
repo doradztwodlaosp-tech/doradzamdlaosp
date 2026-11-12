@@ -1,48 +1,45 @@
 # -*- coding: utf-8 -*-
 """
-przeglad.py — jeden bieg: zrzut z okna dat -> klasyfikacja -> pobranie PDF
-===========================================================================
-1. Okno [dziś - OKNO_DNI, dziś] dzielimy na kawałki po KROK_DNI dni i dla
-   każdego pytamy EUREKĘ o WSZYSTKIE interpretacje wydane w tym czasie (bez
-   frazy). To kilkadziesiąt zapytań zamiast setek (po jednym na frazę).
-2. Każdy rekord, którego ID nie ma w rejestrze, klasyfikujemy lokalnie
-   (klasyfikator.py) — dla wszystkich profili naraz.
-3. PDF pobieramy tylko dla POTWIERDZONYCH. DO_WERYFIKACJI idzie do raportu
-   bez pliku. ODRZUCONE zapamiętujemy, żeby nie oceniać ich znowu.
+przeglad.py — jeden bieg bota
+==============================
+1. WYSZUKIWANIE: każda fraza z profili (profiles.py) jest wysyłana do EUREKI
+   z filtrem daty wydania [dziś - OKNO_DNI, dziś]. Ta sama fraza w kilku
+   profilach (np. „IP Box” w CIT i PIT) idzie tylko raz. Interpretacje już
+   znane z rejestru (po ID) są pomijane.
+2. POBRANIE: każda nowa znaleziona interpretacja jest pobierana (PDF).
+3. OCENA TREŚCI (klasyfikator.py): osobno dla każdego profilu, który ją
+   znalazł. Trafne -> folder profilu. Nietrafne -> folder `_odrzucone`
+   (nic nie jest kasowane, żeby dało się sprawdzić ocenę).
 
-Wznowienie po awarii nie jest potrzebne: kolejny bieg i tak przejdzie całe
-okno, a rekordy już zapisane pominie po ID. Zapis (commit) robimy po każdym
-kawałku okna.
-
-Tryb podglądu niczego nie zapisuje: ani w bazie, ani na dysku.
+Tryb podglądu wykonuje tylko wyszukiwanie i pokazuje, co by pobrał —
+nie pobiera PDF-ów i niczego nie zapisuje.
 """
 from __future__ import annotations
 
 import re
-from datetime import date, timedelta
+from dataclasses import dataclass, field
+from datetime import date
 from pathlib import Path
 
 import config
 import db
 from eureka_client import BlokadaError, nowa_sesja, pauza, pobierz_pdf, wyszukaj
-from klasyfikator import Wynik, klasyfikuj
+from klasyfikator import (Ocena, dopasowanie_z_oceny, kolejnosc_profili, ocen,
+                          profile_z_przepisow, tekst_z_pdf)
 from profiles import PROFILE
 
 LINK_EUREKA = "https://eureka.mf.gov.pl/informacje/{id}"
 
 
-# ===========================================================================
-# DATY
-# ===========================================================================
-def okna_dat(od: date, do: date, krok: int) -> list[tuple[str, str]]:
-    """Dzieli [od, do] (włącznie) na kawałki po `krok` dni, od najnowszych."""
-    okna: list[tuple[str, str]] = []
-    koniec = do
-    while koniec >= od:
-        poczatek = max(od, koniec - timedelta(days=krok - 1))
-        okna.append((poczatek.isoformat(), koniec.isoformat()))
-        koniec = poczatek - timedelta(days=1)
-    return okna
+class LimitPobranError(Exception):
+    """Osiągnięto LIMIT_NOWYCH_NA_RUN — reszta zostanie pobrana w kolejnym biegu."""
+
+
+@dataclass
+class Znaleziona:
+    rekord: dict
+    profile: set[str] = field(default_factory=set)        # profile, których fraza ją znalazła
+    frazy: dict[str, str] = field(default_factory=dict)   # profil -> pierwsza fraza, która ją znalazła
 
 
 # ===========================================================================
@@ -52,32 +49,39 @@ def bezpieczna_nazwa(tekst: str) -> str:
     return re.sub(r'[\\/:*?"<>|]', "_", str(tekst)).strip()
 
 
-def folder_dla(profil_klucz: str, rekord: dict) -> Path:
+def folder_dla(profil_klucz: str, rekord: dict, trafna: bool) -> Path:
     rok = (str(rekord.get("DT_WYD") or "") or "brak-daty")[:4]
     if profil_klucz == "estonski_cit":
-        return config.FOLDER_ESTONSKI_CIT / rok
-    return config.BAZA_DANYCH / bezpieczna_nazwa(PROFILE[profil_klucz].nazwa) / rok
+        baza = config.FOLDER_ESTONSKI_CIT
+        return baza / rok if trafna else baza / "_odrzucone" / rok
+    nazwa = bezpieczna_nazwa(PROFILE[profil_klucz].nazwa)
+    return config.BAZA_DANYCH / nazwa / rok if trafna else config.BAZA_DANYCH / "_odrzucone" / nazwa / rok
 
 
-def sciezka_pliku(profil_klucz: str, rekord: dict) -> Path:
+def nazwa_pliku(rekord: dict) -> str:
     id_inf = str(rekord.get("ID_INFORMACJI"))
     syg = rekord.get("SYG") or "brak_sygnatury"
     data = (str(rekord.get("DT_WYD") or "") or "brak_daty")[:10]
-    return folder_dla(profil_klucz, rekord) / (bezpieczna_nazwa(f"{data}_{syg}_ID{id_inf}") + ".pdf")
+    return bezpieczna_nazwa(f"{data}_{syg}_ID{id_inf}") + ".pdf"
 
 
 # ===========================================================================
-# ZRZUT JEDNEGO OKNA
+# WYSZUKIWANIE
 # ===========================================================================
-def pobierz_okno(sesja, start: str, koniec: str) -> tuple[dict[str, dict], int]:
-    """Wszystkie rekordy wydane w [start, koniec]. Zwraca ({ID: rekord}, totalHits).
-    Jeśli zebrano mniej unikalnych ID niż totalHits, wypisuje ostrzeżenie
-    (np. niestabilne sortowanie między stronami)."""
+def frazy_do_wyszukania(profile_klucze: list[str]) -> dict[str, list[str]]:
+    """{fraza: [profile, które jej używają]} — każda fraza raz, kolejność stała."""
+    frazy: dict[str, list[str]] = {}
+    for klucz in kolejnosc_profili(profile_klucze):
+        for fraza in PROFILE[klucz].frazy():
+            frazy.setdefault(fraza, []).append(klucz)
+    return frazy
+
+
+def szukaj_frazy(sesja, fraza: str, od: str, do: str) -> list[dict]:
     rekordy: dict[str, dict] = {}
     strona = 0
-    wszystkich = 0
     while True:
-        wynik = wyszukaj(sesja, "", strona, config.ROZMIAR_STRONY, zakres_dat=(start, koniec))
+        wynik = wyszukaj(sesja, fraza, strona, config.ROZMIAR_STRONY, zakres_dat=(od, do))
         wszystkich = wynik.get("totalHits") or 0
         partia = wynik.get("results") or []
         for r in partia:
@@ -85,32 +89,34 @@ def pobierz_okno(sesja, start: str, koniec: str) -> tuple[dict[str, dict], int]:
                 rekordy[str(r["ID_INFORMACJI"])] = r
         strona += 1
         if not partia or strona * config.ROZMIAR_STRONY >= wszystkich:
-            break
-        pauza(config.PRZERWA, powod=f"okno {start}..{koniec}, kolejna strona ({strona + 1})")
-    if len(rekordy) < wszystkich:
-        print(f"    UWAGA: okno {start}..{koniec}: zebrano {len(rekordy)} z {wszystkich} rekordów.")
-    return rekordy, wszystkich
+            return list(rekordy.values())
+        pauza(config.PRZERWA, powod=f"'{fraza}': kolejna strona ({strona + 1})")
 
 
 # ===========================================================================
 # WIERSZ RAPORTU
 # ===========================================================================
-def wiersz_raportu(rekord: dict, wynik: Wynik, status: str, plik: Path | None) -> dict:
-    id_inf = str(rekord.get("ID_INFORMACJI"))
-    profile = wynik.profile
+def wiersz_raportu(z: Znaleziona, oceny: list[Ocena], profil_glowny: str, trafna: bool,
+                   status: str, plik: Path | None) -> dict:
+    r = z.rekord
+    id_inf = str(r.get("ID_INFORMACJI"))
+    glowna = next(o for o in oceny if o.profil_klucz == profil_glowny)
+    trafne_profile = [o.profil_klucz for o in oceny if o.trafna]
+    pokaz = trafne_profile if trafna else [profil_glowny]
     return {
         "id": id_inf,
-        "sygnatura": rekord.get("SYG") or "",
-        "data_wydania": (str(rekord.get("DT_WYD") or ""))[:10],
-        "organ": rekord.get("AUTOR") or "",
-        "kategoria_informacji": rekord.get("KATEGORIA_INFORMACJI") or "",
-        "teza": rekord.get("TEZA") or "",
-        "pewnosc": wynik.kategoria,
-        "profile": profile,
-        "profile_nazwy": [PROFILE[k].nazwa for k in profile],
-        "przepisy_ulg": sorted({d.etykieta_artykulu for d in wynik.dopasowania}),
-        "frazy": sorted({d.fraza for d in wynik.dopasowania}),
-        "grupa": "estonski_cit" if "estonski_cit" in profile else "ulgi",
+        "sygnatura": r.get("SYG") or "",
+        "data_wydania": (str(r.get("DT_WYD") or ""))[:10],
+        "organ": r.get("AUTOR") or "",
+        "teza": r.get("TEZA") or "",
+        "trafna": trafna,
+        "profile": pokaz,
+        "profile_nazwy": [PROFILE[k].nazwa for k in pokaz],
+        "podstawa": PROFILE[profil_glowny].podstawa_prawna,
+        "frazy": sorted({z.frazy[k] for k in z.frazy}),
+        "art": glowna.art, "fraz": glowna.frazy, "dochodowe": glowna.dochodowe, "vat": glowna.vat,
+        "powod": glowna.powod,
+        "grupa": "estonski_cit" if profil_glowny == "estonski_cit" else "ulgi",
         "status": status,
         "plik": str(plik.relative_to(config.BAZA_DANYCH)) if plik else "",
         "link": LINK_EUREKA.format(id=id_inf),
@@ -120,60 +126,80 @@ def wiersz_raportu(rekord: dict, wynik: Wynik, status: str, plik: Path | None) -
 # ===========================================================================
 # GŁÓWNY BIEG
 # ===========================================================================
-def uruchom_przeglad(od: date, do: date, tryb: str = "automatyczny") -> dict:
-    """Wykonuje bieg dla okna [od, do]. Zwraca słownik z licznikami, statusem,
-    listą wierszy raportu i komunikatem (dla maila)."""
+def uruchom_przeglad(od: date, do: date, profile_klucze: list[str] | None = None,
+                     tryb: str = "automatyczny") -> dict:
     podglad = config.TRYB_PODGLAD
+    profile_klucze = profile_klucze or list(PROFILE)
     if not podglad:
         config.upewnij_sie_ze_foldery_istnieja()
 
-    licznik = {"znaleziono": 0, "nowe": 0, "do_weryfikacji": 0, "odrzucone": 0,
-               "duplikaty": 0, "bledy": 0}
+    licznik = {"zapytania": 0, "znaleziono": 0, "duplikaty": 0, "trafne": 0, "odrzucone": 0, "bledy": 0}
     wiersze: list[dict] = []
     bledy: list[dict] = []
     komunikat = ""
     status = "sukces"
     sesja = nowa_sesja()
-    okna = okna_dat(od, do, config.KROK_DNI)
+    frazy = frazy_do_wyszukania(profile_klucze)
 
     with db.polacz(config.SCIEZKA_DB) as conn:
         znane = db.znane_id(conn)
-        bieg_id = 0 if podglad else db.rozpocznij_bieg(conn, tryb, list(PROFILE), [od.isoformat(), do.isoformat()])
+        bieg_id = 0 if podglad else db.rozpocznij_bieg(conn, tryb, profile_klucze, [od.isoformat(), do.isoformat()])
         conn.commit()
-        print(f"Rejestr: {len(znane)} znanych interpretacji. Okno: {od} .. {do} ({len(okna)} części)."
-              + (" [PODGLĄD — nic nie zapisuję]" if podglad else ""))
+        print(f"Rejestr: {len(znane)} znanych. Okno dat wydania: {od} .. {do}. "
+              f"Fraz do sprawdzenia: {len(frazy)} (profile: {len(profile_klucze)})."
+              + (" [PODGLĄD — tylko wyszukiwanie]" if podglad else ""))
 
-        def blad(id_inf: str | None, profil: str | None, tekst: str) -> None:
+        def blad(id_inf, profil, tekst):
             licznik["bledy"] += 1
             bledy.append({"id": id_inf or "", "profil": profil or "", "komunikat": tekst, "czas": db.teraz()})
             if not podglad:
                 db.zapisz_blad(conn, bieg_id, id_inf, profil, tekst)
+                conn.commit()
 
         try:
-            for nr_okna, (start, koniec) in enumerate(okna):
-                if nr_okna:
-                    pauza(config.PRZERWA, powod="przed kolejną częścią okna")
+            # --- 1. WYSZUKIWANIE ---
+            znalezione: dict[str, Znaleziona] = {}
+            juz_znane: set[str] = set()
+            for nr, (fraza, profile_frazy) in enumerate(frazy.items()):
+                if nr:
+                    pauza(config.PRZERWA)
                 try:
-                    rekordy, wszystkich = pobierz_okno(sesja, start, koniec)
+                    wyniki = szukaj_frazy(sesja, fraza, od.isoformat(), do.isoformat())
                 except RuntimeError as e:
-                    blad(None, None, f"Okno {start}..{koniec}: {e}")
+                    blad(None, ",".join(profile_frazy), f"Wyszukiwanie '{fraza}': {e}")
                     status = "czesciowy"
                     continue
+                licznik["zapytania"] += 1
+                for r in wyniki:
+                    id_inf = str(r["ID_INFORMACJI"])
+                    if id_inf in znane:
+                        juz_znane.add(id_inf)
+                        continue
+                    z = znalezione.setdefault(id_inf, Znaleziona(r))
+                    for k in profile_frazy:
+                        z.profile.add(k)
+                        z.frazy.setdefault(k, fraza)
+                print(f"  '{fraza}' [{', '.join(profile_frazy)}]: {len(wyniki)} w oknie, "
+                      f"nowych łącznie: {len(znalezione)}")
 
-                nowe_w_oknie = {k: v for k, v in rekordy.items() if k not in znane}
-                licznik["znaleziono"] += len(rekordy)
-                licznik["duplikaty"] += len(rekordy) - len(nowe_w_oknie)
-                print(f"  {start}..{koniec}: {wszystkich} interpretacji, nowych {len(nowe_w_oknie)}")
+            licznik["znaleziono"] = len(znalezione)
+            licznik["duplikaty"] = len(juz_znane)
+            print(f"\nNowych interpretacji do pobrania i oceny: {len(znalezione)}")
 
-                for id_inf, rekord in nowe_w_oknie.items():
-                    wynik = klasyfikuj(rekord)
-                    _obsluz_rekord(conn, sesja, bieg_id, rekord, wynik, licznik, wiersze, znane, blad, podglad)
-
-                if not podglad:
-                    conn.commit()
+            # --- 2+3. POBRANIE I OCENA ---
+            for id_inf, z in znalezione.items():
+                if podglad:
+                    print(f"  [PODGLĄD] {z.rekord.get('SYG')} ({z.rekord.get('DT_WYD')}) — "
+                          f"{', '.join(kolejnosc_profili(z.profile))} — fraza: {', '.join(sorted(set(z.frazy.values())))}")
+                    continue
+                if config.LIMIT_NOWYCH_NA_RUN and (licznik["trafne"] + licznik["odrzucone"]) >= config.LIMIT_NOWYCH_NA_RUN:
+                    raise LimitPobranError(f"Osiągnięto limit {config.LIMIT_NOWYCH_NA_RUN} pobrań w biegu — "
+                                           f"pozostałe zostaną pobrane w kolejnym.")
+                _pobierz_ocen_zapisz(conn, sesja, bieg_id, z, licznik, wiersze, znane, blad)
+                pauza(config.PRZERWA, powod=f"po pobraniu {id_inf}")
 
         except BlokadaError as e:
-            komunikat = f"EUREKA zablokowała zapytania: {e} Bieg przerwany — kolejny spróbuje ponownie."
+            komunikat = f"EUREKA zablokowała zapytania mimo 15-minutowej przerwy: {e} Bieg przerwany."
             print(f"\n!!! {komunikat}")
             blad(None, None, komunikat)
             status = "przerwany"
@@ -192,81 +218,63 @@ def uruchom_przeglad(od: date, do: date, tryb: str = "automatyczny") -> dict:
             status = "blad"
         finally:
             if not podglad:
-                db.zakoncz_bieg(conn, bieg_id, status, licznik)
+                # Tabela `biegi` ma stare nazwy kolumn: „nowe” = trafne, „do_weryfikacji” = odrzucone.
+                db.zakoncz_bieg(conn, bieg_id, status, {
+                    "znaleziono": licznik["znaleziono"], "nowe": licznik["trafne"],
+                    "do_weryfikacji": licznik["odrzucone"], "duplikaty": licznik["duplikaty"],
+                    "bledy": licznik["bledy"]})
                 conn.commit()
 
     return {"bieg_id": bieg_id, "status": status, "od": od.isoformat(), "do": do.isoformat(),
-            "licznik": licznik, "wiersze": wiersze, "bledy": bledy, "komunikat": komunikat,
-            "podglad": podglad}
+            "profile": profile_klucze, "licznik": licznik, "wiersze": wiersze, "bledy": bledy,
+            "komunikat": komunikat, "podglad": podglad}
 
 
-class LimitPobranError(Exception):
-    """Osiągnięto LIMIT_NOWYCH_NA_RUN — reszta zostanie pobrana w kolejnym biegu."""
+def _pobierz_ocen_zapisz(conn, sesja, bieg_id, z: Znaleziona, licznik, wiersze, znane, blad) -> None:
+    r = z.rekord
+    id_inf = str(r["ID_INFORMACJI"])
+    z_przepisow = profile_z_przepisow(r)
+    kandydaci = kolejnosc_profili(z.profile | set(z_przepisow))
 
-
-def _obsluz_rekord(conn, sesja, bieg_id, rekord, wynik: Wynik, licznik, wiersze, znane, blad, podglad) -> None:
-    id_inf = str(rekord.get("ID_INFORMACJI"))
-    podstawowe = {
-        "id": id_inf,
-        "sygnatura": rekord.get("SYG"),
-        "tytul": (rekord.get("TEZA") or "")[:300],
-        "data_wydania": (str(rekord.get("DT_WYD") or ""))[:10],
-        "data_publikacji": None,
-        "organ": rekord.get("AUTOR"),
-        "link": LINK_EUREKA.format(id=id_inf),
-        "plik_sciezka": None,
-        "data_pobrania": None,
-        "tresc_skrot": (rekord.get("TEZA") or "")[:400],
-    }
-
-    if wynik.kategoria == "ODRZUCONE":
-        licznik["odrzucone"] += 1
-        if not podglad:
-            db.zapisz_interpretacje(conn, {**podstawowe, "status_pobrania": "odrzucona"})
-            znane.add(id_inf)
+    try:
+        dane = pobierz_pdf(sesja, id_inf)
+    except BlokadaError:
+        raise
+    except Exception as e:  # noqa: BLE001
+        blad(id_inf, kandydaci[0], f"Pobieranie PDF: {e}")
         return
 
-    plik: Path | None = None
-    if wynik.kategoria == "DO_WERYFIKACJI":
-        status = "do_weryfikacji"
-        licznik["do_weryfikacji"] += 1
+    tekst = tekst_z_pdf(dane)
+    oceny = [ocen(tekst, k, k in z_przepisow) for k in kandydaci]
+    # Kolejność: estoński CIT (gdy trafny) zawsze pierwszy, potem najsilniejsze dopasowanie.
+    trafne = sorted((o for o in oceny if o.trafna),
+                    key=lambda o: (o.profil_klucz != "estonski_cit", tuple(-x for x in o.sila)))
+    trafna = bool(trafne)
+    if trafna:
+        profil_glowny = trafne[0].profil_klucz
     else:
-        if config.LIMIT_NOWYCH_NA_RUN and licznik["nowe"] >= config.LIMIT_NOWYCH_NA_RUN:
-            raise LimitPobranError(
-                f"Osiągnięto limit {config.LIMIT_NOWYCH_NA_RUN} pobrań w jednym biegu — "
-                f"pozostałe zostaną pobrane w kolejnym.")
-        plik = sciezka_pliku(wynik.profil_glowny, rekord)
-        status = "pobrano"
-        if podglad:
-            print(f"  [PODGLĄD] {rekord.get('SYG')} — {', '.join(wynik.profile)} -> {plik.name}")
-        else:
-            try:
-                dane = pobierz_pdf(sesja, id_inf)
-                plik.parent.mkdir(parents=True, exist_ok=True)
-                plik.write_bytes(dane)
-                print(f"  [NOWA] {plik.name} ({len(dane)} B) — {', '.join(wynik.profile)}")
-            except BlokadaError:
-                raise
-            except Exception as e:  # noqa: BLE001
-                blad(id_inf, wynik.profil_glowny, f"Pobieranie PDF: {e}")
-                status, plik = "blad", None
-            pauza(config.PRZERWA, powod=f"po pobraniu {id_inf}")
-        if status == "pobrano":
-            licznik["nowe"] += 1
+        profil_glowny = max(oceny, key=lambda o: o.sila).profil_klucz
 
-    wiersz = wiersz_raportu(rekord, wynik, status, plik)
+    plik = folder_dla(profil_glowny, r, trafna) / nazwa_pliku(r)
+    plik.parent.mkdir(parents=True, exist_ok=True)
+    plik.write_bytes(dane)
+    licznik["trafne" if trafna else "odrzucone"] += 1
+    glowna = next(o for o in oceny if o.profil_klucz == profil_glowny)
+    print(f"  [{'TRAFNA' if trafna else 'odrzucona'}] {r.get('SYG')} — {profil_glowny}: {glowna.powod}")
+
+    status = "pobrano" if trafna else "odrzucona"
+    wiersz = wiersz_raportu(z, oceny, profil_glowny, trafna, status, plik)
     wiersze.append(wiersz)
-    if podglad:
-        return
 
     db.zapisz_interpretacje(conn, {
-        **podstawowe,
-        "plik_sciezka": str(plik) if plik else None,
-        "data_pobrania": db.teraz() if status == "pobrano" else None,
-        "status_pobrania": status,
+        "id": id_inf, "sygnatura": r.get("SYG"), "tytul": (r.get("TEZA") or "")[:300],
+        "data_wydania": (str(r.get("DT_WYD") or ""))[:10], "data_publikacji": None,
+        "organ": r.get("AUTOR"), "link": LINK_EUREKA.format(id=id_inf),
+        "plik_sciezka": str(plik), "data_pobrania": db.teraz(),
+        "status_pobrania": status, "tresc_skrot": (r.get("TEZA") or "")[:400],
     })
-    for d in wynik.dopasowania:
-        db.dopisz_dopasowanie(conn, id_inf, d)
+    for o in trafne:
+        db.dopisz_dopasowanie(conn, id_inf, dopasowanie_z_oceny(o, z.frazy.get(o.profil_klucz, "PRZEPISY")))
     db.zapisz_wynik_biegu(conn, bieg_id, id_inf, wiersz)
-    if status != "blad":
-        znane.add(id_inf)
+    conn.commit()
+    znane.add(id_inf)
