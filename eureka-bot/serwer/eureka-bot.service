@@ -1,0 +1,14 @@
+[Unit]
+Description=Bot EUREKA - interpretacje podatkowe (ulgi)
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=TWOJ_UZYTKOWNIK
+WorkingDirectory=/home/TWOJ_UZYTKOWNIK/eureka-bot
+EnvironmentFile=/home/TWOJ_UZYTKOWNIK/eureka-bot/eureka.env
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/home/TWOJ_UZYTKOWNIK/eureka-bot/venv/bin/python main.py
+# Bieg z przerwami 15 s między zapytaniami może trwać długo — limit 6 h.
+TimeoutStartSec=6h
