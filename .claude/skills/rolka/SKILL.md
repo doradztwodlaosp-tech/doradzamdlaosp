@@ -1,108 +1,162 @@
 ---
 name: rolka
-description: Tworzy pionową rolkę (9:16, Facebook Reels) z Panem Prawnikiem w stylu doradztwodlaosp.pl na podstawie scenariusza lub tematu. Użyj, gdy użytkownik wkleja scenariusz rolki, podaje temat odcinka albo pisze /rolka.
+description: Tworzy pionową rolkę (9:16, Facebook Reels) w stylu doradztwodlaosp.pl z Druhem Paragrafem na podstawie tematu lub scenariusza. Użyj, gdy użytkownik podaje temat rolki, wkleja scenariusz, przysyła nagranie lektora albo obrazy do odcinka, albo pisze /rolka.
 ---
 
-# Rolka z Panem Prawnikiem
+# Rolka doradztwodlaosp.pl
 
 Użytkownik jest prawnikiem, nie informatykiem. Pisz po polsku, prostym językiem, krok po kroku.
-Pytaj o zgodę przed instalowaniem czegokolwiek nowego. Nie proś o wklejanie kluczy API do czatu.
+Pytaj o zgodę przed instalowaniem czegokolwiek nowego. Nigdy nie proś o wklejanie kluczy API do czatu
+(klucze podaje się w bezpiecznym formularzu środowiska).
 
 Projekt Remotion jest w folderze `video/`. Szablon: kompozycja `RolkaOSP` (`video/src/RolkaOSP.tsx`),
-barwy i fonty marki: `video/src/marka.ts`. Szablonu nie zmieniaj dla pojedynczego odcinka.
+typy i format odcinka: `video/src/typy.ts`, barwy, fonty i ustawienia: `video/src/marka.ts`.
+Szablonu nie zmieniaj dla pojedynczego odcinka – odcinek to tylko plik `odcinek.json` i obrazy.
 
 ## 0. Przeczytaj wytyczne marki
 
-Zanim cokolwiek zrobisz, przeczytaj `video/marka/BRANDBOOK.md`, `video/marka/POSTAC.md`,
-`video/marka/ZASADY-FILMU.md` (obowiązkowe zasady), `video/marka/PRZEWODNIK.md`, `video/marka/MOODBOARD.md` (i obrazy w `video/marka/moodboard/`) oraz `video/marka/SLOWNIK-ANIMACJI.md`.
-Trzymaj się ich. Gdy użytkownik używa nazwy ze słownika (np. „najazd”, „przenikanie”), zrób dokładnie ten efekt.
+Zanim cokolwiek zrobisz, przeczytaj w `video/marka/`: `PRZEWODNIK.md` (jak pracujemy i decyzje strategiczne),
+`ZASADY-FILMU.md` (10 obowiązkowych zasad), `BRANDBOOK.md`, `POSTAC.md`, `MOODBOARD.md`, `SLOWNIK-ANIMACJI.md`.
+Gdy użytkownik używa nazwy ze słownika (np. „najazd”, „przenikanie”), zrób dokładnie ten efekt.
 
-## 1. Przygotuj odcinek
+## 1. Kolejność pracy (zawsze ta sama)
 
-Nazwa odcinka: krótki slug bez polskich znaków, np. `nowy-zarzad`. Utwórz
-`video/public/odcinki/<slug>/odcinek.json`:
+1. **Temat → scenariusz.** Z tematu napisz scenariusz według `ZASADY-FILMU.md`: hak (hasło na pierwszą klatkę),
+   obietnica do 10. sekundy, 2–3 bloki konkretu, zdanie-łącznik („Ale to nie wszystko.”), Porada Druha Paragrafa,
+   pytanie na koniec, plansza z prośbą o obserwowanie. 9–12 zdań, 35–50 s. Zapisz go w `video/scenariusze/<slug>.md`
+   razem z podstawami prawnymi i pokaż do akceptacji. Nie wymyślaj przepisów; numery artykułów oznacz jako
+   „do sprawdzenia” – użytkownik jest prawnikiem i to on je zatwierdza.
+2. **Pisz pod obraz.** Do każdego zdania od razu zdecyduj, co widać: zdjęcie z ruchem kamery i naklejkami, mapa 3D,
+   studio z Druhem Paragrafem, karta Porady, telefon. Zdanie, do którego nie da się nic pokazać, przepisz.
+3. **Szkic bez lektora.** Zbuduj `odcinek.json`, uruchom `npm run szkic -- <slug>` i `npm run render -- <slug>`,
+   obejrzyj klatki i wyślij MP4. Powiedz wyraźnie: to szkic, bez głosu, tempo szacunkowe.
+4. **Paczka dla użytkownika.** Jedna wiadomość: (a) tekst dla lektora do wklejenia w ElevenLabs (pola `lektor`
+   lub `tekst`, zdania oddzielone pustą linią), (b) lista brakujących obrazów z gotowymi opisami po polsku.
+5. **Wersja pełna.** Po otrzymaniu MP3: skopiuj jako `video/public/odcinki/<slug>/lektor.mp3`,
+   `npm run czasy -- <slug>` (sprawdź, czy każda scena zaczyna się od właściwego zdania), popraw słowa-kotwice,
+   `npm run render -- <slug>`, obejrzyj klatki, wyślij MP4 i okładkę.
+6. **Opakowanie.** Dodaj opis pod film (2–3 zdania + pytanie) i 3–5 hashtagów.
+
+Gdy w środowisku są klucze (`ELEVENLABS_API_KEY`, `OPENAI_API_KEY`), kroki 4–5 zrób samodzielnie:
+`npm run glos -- <slug>` (głos + dokładne czasy słów) i `npm run obrazy -- <slug>`.
+
+## 2. Plik odcinka
+
+`video/public/odcinki/<slug>/odcinek.json` (slug bez polskich znaków, np. `status-opp`). Wzory: `nowy-zarzad`
+(zdjęcia, naklejki, mapa, telefon) i `status-opp` (długi przelot po mapie 3D, plansza z lektorem).
 
 ```json
 {
-  "tytul": "Tytuł odcinka",
+  "tytul": "1,5% dla Twojej OSP? Najpierw statut.",
+  "nadtytul": "PORADNIK OSP • STATUS OPP",
   "glos": "lektor.mp3",
-  "cta": "Napiszcie w komentarzu",
-  "naczelnik": true,
+  "maskotka": true,
+  "wstep": 1.8,
+  "hak": [{ "tekst": "1,5% PODATKU", "zloty": true }, { "tekst": "DLA TWOJEJ OSP?" }],
+  "cta": "Czy Wasza OSP ma już status OPP?",
+  "plansza": {
+    "haslo": [{ "tekst": "POMAGAMY TYM,", "zloty": true }, { "tekst": "KTÓRZY POMAGAJĄ INNYM." }],
+    "pigulka": "Zaobserwuj nas • doradztwodlaosp.pl",
+    "kontakt": "WhatsApp: …",
+    "stopka": "Materiał informacyjny. Nie zastępuje indywidualnej analizy."
+  },
   "sceny": [
     {
       "tekst": "Zdanie na ekranie (poprawna pisownia, np. KRS)",
-      "lektor": "Zdanie dla lektora, tylko gdy trzeba zapisać wymowę, np. ka-er-es",
-      "akcent": ["słowo"],
-      "prompt": "Opis obrazu sceny po angielsku"
+      "lektor": "Tylko gdy trzeba zapisać wymowę, np. ka-er-esu",
+      "akcent": ["KRS."],
+      "ujecia": [
+        {
+          "obraz": "remiza.jpg",
+          "kadr": { "od": [0.4, 0.5], "do": [0.56, 0.5], "zoomOd": 1, "zoomDo": 1.06 },
+          "swiatla": [{ "x": 0.58, "y": 0.56, "r": 150 }],
+          "naklejki": [{ "typ": "chip", "x": 0.56, "y": 0.44, "slowo": "Walne", "tekst": "Walne zebranie" }]
+        },
+        { "od": "kawa", "obraz": "biuro.jpg", "pyl": true }
+      ],
+      "postac": { "plan": "brak", "gest": { "slowo": "cztery", "plan": "obok", "poza": "ostrzega" } }
     }
   ]
 }
 ```
 
-Zasady:
-- Jedna scena = jedno zdanie lub krótka myśl (zwykle 8–12 scen, rolka 30–60 s).
-- Postać: Pan Prawnik – doświadczony strażak OSP (ok. 45–50 lat) i prawnik od przepisów ochrony przeciwpożarowej,
-  działalności OSP i praw strażaków ochotników. Spokojny, opanowany, rzeczowy i konkretny; mówi wiedzą i argumentami,
-  nie emocjami. Tłumaczy prawo przystępnie, prostuje nieporozumienia, staje w obronie ochotników. Budzi zaufanie.
-- Jeśli użytkownik podał tylko temat, napisz scenariusz w stylu Pana Prawnika (rzeczowo, po druhowsku,
-  zaczyna od "Czołem, druhowie!", kończy odesłaniem do doradztwodlaosp.pl) i pokaż go do akceptacji,
-  zanim wygenerujesz głos.
-- Treść prawną (terminy, przepisy) sprawdź z użytkownikiem; nie wymyślaj przepisów.
-- `lektor`: skróty i adresy zapisuj fonetycznie: KRS → "ka-er-es", doradztwodlaosp.pl → "doradztwo dla o-es-pe kropka pe-el".
-- `naczelnik`: `true` pokazuje rysowaną postać Pana Prawnika (nazwa pola została z pierwszej wersji) (mundur galowy, medale) na dole kadru; usta ruszają się
-  w rytm głosu, macha na powitanie i kiwa głową na końcu. Ustaw `false`, gdy obrazy same pokazują postać.
-- `ilustracja` (opcjonalnie): animowana ilustracja na karcie nad postacią. Dostępne: remiza, sala, koniec,
-  lista-do-sadu, odrzucenie, laptop-krs, teczka, brak-w-protokole, kalendarz-7-dni, plansza-zarzad-protokol-wpis, adres
-  (`video/src/Sceny.tsx`, mapa `ILUSTRACJE`). Gdy żadna nie pasuje do zdania, dopisz nową ilustrację w tym pliku
-  (prosty SVG w barwach marki, animacja od początku sceny) i dodaj ją do mapy.
-- `maskotka`: `true` (na poziomie odcinka) pokazuje maskotkę Druha Paragrafa – złoty paragraf w hełmie (pozy w `video/public/postac`:
-  tlumaczy, cieszy-sie, zaskoczony, ostrzega, mysli, wskazuje). W każdej scenie pole `postac`:
-  `{"plan": "pelny" | "maly" | "brak", "poza": "...", "gest": {"slowo": "siedem", "poza": "ostrzega", "ruch": "kreci" | "kiwa" | "podskok"}}`.
-  Pełny plan tylko w kluczowych scenach (powitanie, ostrzeżenie, zakończenie); poza dopasowana do treści zdania.
-  `etykieta` – złota pigułka nad maskotką na pełnym planie (np. adres strony).
-- `akcent`: 1–3 kluczowe słowa sceny, zapisane dokładnie jak w `tekst` (wielkość liter i interpunkcja nie mają znaczenia).
-  Wyświetlą się duże i czerwone.
-- `prompt` (po polsku): konkretna, realistyczna scena (miejsce, przedmiot, nastrój). Bez napisów na obrazie.
-  Zacznij prompt od "Pan Prawnik", gdy ma wystąpić postać – skrypt dołoży jej stały opis. Wspólny styl (granat, czerwień,
-  zmierzch, kinowo) dokłada `video/skrypty/obrazy.mjs`.
+Pola odcinka:
+- `hak` + `wstep`: hasło na pierwszej klatce (to także okładka) i ile sekund trwa przed pierwszym słowem lektora.
+- `cta`: pytanie do widza w złotej pigułce w ostatniej scenie przed planszą. Zawsze pytanie, nigdy „napisz w komentarzu”.
+- `plansza`: plansza końcowa. Gdy ostatnia scena ma `"plansza": true`, lektor mówi ją na planszy.
+- `muzyka`: plik w folderze odcinka; brak pola = wspólny `public/dzwieki/podklad.mp3`; `false` = bez muzyki.
+- `szkic`: ustawiane przez `npm run szkic`; oznacza czasy szacunkowe i brak głosu. `npm run czasy` je usuwa.
+- `start`, `koniec`, `slowa` w scenach wpisują skrypty – nie wypełniaj ich ręcznie.
 
-## 2. Głos
+Co może pokazać scena (jedno z poniższych):
+- **`ujecia`** – lista kadrów. Pierwszy zaczyna się ze sceną, kolejne na słowie `od` (cięcie na słowo).
+  - `obraz`: plik z folderu odcinka. Pionowe zdjęcie wypełnia ekran (`uklad: "pelny"`), poziome trafia w ostry pas
+    na rozmytej kopii (`"pas"`, domyślnie).
+  - `kadr`: ruch kamery – punkt (ułamki zdjęcia 0–1), na który patrzy na początku i na końcu, oraz przybliżenie.
+    Ruch ma być powolny; zoom powyżej ok. 1,6 rozmywa zdjęcie.
+  - `swiatla` (migoczące okna/lampy), `pyl`, `przyciemnij: [początek, koniec]`.
+  - `naklejki` – grafiki przypięte do miejsca na zdjęciu, pojawiają się na słowie `slowo`:
+    `znacznik` (kółko z podpisem), `chip` (pigułka z tekstem), `pieczec` (stempel, np. „BRAK”), `brak` (ramka wokół
+    brakującego miejsca), `kartka-leci`, `kartka-odbita` (z polem `krzyzyk` = słowo, na którym pojawia się krzyżyk),
+    `napis` (duże słowo na środku), `licznik` (liczba od–do z `sufiks` i `podpis`).
+  - `studio: true` – ciemne tło marki zamiast zdjęcia.
+- **`mapa`** – mapa 3D z `video/src/Mapy.tsx`. Kolejne sceny z tą samą mapą tworzą jeden przelot kamery.
+  Gotowe: `droga-wniosku` (remiza → sąd, wniosek przez internet) i `droga-opp` (statut → komisja → cztery zakazy →
+  walne → KRS → odznaka OPP). Mapa reaguje na konkretne słowa lektora zapisane w jej kodzie – nowy temat zwykle
+  wymaga nowej mapy (klocki w `video/src/Izo.tsx`: budynki, drogi, tabliczki, pionki, dokumenty, odznaka).
+- **`studio: true`** – scena w studiu marki, zwykle z Druhem Paragrafem w pełnym planie.
+- **`porada`** – karta „Porada Druha Paragrafa”: `wiersze: [{ "tekst": "…", "slowo": "…", "zloty": true }]`
+  (wiersz wchodzi na słowie; najwyżej 3 krótkie wiersze).
+- **`telefon: { "slowo": "…" }`** – telefon ze stroną doradztwodlaosp.pl wjeżdża na słowie.
 
-Uruchamiaj polecenia w folderze `video/`.
+Druh Paragraf (`"maskotka": true` na poziomie odcinka, potem `postac` w scenie):
+- `plan`: `pelny` (gospodarz, środek), `obok` (z boku przy zdjęciu), `prawo`, `maly`, `brak`.
+- `poza`: `tlumaczy`, `cieszy-sie`, `zaskoczony`, `ostrzega`, `mysli`, `wskazuje`.
+- `gest`: `{ "slowo": "…", "plan": "…", "poza": "…", "ruch": "kreci" | "kiwa" | "podskok" }` – zmiana na słowie.
+- Zasada: pełny plan na wejściu i wyjściu, wejście z boku w 1–2 kluczowych momentach, poza tym `brak`.
+  Nie stawiaj go na naklejkach ani na karcie Porady.
 
-- Jest `ELEVENLABS_API_KEY`: `npm run glos -- <slug>` (głos "Pan Prawnik" – wystarczy fragment nazwy; inny: zmienna `ELEVENLABS_VOICE`).
-  Zapisuje `lektor.mp3` oraz dokładne czasy scen i słów.
-- Użytkownik przysłał gotowe MP3: skopiuj je jako `video/public/odcinki/<slug>/lektor.mp3`,
-  potem `npm run czasy -- <slug>`. Sprawdź wypisane czasy: każda scena powinna zaczynać się od właściwego zdania.
-- Brak klucza i brak MP3: daj użytkownikowi tekst do wklejenia w ElevenLabs (pole `lektor` lub `tekst` każdej sceny,
-  oddzielone pustą linią) i poproś o plik MP3.
+Pozostałe zasady:
+- `akcent`: 1–3 słowa zapisane dokładnie jak w `tekst` – wyświetlą się na złoto.
+- `lektor`: skróty fonetycznie (KRS → „ka-er-es”, OSP → „o-es-pe”, OPP → „o-pe-pe”, 1,5% → „półtora procent”).
+- Słowa-kotwice (`od`, `slowo`, `krzyzyk`) dopasowują się do słów z `tekst`: najpierw dokładnie, potem po początku słowa.
+- Strefy bezpieczne: nic ważnego poniżej y=1440 ani na prawo od x=918 (przyciski Facebooka). Podgląd stref:
+  props `"strefy": true`.
+- Obrazy: realistyczne, bez napisów, w barwach marki (grafit, ciepłe złote światło), najlepiej pionowe 1024×1536.
+  Opisy pisz po polsku. Obejrzyj każdy obraz (Read) przed użyciem; odrzuć te z napisami, zniekształconymi twarzami lub dłońmi.
 
-## 3. Obrazy
-
-- Jest `OPENAI_API_KEY`: `npm run obrazy -- <slug>`. Gotowe obrazy są pomijane; żeby wygenerować jeden ponownie,
-  usuń jego plik `sNN.png`.
-- Brak klucza: daj użytkownikowi prompty (z dopiskiem stylu z `obrazy.mjs`) do wklejenia w generator obrazów
-  i poproś o pliki; zapisz je jako `s01.png`, `s02.png`… i wpisz nazwy w pole `obraz` scen.
-- Bez obrazów szablon pokaże ciemne tło marki – można tak zrobić szybki podgląd.
-
-Obejrzyj każdy obraz (Read) przed renderem. Odrzuć te z napisami, zniekształconymi twarzami lub dłońmi.
-
-## 4. Render i sprawdzenie
+## 3. Polecenia (w folderze `video/`)
 
 ```bash
-npm run render -- <slug>
+npm run szkic -- <slug>     # szacunkowe czasy, gdy nie ma jeszcze lektora
+npm run czasy -- <slug>     # dokładne czasy z lektor.mp3
+npm run glos -- <slug>      # głos z ElevenLabs (wymaga klucza)
+npm run obrazy -- <slug>    # obrazy z OpenAI (wymaga klucza)
+npm run render -- <slug>    # out/<slug>.mp4 + out/<slug>-okladka.png
 ```
 
-Wynik: `video/out/<slug>.mp4` (1080×1920, 30 kl./s). Wyciągnij kilka klatek ffmpeg-iem i obejrzyj je
-(czy napisy mieszczą się w kadrze, czy obrazy pasują do zdań). Potem wyślij MP4 użytkownikowi (SendUserFile).
+W chmurze render potrzebuje przeglądarki z obrazu: skrypt `render.mjs` sam podaje ścieżkę
+`/opt/pw-browsers/chromium_headless_shell-*/chrome-headless-shell-linux64/chrome-headless-shell`.
+Szybki podgląd: `npx remotion render RolkaOSP out/p.mp4 --props='{"odcinek":"<slug>"}' --scale=0.4 --concurrency=4
+--browser-executable=<ścieżka>`; potem wytnij klatki ffmpeg-iem i obejrzyj je.
+
+## 4. Sprawdzenie przed wysłaniem
+
+Obejrzyj klatki z całego filmu (co ok. 2 s) i sprawdź: napisy mieszczą się i nic ich nie zasłania; nic ważnego
+w strefach Facebooka; naklejki trafiają we właściwe miejsca zdjęcia; Druh Paragraf niczego nie zasłania;
+pierwsza klatka działa jako okładka; film kończy się planszą. Potem przejdź 10 punktów z `ZASADY-FILMU.md`.
+Wyślij MP4 (SendUserFile) i napisz wprost, czego nie dało się sprawdzić – dźwięku nie słyszysz, więc poproś
+użytkownika o ocenę głośności muzyki i efektów.
 
 ## 5. Zapis
 
-Zrób commit (folder odcinka razem z obrazami i lektor.mp3; `out/` nie trafia do repozytorium) i wypchnij go.
-Jeśli wypchnięcie się nie uda, wyślij użytkownikowi kopię ZIP (`git archive`).
+Commit (folder odcinka z obrazami i `lektor.mp3`; `out/` nie trafia do repozytorium) i push.
 
 ## Uwagi techniczne
 
-- Sieć: skrypty łączą się z api.elevenlabs.io i api.openai.com (muszą być dozwolone w ustawieniach sieci środowiska).
-- Font DM Sans jest w `video/public/fonty` (render nie potrzebuje internetu).
-- Pierwszy test z rysowaną postacią to kompozycja `NowyZarzad` (`video/src/Rolka.tsx`), nie używaj jej do nowych odcinków.
+- Sieć: `glos` i `obrazy` łączą się z api.elevenlabs.io i api.openai.com – działają dopiero, gdy użytkownik poda
+  klucze w bezpiecznym formularzu środowiska.
+- Fonty Montserrat są w `video/public/fonty` (render nie potrzebuje internetu).
+- Muzyka i efekty w `video/public/dzwieki` są na razie syntetyczne (`skrypty/dzwieki.py`). Docelowo podkład
+  z licencją (np. Pixabay) zapisany jako `public/dzwieki/podklad.mp3`.
+- `NowyZarzad` (`video/src/Rolka.tsx`) i `video/src/Starsze.tsx` to stare wersje – nie używaj ich w nowych odcinkach.

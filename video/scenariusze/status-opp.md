@@ -3,6 +3,11 @@
 Cel: zasięg i obserwujący. Widz: zarządy OSP. Ton: poważny ekspert. Długość: ok. 35 s.
 
 ## Scenariusz (napisy na ekranie)
+Stan na 12.11.2026: szkic jest zmontowany inaczej, niż zakładała kolumna „Obraz”. Sceny 3–9 to jeden przelot kamery
+po mapie 3D `droga-opp` (statut → komisja → cztery zakazy → walne → KRS → odznaka OPP), więc zdjęcia A, B i C nie są
+potrzebne. Scena 1 używa zdjęcia remizy z licznikiem „1,5%”, scena 10 – karty „Porada Druha Paragrafa”.
+Do pełnej wersji brakuje tylko nagrania lektora (`lektor.mp3`).
+
 | # | Tekst | Obraz | Druh Paragraf |
 |---|---|---|---|
 | 0 | (hak, 1,8 s, bez głosu) „1,5% PODATKU DLA TWOJEJ OSP?” / „NAJPIERW STATUT.” | zdjęcie remizy (mamy) | zdziwiony pod hasłem |
@@ -19,9 +24,21 @@ Cel: zasięg i obserwujący. Widz: zarządy OSP. Ton: poważny ekspert. Długoś
 | 11 | Czy Wasza OSP ma już status OPP? | studio marki + pytanie | pełny plan, „tłumaczy” |
 | 12 | Zaobserwuj nas. Pomagamy tym, którzy pomagają innym. | plansza końcowa | mały na planszy |
 
-## Podstawy prawne (do sprawdzenia przed publikacją)
+## Podstawy prawne (do sprawdzenia przez prawnika przed publikacją)
+Numery punktów poniżej podał Claude z pamięci – trzeba je porównać z aktualnym tekstem ustawy.
+
 - 1,5% podatku dla OPP – art. 45c ustawy o PIT (1,5% od rozliczeń składanych w 2023 r.).
-- Organ kontroli niezależny od zarządu – art. 20 ust. 1 pkt 6 ustawy o działalności pożytku publicznego i o wolontariacie.
-- Cztery zakazy w statucie (pożyczki i zabezpieczenia, przekazywanie majątku, wykorzystywanie majątku, zakupy na szczególnych zasadach wobec członków, organów, pracowników i osób bliskich) – art. 20 ust. 1 pkt 7 tej ustawy.
+- Organ kontroli lub nadzoru odrębny od zarządu i mu niepodlegający – art. 20 ust. 1 **pkt 4** ustawy o działalności
+  pożytku publicznego i o wolontariacie.
+- Cztery zakazy w statucie – art. 20 ust. 1 **pkt 6 lit. a–d** tej ustawy:
+  a) pożyczki i zabezpieczanie zobowiązań majątkiem organizacji, b) przekazywanie majątku, c) wykorzystywanie majątku,
+  d) zakup towarów lub usług – wobec członków, członków organów, pracowników i ich osób bliskich, na zasadach innych
+  niż wobec osób trzecich. Napisy na czterech kartach w filmie są skrótami („Pożyczki i poręczenia”, „Przekazywanie majątku”,
+  „Korzystanie z majątku”, „Zakupy od powiązanych firm”) – do oceny, czy skrót nie zmienia sensu.
 - Zmiana statutu: uchwała walnego zebrania, wpis zmiany do KRS (Prawo o stowarzyszeniach, ustawa o KRS).
-- Wniosek o wpis statusu OPP do KRS – art. 22 ustawy o działalności pożytku publicznego (sprawdzić m.in. wymóg prowadzenia działalności przez co najmniej 2 lata).
+- Status OPP: wpis do KRS informacji o spełnieniu wymagań z art. 20 – art. 22 ustawy o działalności pożytku publicznego
+  (w tym wymóg nieprzerwanej działalności pożytku publicznego przez co najmniej 2 lata).
+- Do rozważenia w opisie pod filmem: żeby faktycznie otrzymywać 1,5%, OPP musi jeszcze znaleźć się w wykazie organizacji
+  uprawnionych (sprawozdania w terminie). Film tego nie mówi – mówi tylko, od czego zacząć.
+
+Poprawka z 12.11.2026: wcześniejsza wersja tego pliku podawała błędnie „pkt 6” dla organu kontroli i „pkt 7” dla zakazów.
