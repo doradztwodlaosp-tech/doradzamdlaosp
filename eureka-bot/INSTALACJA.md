@@ -7,7 +7,8 @@ Poniżej `TWOJ_UZYTKOWNIK` to nazwa użytkownika, którym logujesz się na serwe
 ## 1. Wgranie plików (FileZilla)
 
 1. Połącz się z serwerem w FileZilli (protokół **SFTP**).
-2. Po prawej stronie wejdź do `/home/TWOJ_UZYTKOWNIK/`.
+2. Po prawej stronie wejdź do swojego katalogu domowego (`/root/` dla użytkownika root, inaczej `/home/TWOJ_UZYTKOWNIK/`).
+   Folder `eureka-bot` musi leżeć bezpośrednio w nim, czyli `~/eureka-bot`.
 3. Przeciągnij cały folder `eureka-bot` (z plikami `main.py`, `config.py` itd.).
 
 ## 2. Python i biblioteki (jednorazowo)
@@ -120,7 +121,7 @@ przy przerwach 15 s to ok. 2 godziny). Kolejne biegi pobierają tylko to, czego 
 Wstaw swoją nazwę użytkownika do plików usługi i zainstaluj je:
 
 ```bash
-cd ~/eureka-bot/serwer && sed -i "s/TWOJ_UZYTKOWNIK/$USER/g" eureka-bot.service
+cd ~/eureka-bot/serwer && sed -i "s#KATALOG_BOTA#$HOME/eureka-bot#g; s#UZYTKOWNIK#$USER#g" eureka-bot.service
 ```
 
 ```bash
