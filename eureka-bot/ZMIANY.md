@@ -18,6 +18,11 @@ robi streszczenia i wysyła raport na Gmaila, a pliki na Dysk Google.
    - **ODRZUCONE** — nic z powyższych (np. interpretacja VAT, w której pada „działalność
      badawczo-rozwojowa”). **Bez pobierania.** Zostaje wpis w rejestrze i wiersz w arkuszu
      „Odrzucone (bez PDF)”, żeby dało się sprawdzić, że nic nie ginie.
+   - **wyjątek — frazy jednoznaczne** (`tematy.FRAZY_JEDNOZNACZNE`, np. „ryczałt od dochodów
+     spółek”, „IP Box”, „ulga na robotyzację”): rekord znaleziony taką frazą nie jest odrzucany
+     na metadanych, tylko trafia do DO WERYFIKACJI (chyba że sygnatura wskazuje VAT/akcyzę/PCC).
+     Powód: interpretacja PIT o wypłacie zysku ze spółki na estońskim CIT miała w metadanych
+     same przepisy PIT, a dotyczy estońskiego CIT.
 3. **Pobranie PDF** każdej potwierdzonej i każdej do weryfikacji — plik zawsze leży u Ciebie.
 4. **Ocena treści PDF** (`klasyfikator.py`) tylko dla DO WERYFIKACJI: liczy wzmianki
    artykułu ulgi (bez wyliczeń „z zastrzeżeniem art. …” z art. 7 ust. 2 CIT), fraz profilu

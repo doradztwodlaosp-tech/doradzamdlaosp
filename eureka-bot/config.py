@@ -57,6 +57,10 @@ LIMIT_NOWYCH_NA_RUN = int(os.environ.get("EUREKA_LIMIT_NOWYCH", "400"))
 PROG_ART = int(os.environ.get("EUREKA_PROG_ART", "2"))                 # tyle wzmianek artykułu ulgi wystarcza
 PROG_FRAZ_Z_ART = int(os.environ.get("EUREKA_PROG_FRAZ_Z_ART", "2"))   # 1 artykuł + tyle fraz
 PROG_FRAZ = int(os.environ.get("EUREKA_PROG_FRAZ", "5"))               # same frazy (bez artykułu)
+# Profile, dla których ocena treści NIE wymaga, żeby interpretacja była z „ich”
+# ustawy. Estoński CIT: strona wspólnika (wypłata zysku ze spółki na ryczałcie)
+# to interpretacje PIT, a dotyczą estońskiego CIT.
+PROFILE_BEZ_KONTROLI_USTAWY = {"estonski_cit"}
 
 BAZA_API = "https://eureka.mf.gov.pl/api"
 URL_WYSZUKIWARKA = BAZA_API + "/public/v1/wyszukiwarka/informacje/"

@@ -107,6 +107,8 @@ def ocen(tekst: str, profil_klucz: str) -> Ocena:
     o.pit = len(_PIT.findall(tekst))
     o.vat = len(_VAT_AKCYZA.findall(tekst))
     zgodna_ustawa = {"CIT": o.cit >= o.pit, "PIT": o.pit >= o.cit}.get(profil.podatek, True)
+    if profil_klucz in config.PROFILE_BEZ_KONTROLI_USTAWY:
+        zgodna_ustawa = True
 
     if not tekst.strip():
         o.trafna, o.powod = True, "brak tekstu w PDF (np. skan) — do ręcznego sprawdzenia"

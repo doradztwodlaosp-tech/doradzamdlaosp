@@ -29,6 +29,7 @@ from pathlib import Path
 import config
 import db
 import matcher
+import tematy
 from eureka_client import BlokadaError, nowa_sesja, pauza, pobierz_pdf, wyszukaj
 from klasyfikator import data_publikacji, kolejnosc_profili, ocen, tekst_z_pdf
 from profiles import PROFILE
@@ -160,6 +161,23 @@ def wiersz_raportu(z: Znaleziona, dopasowania: list, status: str, plik: Path | N
     }
 
 
+def dopasowania_z_frazy_jednoznacznej(z: Znaleziona) -> list:
+    """Rekord odrzucony na metadanych, ale znaleziony frazą jednoznaczną profilu
+    (tematy.FRAZY_JEDNOZNACZNE) -> DO_WERYFIKACJI: bot go pobierze i oceni po treści.
+    Nie dotyczy rekordów z innego podatku (VAT, akcyza, PCC — wg sygnatury)."""
+    if matcher.inny_podatek(z.rekord):
+        return []
+    wynik = []
+    for k in kolejnosc_profili(z.profile):
+        fraza = z.frazy.get(k, "")
+        if fraza in tematy.FRAZY_JEDNOZNACZNE.get(k, ()):
+            wynik.append(matcher.Dopasowanie(
+                profil_klucz=k, fraza=fraza, ustawa=PROFILE[k].podatek.split("+")[0],
+                etykieta_artykulu=f"znaleziona frazą jednoznaczną „{fraza}” (metadane jej nie pokazują)",
+                pewnosc="DO_WERYFIKACJI"))
+    return wynik
+
+
 # ===========================================================================
 # GŁÓWNY BIEG
 # ===========================================================================
@@ -229,6 +247,8 @@ def uruchom_przeglad(od: date, do: date, profile_klucze: list[str] | None = None
             for id_inf, z in znalezione.items():
                 profil_szukajacy = PROFILE[kolejnosc_profili(z.profile)[0]]
                 dopasowania = matcher.ocen_rekord(z.rekord, profil_szukajacy, z.frazy[profil_szukajacy.klucz])
+                if not dopasowania:
+                    dopasowania = dopasowania_z_frazy_jednoznacznej(z)
 
                 if not dopasowania:
                     if id_inf in w_rejestrze:

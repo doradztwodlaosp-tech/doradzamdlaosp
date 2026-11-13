@@ -71,14 +71,47 @@ PRZEPISY_POMOCNICZE: dict[str, tuple[tuple[str, str], ...]] = {
     ),
 }
 
+# Frazy JEDNOZNACZNE: jeśli EUREKA znalazła interpretację którąś z nich
+# (wyszukiwanie frazy w całości), temat profilu na pewno jest w treści, nawet gdy
+# metadane go nie pokazują. Taki rekord nie jest odrzucany na metadanych — bot go
+# pobiera i ocenia po pełnej treści PDF (patrz przeglad.py).
+# Przykład z 13.11.2026: 0114-KDIP3-1.4011.848.2026.3.MS2 — PIT, wypłata zysku
+# po przekształceniu sp.k. w sp. z o.o.; w metadanych same przepisy PIT, a
+# znalazła ją fraza „ryczałt od dochodów spółek”.
+# Celowo BEZ fraz ogólnych („prace rozwojowe”, „gra komputerowa”) i BEZ fraz
+# artykułowych („art. 24d” łapie cytat art. 7 ust. 2 CIT w setkach interpretacji).
+FRAZY_JEDNOZNACZNE: dict[str, tuple[str, ...]] = {
+    "estonski_cit": (
+        "ryczałt od dochodów spółek", "estoński CIT", "warunki opodatkowania ryczałtem od dochodów spółek",
+        "dochód z tytułu ukrytych zysków", "dochód z tytułu podzielonego zysku",
+    ),
+    "ulga_br": ("ulga badawczo-rozwojowa", "zwrot gotówkowy ulgi B+R",
+                "koszty kwalifikowane działalności badawczo-rozwojowej"),
+    "innowacyjni_pracownicy": ("ulga na innowacyjnych pracowników",),
+    "ulga_prototyp": ("ulga na prototyp",),
+    "ulga_prowzrostowa": ("ulga na ekspansję", "ulga prowzrostowa"),
+    "ulga_termomodernizacyjna": ("ulga termomodernizacyjna",),
+    "ulga_konsolidacyjna": ("ulga konsolidacyjna",),
+    "ulga_csr": ("ulga sponsoringowa",),
+    "ulga_robotyzacja": ("ulga na robotyzację",),
+    "ulga_ipo": ("ulga na IPO", "ulga na pierwszą ofertę publiczną", "ulga emisyjna"),
+    "ip_box_cit": ("IP Box", "Innovation Box", "wskaźnik nexus",
+                   "kwalifikowany dochód z kwalifikowanego prawa własności intelektualnej"),
+    "ip_box_pit": ("IP Box", "wskaźnik nexus"),
+}
+
 # Kompilacja przy imporcie: literówka w rdzeniu wyjdzie od razu przy starcie,
 # a nie w połowie biegu.
 TEMATY_SKOMPILOWANE = {
     klucz: tuple(re.compile(w, re.IGNORECASE) for w in wzorce) for klucz, wzorce in TEMATY.items()
 }
-for _klucz in list(TEMATY) + list(PRZEPISY_POMOCNICZE):
+for _klucz in list(TEMATY) + list(PRZEPISY_POMOCNICZE) + list(FRAZY_JEDNOZNACZNE):
     if _klucz not in PROFILE:
         raise ValueError(f"tematy.py: nieznany profil '{_klucz}' (brak go w profiles.py)")
 for _lista_wzorcow in PRZEPISY_POMOCNICZE.values():
     for _ustawa, _wzorzec in _lista_wzorcow:
         re.compile(_wzorzec)
+for _klucz, _frazy in FRAZY_JEDNOZNACZNE.items():
+    for _fraza in _frazy:
+        if _fraza not in PROFILE[_klucz].frazy():
+            raise ValueError(f"tematy.py: fraza jednoznaczna '{_fraza}' nie występuje w profilu '{_klucz}' (profiles.py)")

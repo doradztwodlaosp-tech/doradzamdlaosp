@@ -86,6 +86,51 @@ class TestMatcher(unittest.TestCase):
         self.assertEqual(d[0].pewnosc, "POTWIERDZONE")
 
 
+class TestFrazyJednoznaczne(unittest.TestCase):
+    # Prawdziwy przypadek z 13.11.2026 (dane z arkusza „Odrzucone”): PIT, wypłata zysku
+    # po przekształceniu sp.k. w sp. z o.o.; znaleziona frazą „ryczałt od dochodów spółek”.
+    REKORD = {"ID_INFORMACJI": "718025", "SYG": "0114-KDIP3-1.4011.848.2026.3.MS2", "DT_WYD": "2026-11-03",
+              "AUTOR": ["Dyrektor Krajowej Informacji Skarbowej"],
+              "TEZA": "Wypłata zysku spółki komandytowej po przekształceniu jej w spółkę z o.o.",
+              "SLOWA_KLUCZOWE": ["przekształcanie", "spółki-spółka komandytowa",
+                                 "spółki-spółka z ograniczoną odpowiedzialnością", "zyski-wypłata z zysku"],
+              "ZAGADNIENIA": None,
+              "PRZEPISY": [f"{PIT}-Rozdział 5-art. 24-ust. 5", f"{PIT}-Rozdział 6-art. 30a-ust. 1-pkt 4",
+                           f"{PIT}-Rozdział 7-art. 41-ust. 4"]}
+
+    def _z(self, fraza, profil):
+        z = przeglad.Znaleziona(przeglad.normalizuj(self.REKORD))
+        z.profile.append(profil)
+        z.frazy[profil] = fraza
+        return z
+
+    def test_matcher_sam_ja_odrzuca(self):
+        self.assertEqual(matcher.ocen_rekord(self.REKORD, PROFILE["estonski_cit"], "ryczałt od dochodów spółek"), [])
+
+    def test_fraza_jednoznaczna_ratuje(self):
+        d = przeglad.dopasowania_z_frazy_jednoznacznej(self._z("ryczałt od dochodów spółek", "estonski_cit"))
+        self.assertEqual([(x.profil_klucz, x.pewnosc) for x in d], [("estonski_cit", "DO_WERYFIKACJI")])
+
+    def test_fraza_ogolna_nie_ratuje(self):
+        self.assertEqual(przeglad.dopasowania_z_frazy_jednoznacznej(
+            self._z("wydatki niezwiązane z działalnością gospodarczą", "estonski_cit")), [])
+        self.assertEqual(przeglad.dopasowania_z_frazy_jednoznacznej(self._z("prace rozwojowe", "ulga_br")), [])
+
+    def test_vat_nie_jest_ratowany(self):
+        z = self._z("IP Box", "ip_box_cit")
+        z.rekord["SYG"] = "0114-KDIP4-2.4012.740.2026.2.SKJ"
+        z.rekord["PRZEPISY"] = [f"{VAT}-art. 86"]
+        self.assertEqual(przeglad.dopasowania_z_frazy_jednoznacznej(z), [])
+
+    def test_tresc_pit_o_estonskim_cit_jest_trafna(self):
+        tekst = ("Interpretacja w zakresie podatku dochodowego od osób fizycznych. Spółka z o.o. wybrała ryczałt od "
+                 "dochodów spółek. Zgodnie z art. 28m ust. 1 pkt 1 ustawy o CIT opodatkowaniu ryczałtem podlega dochód "
+                 "z tytułu podzielonego zysku. Wypłata zysku netto, o którym mowa w art. 28m ust. 1 pkt 1, "
+                 "a odliczenie z art. 30a ust. 19 ustawy o PIT. ") * 2
+        o = ocen(tekst, "estonski_cit")
+        self.assertTrue(o.trafna, o)
+
+
 class TestTresc(unittest.TestCase):
     def test_odmiana_frazy(self):
         self.assertTrue(wzorzec_frazy("ulga badawczo-rozwojowa").search("z ulgi badawczo-rozwojowej"))
