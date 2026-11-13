@@ -17,6 +17,8 @@ import type { PropsMapy, ZdarzenieDzwiekowe } from "./Mapy";
 
 const Z = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 const PLYNNIE = Easing.bezier(0.45, 0, 0.25, 1);
+// Ciepłe tło „pokoju” jak w filmach instruktażowych (dalekie części stołu rozpływają się w nim)
+const TLO_POKOJU = "#5E4D40";
 const PRZEJAZD = 2.2; // sekundy przejazdu kamery między miejscami (spokojnie)
 
 type Stacja = { cel: [number, number, number]; kat: number; odl: number; wys: number };
@@ -379,8 +381,8 @@ const Swiat: React.FC<{ sceny: ScenaOSP[]; t: number; tx: TeksturyStolu; ts: Tek
     <>
       <Kamera sceny={sceny} t={t} />
       <Otoczenie sila={0.6} />
-      <color attach="background" args={[MARKA.tlo]} />
-      <fog attach="fog" args={[MARKA.tlo, 42, 95]} />
+      <color attach="background" args={[TLO_POKOJU]} />
+      <fog attach="fog" args={[TLO_POKOJU, 30, 75]} />
       <ambientLight intensity={0.9} color="#B8B0A4" />
       <directionalLight position={[-6, 9, 12]} intensity={1.1} color="#FFE6C4" />
       <hemisphereLight args={["#ffe2b0", "#15161B", 1.1]} />
@@ -482,7 +484,7 @@ export const StolOSP: React.FC<PropsMapy> = ({ sceny, klatkaStartu }) => {
           <Swiat sceny={sceny} t={t} tx={tx} ts={ts} />
         </ThreeCanvas>
       ) : null}
-      <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: 560, background: "linear-gradient(rgba(21,22,27,0.85), rgba(21,22,27,0))" }} />
+      <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: 560, background: "linear-gradient(rgba(21,22,27,0.72), rgba(21,22,27,0) 85%)" }} />
       {sceny.map((s, i) =>
         s.karta ? (
           <Karta
