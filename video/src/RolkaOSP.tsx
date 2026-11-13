@@ -155,6 +155,48 @@ const porcje = (slowa: Slowo[]): Slowo[][] => {
   return wynik;
 };
 
+// Napisy w stylu „makieta”: ciemna pigułka, słowa wypowiedziane białe, bieżące złote, kolejne szare
+const NapisyPigulka: React.FC<{ scena: ScenaOSP; gora: boolean }> = ({ scena, gora }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = scena.start + frame / fps;
+  const grupy = porcje(scena.slowa);
+  const aktywna = [...grupy].reverse().find((g) => g[0].s <= t) ?? grupy[0];
+  const wejscie = spring({ frame: frame - Math.round((aktywna[0].s - scena.start) * fps), fps, config: { damping: 18, mass: 0.6 } });
+  const dlugosc = aktywna.reduce((a, s) => a + s.w.length + 1, 0);
+  const rozmiar = Math.min(50, Math.floor(1500 / Math.max(dlugosc, 12)));
+  return (
+    <div style={{ position: "absolute", left: SRODEK_X - 430, width: 860, top: gora ? 215 : 1268, display: "flex", justifyContent: "center" }}>
+      <div
+        style={{
+          background: "rgba(28,29,35,0.9)",
+          borderRadius: 16,
+          padding: "12px 26px 14px",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.35)",
+          fontFamily: FONT,
+          fontWeight: 700,
+          fontSize: rozmiar,
+          lineHeight: 1.2,
+          textAlign: "center",
+          opacity: Math.min(1, wejscie * 1.5),
+          transform: `translateY(${(1 - wejscie) * 10}px)`,
+        }}
+      >
+        {aktywna.map((s, i) => {
+          const powiedziane = t >= s.e;
+          const mowione = t >= s.s && t < s.e + 0.05;
+          return (
+            <span key={`${s.s}-${i}`} style={{ color: mowione ? MARKA.zloto : powiedziane ? MARKA.bialy : "#8D8E97" }}>
+              {s.w}
+              {i < aktywna.length - 1 ? " " : ""}
+            </span>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 // Napisy słowo po słowie; słowo wypowiadane w tej chwili świeci na złoto
 const Napisy: React.FC<{ scena: ScenaOSP }> = ({ scena }) => {
   const frame = useCurrentFrame();
@@ -307,11 +349,12 @@ const Wezwanie: React.FC<{ tekst: string; srodek: number }> = ({ tekst, srodek }
           transform: `scale(${w})`,
           fontFamily: FONT,
           fontWeight: 800,
-          fontSize: U.przyciskRozmiar,
+          // długie pytanie zmniejszamy, żeby pigułka mieściła się w bezpiecznej strefie
+          fontSize: Math.min(U.przyciskRozmiar, Math.floor((U.strefaPrawo - 120) / (tekst.length * 0.6))),
           color: MARKA.tlo,
           background: MARKA.zloto,
           borderRadius: 999,
-          padding: "18px 44px",
+          padding: "18px 40px",
           whiteSpace: "nowrap",
           boxShadow: "0 14px 40px rgba(0,0,0,0.5)",
         }}
@@ -479,7 +522,7 @@ export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [], w
           left: 0,
           width: 1080,
           top: 0,
-          height: U.ilustracjaOdGory + 80,
+          height: dane.styl === "makieta" ? 300 : U.ilustracjaOdGory + 80,
           background: `linear-gradient(180deg, ${MARKA.tlo}f2 0%, ${MARKA.tlo}e0 70%, transparent 100%)`,
         }}
       />
@@ -489,7 +532,7 @@ export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [], w
         const { od, doKlatki } = zakresSceny(i);
         return (
           <Sequence key={i} from={od} durationInFrames={doKlatki - od} layout="none">
-            <Napisy scena={scena} />
+            {dane.styl === "makieta" ? null : <Napisy scena={scena} />}
           </Sequence>
         );
       })}
@@ -511,6 +554,19 @@ export const RolkaOSP: React.FC<RolkaProps> = ({ odcinek, dane, glosnosc = [], w
       })}
 
       {dane.maskotka && <Maskotka dane={dane} glosnosc={glosnosc} />}
+
+      {/* Napisy-pigułki („makieta”) leżą nad maskotką; w studiu z pełną postacią przechodzą na górę */}
+      {dane.styl === "makieta"
+        ? dane.sceny.map((scena, i) => {
+            if (scena.plansza) return null;
+            const { od, doKlatki } = zakresSceny(i);
+            return (
+              <Sequence key={`p${i}`} from={od} durationInFrames={doKlatki - od} layout="none">
+                <NapisyPigulka scena={scena} gora={!!scena.studio || scena.postac?.plan === "pelny"} />
+              </Sequence>
+            );
+          })
+        : null}
 
       {dane.sceny.map((scena, i) => {
         if (!scena.etykieta) return null;

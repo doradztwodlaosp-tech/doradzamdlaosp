@@ -86,6 +86,7 @@ export type Odcinek = {
   cta?: string;
   naczelnik?: boolean;
   maskotka?: boolean;
+  styl?: "makieta"; // „makieta”: napisy w ciemnej pigułce nad dolną strefą (jak w filmach instruktażowych 3D)
   szkic?: string; // odcinek bez nagrania lektora: czasy szacunkowe
   wstep?: number; // sekundy z hasłem-hakiem przed pierwszym słowem lektora
   hak?: LiniaHasla[]; // hasło na pierwszej klatce (działa też jako okładka)

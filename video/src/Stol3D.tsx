@@ -429,14 +429,14 @@ const Karta: React.FC<{ t: number; od: number; do: number; tytul?: string; wiers
     <div
       style={{
         position: "absolute",
-        top: 440,
+        top: 330,
         left: 459 - 380,
         width: 760,
         padding: "30px 38px 34px",
         borderRadius: 22,
         background: "rgba(32,34,42,0.94)",
         border: `2px solid ${MARKA.zloto}`,
-        boxShadow: "0 24px 60px rgba(0,0,0,0.55)",
+        boxShadow: "0 24px 60px rgba(0,0,0,0.45)",
         fontFamily: FONT,
         transform: `translateY(${(1 - wejscie) * 30}px)`,
         opacity: Math.min(1, wejscie * 1.3) * wyjscie,
@@ -461,7 +461,7 @@ const Licznik: React.FC<{ t: number; od: number; do: number }> = ({ t, od, do: k
   const w = interpolate(t, [od, od + 0.6], [0, 1], Z) * interpolate(t, [koniec, koniec + 0.5], [1, 0], Z);
   const liczba = interpolate(t, [od, od + 1.6], [0, 1.5], { ...Z, easing: Easing.out(Easing.cubic) });
   return (
-    <div style={{ position: "absolute", top: 450, width: 918, textAlign: "center", fontFamily: FONT, opacity: w, transform: `translateY(${(1 - w) * 20}px)` }}>
+    <div style={{ position: "absolute", top: 340, width: 918, textAlign: "center", fontFamily: FONT, opacity: w, transform: `translateY(${(1 - w) * 20}px)` }}>
       <div style={{ fontWeight: 800, fontSize: 150, color: MARKA.zloto, lineHeight: 1, textShadow: "0 10px 40px rgba(0,0,0,0.6)" }}>{liczba.toFixed(1).replace(".", ",")}%</div>
       <div style={{ marginTop: 12, fontWeight: 700, fontSize: 38, color: "white", textShadow: "0 4px 18px rgba(0,0,0,0.8)" }}>podatku od mieszkańców co roku</div>
     </div>
@@ -484,7 +484,7 @@ export const StolOSP: React.FC<PropsMapy> = ({ sceny, klatkaStartu }) => {
           <Swiat sceny={sceny} t={t} tx={tx} ts={ts} />
         </ThreeCanvas>
       ) : null}
-      <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: 560, background: "linear-gradient(rgba(21,22,27,0.72), rgba(21,22,27,0) 85%)" }} />
+      
       {sceny.map((s, i) =>
         s.karta ? (
           <Karta
