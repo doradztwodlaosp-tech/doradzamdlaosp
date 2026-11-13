@@ -270,6 +270,8 @@ def zapisz_odrzucona(conn: sqlite3.Connection, wiersz: dict) -> None:
     nadpisuje istniejącego wpisu, więc nie cofnie statusu rekordu już
     pobranego. Status 'odrzucone' nie wchodzi do znane_id(), więc po zmianie
     reguł taki rekord zostanie oceniony ponownie i w razie potrzeby pobrany."""
+    # Listy z API (np. AUTOR) zamieniamy na tekst, tak jak w zapisz_interpretacje.
+    wiersz = {k: (", ".join(map(str, v)) if isinstance(v, list) else v) for k, v in wiersz.items()}
     conn.execute("""
         INSERT OR IGNORE INTO interpretacje
             (id, sygnatura, tytul, data_wydania, data_publikacji, organ,

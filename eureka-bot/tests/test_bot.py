@@ -50,7 +50,8 @@ TEKST_SSE = ("Interpretacja indywidualna – stanowisko nieprawidłowe\nOpis sta
 
 def rek(id_, przepisy=None, teza="", dt="2026-11-02", syg_kod="4010", slowa=None):
     return {"ID_INFORMACJI": id_, "SYG": f"0111-KDIB1-3.{syg_kod}.{id_}.2026.1.AB", "DT_WYD": dt,
-            "AUTOR": "Dyrektor KIS", "TEZA": teza, "SLOWA_KLUCZOWE": slowa, "ZAGADNIENIA": None, "PRZEPISY": przepisy}
+            # AUTOR jako lista — tak zwraca prawdziwa EUREKA
+            "AUTOR": ["Dyrektor Krajowej Informacji Skarbowej"], "TEZA": teza, "SLOWA_KLUCZOWE": slowa, "ZAGADNIENIA": None, "PRZEPISY": przepisy}
 
 
 class TestMatcher(unittest.TestCase):

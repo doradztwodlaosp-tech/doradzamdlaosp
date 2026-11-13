@@ -87,6 +87,23 @@ def frazy_do_wyszukania(profile_klucze: list[str]) -> dict[str, list[str]]:
     return frazy
 
 
+# Pola, które mają być pojedynczym tekstem. EUREKA zwraca część z nich jako
+# listę (np. AUTOR = ["Dyrektor Krajowej Informacji Skarbowej"]). Pola listowe
+# (PRZEPISY, SLOWA_KLUCZOWE, ZAGADNIENIA) zostają listami — matcher tego oczekuje.
+_POLA_TEKSTOWE = ("SYG", "AUTOR", "TEZA", "DT_WYD", "KATEGORIA_INFORMACJI", "STATUS_INFORMACJI", "DATA_REJESTRACJI")
+
+
+def normalizuj(rekord: dict) -> dict:
+    r = dict(rekord)
+    for pole in _POLA_TEKSTOWE:
+        v = r.get(pole)
+        if isinstance(v, (list, tuple)):
+            r[pole] = ", ".join(str(x) for x in v if x)
+        elif v is not None and not isinstance(v, str):
+            r[pole] = str(v)
+    return r
+
+
 def szukaj_frazy(sesja, fraza: str, od: str, do: str) -> list[dict]:
     rekordy: dict[str, dict] = {}
     strona = 0
@@ -96,7 +113,7 @@ def szukaj_frazy(sesja, fraza: str, od: str, do: str) -> list[dict]:
         partia = wynik.get("results") or []
         for r in partia:
             if r.get("ID_INFORMACJI") is not None:
-                rekordy[str(r["ID_INFORMACJI"])] = r
+                rekordy[str(r["ID_INFORMACJI"])] = normalizuj(r)
         strona += 1
         if not partia or strona * config.ROZMIAR_STRONY >= wszystkich:
             return list(rekordy.values())
