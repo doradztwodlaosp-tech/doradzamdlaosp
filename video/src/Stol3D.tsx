@@ -33,7 +33,7 @@ const STACJE: Record<string, Stacja> = {
   protokol: { cel: [3.0, 0.2, 0.3], kat: 0.15, odl: 6.0, wys: 4.6 },
   gmina: { cel: [10.0, 0.9, 0.0], kat: -0.35, odl: 11.5, wys: 3.6 },
   woz: { cel: [-6.55, 0.35, -1.3], kat: 0.75, odl: 5.0, wys: 1.9 },
-  helm: { cel: [-3.0, 0.35, 0.3], kat: 0.5, odl: 6.8, wys: 3.4 },
+  helm: { cel: [-3.0, 0.12, 0.3], kat: 0.5, odl: 7.0, wys: 3.4 },
   calosc: { cel: [-0.5, 0.0, 0.3], kat: 0.3, odl: 19, wys: 13.5 },
 };
 

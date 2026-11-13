@@ -207,22 +207,24 @@ const NapisyPigulka: React.FC<{ scena: ScenaOSP; gora: boolean }> = ({
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = scena.start + frame / fps;
-  const grupy = porcje(scena.slowa);
-  const aktywna = [...grupy].reverse().find((g) => g[0].s <= t) ?? grupy[0];
+  // Cała wypowiedź do tego obrazu naraz (bez dzielenia na kawałki); słowa podświetlają się za lektorem
+  const aktywna = scena.slowa;
   const wejscie = spring({
-    frame: frame - Math.round((aktywna[0].s - scena.start) * fps),
+    frame,
     fps,
     config: { damping: 18, mass: 0.6 },
   });
   const dlugosc = aktywna.reduce((a, s) => a + s.w.length + 1, 0);
-  const rozmiar = Math.min(50, Math.floor(1500 / Math.max(dlugosc, 12)));
+  const rozmiar =
+    dlugosc <= 45 ? 50 : dlugosc <= 90 ? 46 : dlugosc <= 130 ? 42 : 38;
   return (
     <div
       style={{
         position: "absolute",
         left: SRODEK_X - 430,
         width: 860,
-        top: gora ? 215 : 1268,
+        // na dole pigułka „rośnie” w górę, żeby nie wejść w strefę przycisków Facebooka
+        ...(gora ? { top: 215 } : { bottom: 1920 - 1425 }),
         display: "flex",
         justifyContent: "center",
       }}
@@ -231,12 +233,13 @@ const NapisyPigulka: React.FC<{ scena: ScenaOSP; gora: boolean }> = ({
         style={{
           background: "rgba(28,29,35,0.9)",
           borderRadius: 16,
-          padding: "12px 26px 14px",
+          padding: "14px 30px 16px",
+          maxWidth: 860,
           boxShadow: "0 10px 30px rgba(0,0,0,0.35)",
           fontFamily: FONT,
           fontWeight: 700,
           fontSize: rozmiar,
-          lineHeight: 1.2,
+          lineHeight: 1.25,
           textAlign: "center",
           opacity: Math.min(1, wejscie * 1.5),
           transform: `translateY(${(1 - wejscie) * 10}px)`,
