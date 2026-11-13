@@ -798,6 +798,7 @@ export const RolkaOSP: React.FC<RolkaProps> = ({
   glosnosc = [],
   wymiary = {},
   strefy = false,
+  tylkoDzwiek = false,
 }) => {
   const { fps, durationInFrames } = useVideoConfig();
   const klatka = (s: number) => Math.round(s * fps);
@@ -856,6 +857,20 @@ export const RolkaOSP: React.FC<RolkaProps> = ({
     dane.sceny[
       ostatnia.plansza ? dane.sceny.length - 2 : dane.sceny.length - 1
     ];
+
+  // Tryb „tylko dźwięk” (render ścieżki dźwiękowej bez przeliczania obrazu, np. przy renderze w kawałkach)
+  if (tylkoDzwiek) {
+    return (
+      <AbsoluteFill>
+        <Dzwiek
+          odcinek={odcinek}
+          dane={dane}
+          glosnosc={glosnosc}
+          zdarzenia={zdarzenia}
+        />
+      </AbsoluteFill>
+    );
+  }
 
   return (
     <AbsoluteFill style={{ backgroundColor: MARKA.tlo }}>

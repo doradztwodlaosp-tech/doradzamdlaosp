@@ -101,6 +101,7 @@ export type RolkaProps = {
   glosnosc?: number[];
   wymiary?: Record<string, [number, number]>;
   strefy?: boolean;
+  tylkoDzwiek?: boolean; // tylko ścieżka dźwiękowa (bez obrazu)
 };
 
 export const FPS = 30;

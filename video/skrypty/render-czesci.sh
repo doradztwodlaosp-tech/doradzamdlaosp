@@ -24,7 +24,7 @@ done
 
 # dźwięk całości osobno (szybko)
 if [ ! -s "$DIR/dzwiek.aac" ]; then
-  npx remotion render RolkaOSP "$DIR/dzwiek.tmp.aac" --props="$PROPS" --codec=aac "${PRZ[@]}" >/dev/null
+  npx remotion render RolkaOSP "$DIR/dzwiek.tmp.aac" --props="{\"odcinek\":\"$SLUG\",\"tylkoDzwiek\":true}" --codec=aac "${PRZ[@]}" >/dev/null
   mv "$DIR/dzwiek.tmp.aac" "$DIR/dzwiek.aac"
 fi
 
