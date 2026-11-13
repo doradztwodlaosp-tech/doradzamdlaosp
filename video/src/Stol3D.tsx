@@ -6,6 +6,7 @@ import { AbsoluteFill, Easing, continueRender, delayRender, interpolate, spring,
 import { FONT, MARKA } from "./marka";
 import { Otoczenie, WozStrazacki } from "./Woz3D";
 import { BudynekRemizy } from "./Remiza3D";
+import { LaptopPro, StosDokumentow, StosyMonet, useBlat } from "./Przedmioty3D";
 import { Dlugopis, Helm, Segregator, type Tekstury, useTekstury } from "./Scena3D";
 import { type ScenaOSP, czasSlowa } from "./typy";
 import type { PropsMapy, ZdarzenieDzwiekowe } from "./Mapy";
@@ -247,39 +248,6 @@ const Remiza: React.FC<{ t: number; c: ReturnType<typeof czasy>; tx: TeksturySto
   );
 };
 
-// Stos papierów: kolejne kartki spadają na stos na słowie „stos”
-const Papiery: React.FC<{ t: number; c: ReturnType<typeof czasy> }> = ({ t, c }) => {
-  const kartki = useMemo(
-    () => Array.from({ length: 22 }, (_, i) => ({ obrot: Math.sin(i * 12.9898) * 0.22, dx: Math.sin(i * 4.1) * 0.08, dz: Math.cos(i * 3.3) * 0.08 })),
-    [],
-  );
-  return (
-    <group position={[0.0, 0, -3.0]}>
-      {kartki.map((k, i) => {
-        const odKiedy = c.stos - 0.6 + (i - 6) * 0.11;
-        const spad = i < 6 ? 1 : interpolate(t, [odKiedy, odKiedy + 0.55], [0, 1], { ...Z, easing: Easing.out(Easing.cubic) });
-        if (spad <= 0) return null;
-        return (
-          <mesh
-            key={i}
-            position={[k.dx, 0.01 + i * 0.022 + (1 - spad) * 1.6, k.dz]}
-            rotation={[0, k.obrot + (1 - spad) * 0.6, 0]}
-            castShadow
-            receiveShadow
-          >
-            <boxGeometry args={[0.95, 0.012, 1.3]} />
-            <meshStandardMaterial color={i % 5 === 3 ? "#E7DCC4" : "#F1ECE1"} roughness={0.95} />
-          </mesh>
-        );
-      })}
-      {/* spinacz na wierzchu */}
-      <mesh position={[0.3, 0.52, -0.5]} rotation={[-Math.PI / 2, 0, 0.3]}>
-        <torusGeometry args={[0.06, 0.012, 8, 24]} />
-        <meshStandardMaterial color="#B8BBC4" metalness={0.8} roughness={0.3} />
-      </mesh>
-    </group>
-  );
-};
 
 // Tabliczka marki na biurku
 const Tabliczka: React.FC<{ t: number; c: ReturnType<typeof czasy>; tx: TeksturyStolu }> = ({ t, c, tx }) => {
@@ -303,62 +271,7 @@ const Tabliczka: React.FC<{ t: number; c: ReturnType<typeof czasy>; tx: Tekstury
   );
 };
 
-const Laptop: React.FC<{ t: number; c: ReturnType<typeof czasy>; tx: TeksturyStolu }> = ({ t, c, tx }) => {
-  const otwarcie = interpolate(t, [c.laptop - 0.3, c.laptop + 1.6], [0.15, 1], { ...Z, easing: PLYNNIE });
-  const kat = -Math.PI / 2 + otwarcie * (Math.PI / 2 + 0.28);
-  return (
-    <group position={[6.0, 0, 3.5]} rotation={[0, -0.25, 0]}>
-      <mesh position={[0, 0.035, 0]} castShadow receiveShadow>
-        <boxGeometry args={[1.7, 0.07, 1.15]} />
-        <meshStandardMaterial color="#3A3D46" metalness={0.5} roughness={0.4} />
-      </mesh>
-      <mesh position={[0, 0.072, 0.05]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[1.5, 0.7]} />
-        <meshStandardMaterial color="#202228" roughness={0.8} />
-      </mesh>
-      <group position={[0, 0.07, -0.56]} rotation={[kat, 0, 0]}>
-        <mesh position={[0, 0.56, -0.02]} castShadow>
-          <boxGeometry args={[1.7, 1.12, 0.04]} />
-          <meshStandardMaterial color="#3A3D46" metalness={0.5} roughness={0.4} />
-        </mesh>
-        <mesh position={[0, 0.56, 0.002]}>
-          <planeGeometry args={[1.58, 0.99]} />
-          <meshBasicMaterial map={tx.ekran} toneMapped={false} />
-        </mesh>
-      </group>
-      <pointLight position={[0, 0.7, 0.6]} intensity={1.8 * otwarcie} color="#C9D6FF" distance={3} />
-    </group>
-  );
-};
 
-// Stosy złotych monet rosnące na słowie „dostawać”
-const Monety: React.FC<{ t: number; c: ReturnType<typeof czasy> }> = ({ t, c }) => {
-  const stosy: [number, number, number][] = [
-    [-0.55, 0, 0.1, ],
-    [0.1, 0, -0.25],
-    [0.65, 0, 0.25],
-    [0.05, 0, 0.55],
-  ].map((p) => p as [number, number, number]);
-  const wysokosci = [9, 14, 7, 4];
-  return (
-    <group position={[-6.0, 0, 3.8]}>
-      {stosy.map((p, s) =>
-        Array.from({ length: wysokosci[s] }, (_, i) => {
-          const kiedy = c.dostawac + s * 0.25 + i * 0.07;
-          // dwie dolne monety każdego stosu leżą od początku, reszta spada na „1,5%”
-          const w = i < 2 ? 1 : interpolate(t, [kiedy, kiedy + 0.35], [0, 1], { ...Z, easing: Easing.out(Easing.cubic) });
-          if (w <= 0) return null;
-          return (
-            <mesh key={`${s}-${i}`} position={[p[0] + Math.sin(i * 7.7) * 0.015, 0.03 + i * 0.062 + (1 - w) * 0.9, p[2]]} castShadow receiveShadow>
-              <cylinderGeometry args={[0.26, 0.26, 0.055, 40]} />
-              <meshStandardMaterial color={MARKA.zloto} metalness={0.45} roughness={0.35} emissive="#5a3c08" emissiveIntensity={0.35} />
-            </mesh>
-          );
-        }),
-      )}
-    </group>
-  );
-};
 
 // Protokół z walnego: na „oddala” spada czerwona pieczęć, na „traci” moneta toczy się ze stołu
 const Protokol: React.FC<{ t: number; c: ReturnType<typeof czasy>; tx: TeksturyStolu }> = ({ t, c, tx }) => {
@@ -408,19 +321,19 @@ const Gmina: React.FC<{ t: number; c: ReturnType<typeof czasy>; tx: TeksturyStol
       </mesh>
       <mesh position={[0, 0.78, -0.1]} castShadow receiveShadow>
         <boxGeometry args={[2.6, 1.3, 1.5]} />
-        <meshStandardMaterial color="#E9E4DA" roughness={0.85} />
+        <meshStandardMaterial color="#CFC8BB" roughness={0.85} />
       </mesh>
       <mesh position={[0, 1.48, -0.85]} castShadow>
         <boxGeometry args={[2.7, 0.12, 1.75]} />
-        <meshStandardMaterial color="#D9D2C4" roughness={0.85} />
+        <meshStandardMaterial color="#C4BDB0" roughness={0.85} />
       </mesh>
       <mesh geometry={fronton} position={[0, 1.54, 0.76]} castShadow>
-        <meshStandardMaterial color="#E9E4DA" roughness={0.85} />
+        <meshStandardMaterial color="#CFC8BB" roughness={0.85} />
       </mesh>
       {[-0.9, -0.3, 0.3, 0.9].map((x) => (
         <mesh key={x} position={[x, 0.78, 0.86]} castShadow>
           <cylinderGeometry args={[0.08, 0.09, 1.3, 16]} />
-          <meshStandardMaterial color="#F4F1EA" roughness={0.7} />
+          <meshStandardMaterial color="#DCD7CD" roughness={0.7} />
         </mesh>
       ))}
       <mesh position={[0, 1.7, 0.885]}>
@@ -459,21 +372,23 @@ const Gmina: React.FC<{ t: number; c: ReturnType<typeof czasy>; tx: TeksturyStol
 
 const Swiat: React.FC<{ sceny: ScenaOSP[]; t: number; tx: TeksturyStolu; ts: Tekstury }> = ({ sceny, t, tx, ts }) => {
   const c = czasy(sceny);
+  const blat = useBlat();
   const otw = c.otwarty ? interpolate(t, [c.otwarcie, c.otwarcie + 2.0], [0, 1], { ...Z, easing: Easing.bezier(0.55, 0, 0.25, 1) }) : 0;
   const blask = c.otwarty ? interpolate(t, [c.otwarcie + 2.0, c.otwarcie + 3.0], [0, 0.8], Z) : 0;
   return (
     <>
       <Kamera sceny={sceny} t={t} />
-      <Otoczenie sila={0.45} />
+      <Otoczenie sila={0.6} />
       <color attach="background" args={[MARKA.tlo]} />
       <fog attach="fog" args={[MARKA.tlo, 42, 95]} />
-      <ambientLight intensity={1.0} color="#9aa0b8" />
+      <ambientLight intensity={0.9} color="#B8B0A4" />
+      <directionalLight position={[-6, 9, 12]} intensity={1.1} color="#FFE6C4" />
       <hemisphereLight args={["#ffe2b0", "#15161B", 1.1]} />
       <spotLight
         position={[3, 26, 14]}
         angle={0.7}
         penumbra={0.75}
-        intensity={2600}
+        intensity={3400}
         decay={2}
         color="#FFD9A0"
         castShadow
@@ -484,14 +399,14 @@ const Swiat: React.FC<{ sceny: ScenaOSP[]; t: number; tx: TeksturyStolu; ts: Tek
       <pointLight position={[-7, 3, -5]} intensity={10} color={MARKA.zloto} />
       <mesh position={[0, -0.05, 0]} receiveShadow>
         <boxGeometry args={[60, 0.1, 40]} />
-        <meshStandardMaterial map={tx.drewno} color="#8A6E56" roughness={0.75} />
+        <meshStandardMaterial map={blat} roughness={0.62} />
       </mesh>
       <Remiza t={t} c={c} tx={tx} />
-      <Papiery t={t} c={c} />
+      <StosDokumentow t={t} stos={c.stos} pozycja={[0.0, 0, -3.0]} />
       <Tabliczka t={t} c={c} tx={tx} />
-      <Laptop t={t} c={c} tx={tx} />
+      <LaptopPro otwarcie={interpolate(t, [c.laptop - 0.3, c.laptop + 1.6], [0.15, 1], { ...Z, easing: PLYNNIE })} ekran={tx.ekran} pozycja={[6.0, 0, 3.5]} obrot={-0.25} />
       <Segregator t={ts} otwarcie={otw} blask={blask} pozycja={[0.1, 0.06, 3.5]} obrot={0.42} />
-      <Monety t={t} c={c} />
+      <StosyMonet t={t} od={c.dostawac} pozycja={[-6.0, 0, 3.8]} />
       <Protokol t={t} c={c} tx={tx} />
       <Gmina t={t} c={c} tx={tx} />
       <Helm pozycja={[-3.0, 0.06, 0.3]} obrot={0.75} />
