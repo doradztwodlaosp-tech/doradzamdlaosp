@@ -344,15 +344,6 @@
       ],
       "mapa": "stol-osp",
       "kamera": "marka",
-      "postac": {
-        "plan": "brak",
-        "gest": {
-          "slowo": "Jesteśmy",
-          "plan": "obok",
-          "poza": "tlumaczy",
-          "ruch": "kiwa"
-        }
-      },
       "start": 24.271,
       "koniec": 30.7,
       "slowa": [
@@ -987,15 +978,6 @@
       ],
       "mapa": "stol-osp",
       "kamera": "marka",
-      "postac": {
-        "plan": "brak",
-        "gest": {
-          "slowo": "Pomogliśmy",
-          "plan": "obok",
-          "poza": "cieszy-sie",
-          "ruch": "podskok"
-        }
-      },
       "start": 72.886,
       "koniec": 77.457,
       "slowa": [
@@ -1327,5 +1309,6 @@
     }
   ],
   "szkic": "Czasy szacunkowe (bez lektora). Po dodaniu lektor.mp3 uruchom: npm run czasy -- kim-jestesmy",
-  "styl": "makieta"
+  "styl": "makieta",
+  "hakPostac": false
 }

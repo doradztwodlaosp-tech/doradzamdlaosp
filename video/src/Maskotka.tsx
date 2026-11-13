@@ -68,20 +68,22 @@ export const Maskotka: React.FC<{ dane: Odcinek; glosnosc: number[] }> = ({ dane
   if (gora > 1920) return null;
 
   // Krótkie „wskoczenie” przy każdej zmianie pozy
-  const pop = spring({ frame: frame - Math.round(zmianaPozy * fps), fps, config: { damping: 11, mass: 0.6 } });
+  const pop = spring({ frame: frame - Math.round(zmianaPozy * fps), fps, config: { damping: 20, mass: 0.8 } });
 
-  // Mówienie: lekkie podskoki i sprężanie w rytm głośności nagrania; oddech, gdy milczy
-  const usta = glosnosc[frame] ?? 0;
-  const oddech = Math.sin(frame / 28) * 0.008;
+  // Postać stoi spokojnie: bez podskakiwania w rytm głosu, tylko bardzo powolny oddech.
+  // (glosnosc zostaje w parametrach na przyszłość – do ruchu ust, gdy będzie arkusz mówienia)
+  void glosnosc;
+  const oddech = Math.sin(frame / 45) * 0.004;
 
   // Ruchy przypięte do słów
   const odGestu = czasGestu !== undefined ? t - czasGestu : -1;
   const zanik = odGestu >= 0 ? interpolate(odGestu, [0, 1.2], [1, 0], ZAKRES) : 0;
   let obrot = 0;
   let skok = 0;
-  if (ust.gest?.ruch === "kreci") obrot = Math.sin(odGestu * 16) * 6 * zanik;
-  if (ust.gest?.ruch === "kiwa") skok = Math.sin(odGestu * 12) * 14 * zanik;
-  if (ust.gest?.ruch === "podskok") skok = -Math.abs(Math.sin(odGestu * 9)) * 40 * zanik;
+  // Gesty są spokojne i krótkie (marka: poważny ekspert)
+  if (ust.gest?.ruch === "kreci") obrot = Math.sin(odGestu * 8) * 2 * zanik;
+  if (ust.gest?.ruch === "kiwa") skok = Math.sin(odGestu * 7) * 5 * zanik;
+  if (ust.gest?.ruch === "podskok") skok = -Math.abs(Math.sin(odGestu * 5)) * 12 * zanik;
 
   // Na połyskującej podłodze (studio, mokry bruk) postać ma delikatne odbicie
   const zOdbiciem = plan === "pelny" || plan === "prawo";
@@ -125,11 +127,11 @@ export const Maskotka: React.FC<{ dane: Odcinek; glosnosc: number[] }> = ({ dane
         style={{
           position: "absolute",
           left: lewo,
-          top: gora - usta * 8 + skok,
+          top: gora + skok,
           width: szer,
           height: wys,
           transformOrigin: "50% 100%",
-          transform: `rotate(${obrot}deg) scale(${(0.94 + 0.06 * pop) * (1 + oddech)}, ${(0.94 + 0.06 * pop) * (1 + oddech + usta * 0.025)})`,
+          transform: `rotate(${obrot}deg) scale(${(0.97 + 0.03 * pop) * (1 + oddech)}, ${(0.97 + 0.03 * pop) * (1 + oddech)})`,
           filter: "drop-shadow(0 14px 22px rgba(0,0,0,0.5))",
         }}
       >

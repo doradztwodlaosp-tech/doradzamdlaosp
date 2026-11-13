@@ -25,7 +25,7 @@ type Stacja = { cel: [number, number, number]; kat: number; odl: number; wys: nu
 const STACJE: Record<string, Stacja> = {
   remiza: { cel: [-6.0, 0.95, -2.6], kat: 0.3, odl: 12.5, wys: 4.8 },
   papiery: { cel: [0.0, 0.25, -3.0], kat: 0.12, odl: 6.2, wys: 5.0 },
-  marka: { cel: [5.55, -0.25, -2.4], kat: -0.18, odl: 5.6, wys: 2.1 },
+  marka: { cel: [5.58, 0.3, -2.42], kat: -0.18, odl: 5.7, wys: 2.0 },
   laptop: { cel: [6.0, 0.55, 3.5], kat: 0.36, odl: 8.6, wys: 3.8 },
   statut: { cel: [0.1, 0.15, 3.45], kat: 0.42, odl: 7.4, wys: 4.8 },
   "statut-otwarty": { cel: [-0.2, 0.1, 3.25], kat: 0.24, odl: 7.6, wys: 7.6 },
@@ -150,12 +150,23 @@ const useTeksturyStolu = () => {
         c.font = `800 190px ${FONT}`;
         c.textAlign = "center";
         c.fillText("§", 150, 215);
+        // Tytuł mieści się w ramce z zapasem; adres pod spodem ma dokładnie tę samą szerokość (równe brzegi)
+        const LEWO = 275;
+        const MIEJSCE = 1200 - LEWO - 80;
         c.textAlign = "left";
-        c.font = `800 74px ${FONT}`;
-        c.fillText("DORADZTWO DLA OSP", 270, 140);
+        let r1 = 74;
+        c.font = `800 ${r1}px ${FONT}`;
+        while (c.measureText("DORADZTWO DLA OSP").width > MIEJSCE && r1 > 40) c.font = `800 ${--r1}px ${FONT}`;
+        const szer = c.measureText("DORADZTWO DLA OSP").width;
+        c.fillText("DORADZTWO DLA OSP", LEWO, 140);
         c.fillStyle = "#CBCBD3";
-        c.font = `600 50px ${FONT}`;
-        c.fillText("doradztwodlaosp.pl", 272, 220);
+        let r2 = 60;
+        c.font = `600 ${r2}px ${FONT}`;
+        while (c.measureText("doradztwodlaosp.pl").width > szer && r2 > 20) c.font = `600 ${--r2}px ${FONT}`;
+        const zapas = szer - c.measureText("doradztwodlaosp.pl").width;
+        c.letterSpacing = `${zapas / 17}px`;
+        c.fillText("doradztwodlaosp.pl", LEWO, 222);
+        c.letterSpacing = "0px";
       });
       const ekran = plotno(800, 500, (c) => {
         c.fillStyle = "#15161B";
