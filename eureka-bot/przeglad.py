@@ -230,6 +230,9 @@ def uruchom_przeglad(od: date, do: date, profile_klucze: list[str] | None = None
                     continue
 
                 if podglad:
+                    # w podglądzie liczymy wg metadanych (bez oceny treści PDF)
+                    licznik["potwierdzone" if any(d.pewnosc == "POTWIERDZONE" for d in dopasowania)
+                            else "do_weryfikacji"] += 1
                     print(f"  [PODGLĄD] {z.rekord.get('SYG')} ({z.rekord.get('DT_WYD')}) — "
                           + "; ".join(f"{d.profil_klucz} {d.etykieta_artykulu} [{d.pewnosc}]" for d in dopasowania))
                     continue

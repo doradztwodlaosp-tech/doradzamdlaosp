@@ -106,7 +106,9 @@ def main(argv: list[str] | None = None) -> int:
           f"odrzucone bez pobierania: {l['odrzucone']} | błędy: {l['bledy']}")
 
     if wynik["podglad"]:
-        print("Podgląd: nie tworzę raportów i niczego nie wysyłam.")
+        print(f"Podgląd: wg metadanych zostałoby pobranych {l['potwierdzone'] + l['do_weryfikacji']} PDF-ów "
+              f"(ok. {(l['potwierdzone'] + l['do_weryfikacji']) * config.PRZERWA / 60:.0f} min). "
+              f"Nie tworzę raportów i niczego nie wysyłam.")
         return 0
     kod = _raporty_i_wysylka(wynik, args.bez_wysylki)
     print(f"--- KONIEC {datetime.now():%Y-%m-%d %H:%M:%S} ---")

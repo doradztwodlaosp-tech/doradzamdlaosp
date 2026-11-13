@@ -182,7 +182,7 @@ class TestBieg(unittest.TestCase):
         config.TRYB_PODGLAD = True
         pobrane = []
         w = self._bieg(pobrane)
-        self.assertEqual((w["licznik"]["znaleziono"], w["licznik"]["odrzucone"]), (5, 1))
+        self.assertEqual((w["licznik"]["znaleziono"], w["licznik"]["odrzucone"], w["licznik"]["potwierdzone"] + w["licznik"]["do_weryfikacji"]), (5, 1, 4))
         self.assertEqual(pobrane, [])
         con = sqlite3.connect(config.SCIEZKA_DB)
         self.assertEqual(con.execute("select count(*) from interpretacje").fetchone()[0], 0)
