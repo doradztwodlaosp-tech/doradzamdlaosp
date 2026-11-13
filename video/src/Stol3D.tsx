@@ -4,6 +4,8 @@ import { useThree } from "@react-three/fiber";
 import { ThreeCanvas } from "@remotion/three";
 import { AbsoluteFill, Easing, continueRender, delayRender, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { FONT, MARKA } from "./marka";
+import { Otoczenie, WozStrazacki } from "./Woz3D";
+import { BudynekRemizy } from "./Remiza3D";
 import { Dlugopis, Helm, Segregator, type Tekstury, useTekstury } from "./Scena3D";
 import { type ScenaOSP, czasSlowa } from "./typy";
 import type { PropsMapy, ZdarzenieDzwiekowe } from "./Mapy";
@@ -18,7 +20,7 @@ const PRZEJAZD = 2.2; // sekundy przejazdu kamery między miejscami (spokojnie)
 
 type Stacja = { cel: [number, number, number]; kat: number; odl: number; wys: number };
 const STACJE: Record<string, Stacja> = {
-  remiza: { cel: [-6.0, 0.6, -2.6], kat: 0.3, odl: 12, wys: 5.0 },
+  remiza: { cel: [-6.0, 0.95, -2.6], kat: 0.3, odl: 12.5, wys: 4.8 },
   papiery: { cel: [0.0, 0.25, -3.0], kat: 0.12, odl: 6.2, wys: 5.0 },
   marka: { cel: [5.55, -0.25, -2.4], kat: -0.18, odl: 5.6, wys: 2.1 },
   laptop: { cel: [6.0, 0.55, 3.5], kat: 0.36, odl: 8.6, wys: 3.8 },
@@ -232,99 +234,14 @@ const useTeksturyStolu = () => {
 const Remiza: React.FC<{ t: number; c: ReturnType<typeof czasy>; tx: TeksturyStolu }> = ({ t, c, tx }) => {
   const otwarcie = interpolate(t, [c.wyjazd, c.wyjazd + 1.6], [0, 1], { ...Z, easing: PLYNNIE });
   const wyjazd = interpolate(t, [c.wyjazd + 1.0, c.wyjazd + 4.2], [0, 1], { ...Z, easing: PLYNNIE });
-  const dach = useMemo(() => {
-    const sh = new THREE.Shape();
-    sh.moveTo(-0.95, 0);
-    sh.lineTo(0.95, 0);
-    sh.lineTo(0, 0.62);
-    sh.closePath();
-    return new THREE.ExtrudeGeometry(sh, { depth: 2.7, bevelEnabled: false });
-  }, []);
-  const okno = (x: number, y: number, z: number, ry = 0) => (
-    <mesh position={[x, y, z]} rotation={[0, ry, 0]}>
-      <planeGeometry args={[0.26, 0.3]} />
-      <meshBasicMaterial color="#FFC978" />
-    </mesh>
-  );
   return (
     <group position={[-6.0, 0, -3.5]}>
-      {/* budynek */}
-      <mesh position={[0, 0.55, 0]} castShadow receiveShadow>
-        <boxGeometry args={[2.6, 1.1, 1.6]} />
-        <meshStandardMaterial color="#B9AE9B" roughness={0.9} />
-      </mesh>
-      <mesh geometry={dach} position={[-1.35, 1.1, 0]} rotation={[0, Math.PI / 2, 0]} castShadow>
-        <meshStandardMaterial color="#5E2A22" roughness={0.7} />
-      </mesh>
-      {/* wieża */}
-      <mesh position={[1.0, 1.55, -0.3]} castShadow>
-        <boxGeometry args={[0.5, 1.5, 0.5]} />
-        <meshStandardMaterial color="#B3A894" roughness={0.9} />
-      </mesh>
-      <mesh position={[1.0, 2.5, -0.3]} rotation={[0, Math.PI / 4, 0]} castShadow>
-        <coneGeometry args={[0.45, 0.45, 4]} />
-        <meshStandardMaterial color="#5E2A22" roughness={0.7} />
-      </mesh>
-      {okno(1.0, 1.9, -0.04)}
-      {/* szyld */}
-      <mesh position={[0, 1.0, 0.806]}>
-        <planeGeometry args={[0.8, 0.2]} />
-        <meshStandardMaterial map={tx.szyld} roughness={0.6} />
-      </mesh>
-      {/* bramy: ciemny otwór i podnoszona brama */}
-      {[-0.55, 0.55].map((x, i) => {
-        const o = i === 0 ? otwarcie : 0;
-        return (
-          <group key={x}>
-            <mesh position={[x, 0.42, 0.803]}>
-              <planeGeometry args={[0.78, 0.82]} />
-              <meshBasicMaterial color="#120C08" />
-            </mesh>
-            <mesh position={[x, 0.42 + 0.41 * o, 0.806]} scale={[1, 1 - 0.95 * o, 1]}>
-              <planeGeometry args={[0.78, 0.82]} />
-              <meshStandardMaterial map={tx.brama} roughness={0.5} />
-            </mesh>
-          </group>
-        );
-      })}
-      {okno(-1.07, 0.65, 0.802)}
-      {okno(1.07, 0.65, 0.802)}
+      <BudynekRemizy otwarcie={otwarcie} t={t} brama={tx.brama} szyld={tx.szyld} />
       {/* światło z wnętrza */}
       <pointLight position={[-0.55, 0.5, 1.4]} intensity={3 * otwarcie + 0.6} color="#FFB45A" distance={4} />
-      {/* wóz strażacki */}
-      <group position={[-0.55, 0, 0.1 + wyjazd * 2.0]}>
-        <mesh position={[0, 0.27, -0.12]} castShadow>
-          <boxGeometry args={[0.56, 0.42, 0.95]} />
-          <meshStandardMaterial color="#C0392B" roughness={0.4} />
-        </mesh>
-        <mesh position={[0, 0.25, 0.5]} castShadow>
-          <boxGeometry args={[0.56, 0.38, 0.32]} />
-          <meshStandardMaterial color="#C0392B" roughness={0.4} />
-        </mesh>
-        <mesh position={[0, 0.33, 0.667]}>
-          <planeGeometry args={[0.46, 0.16]} />
-          <meshStandardMaterial color="#1B2230" roughness={0.2} metalness={0.4} />
-        </mesh>
-        <mesh position={[0, 0.2, 0.2]}>
-          <boxGeometry args={[0.57, 0.04, 1.3]} />
-          <meshStandardMaterial color="#F2EEE6" />
-        </mesh>
-        <mesh position={[0, 0.5, -0.12]}>
-          <boxGeometry args={[0.5, 0.04, 0.9]} />
-          <meshStandardMaterial color="#9A9DA6" metalness={0.6} roughness={0.4} />
-        </mesh>
-        <mesh position={[0, 0.47, 0.55]}>
-          <boxGeometry args={[0.3, 0.05, 0.08]} />
-          <meshBasicMaterial color={Math.sin(t * 9) > 0 ? "#4F8BFF" : "#1E3A7A"} />
-        </mesh>
-        {[-0.45, 0.1, 0.5].map((z) =>
-          [-0.29, 0.29].map((x) => (
-            <mesh key={`${x}${z}`} position={[x, 0.09, z]} rotation={[0, 0, Math.PI / 2]} castShadow>
-              <cylinderGeometry args={[0.09, 0.09, 0.07, 20]} />
-              <meshStandardMaterial color="#141414" roughness={0.8} />
-            </mesh>
-          )),
-        )}
+      {/* wóz strażacki (src/Woz3D.tsx) */}
+      <group position={[-0.55, 0, -0.05 + wyjazd * 2.2]} scale={0.57}>
+        <WozStrazacki t={t} droga={wyjazd * 2.2 / 0.57} />
       </group>
     </group>
   );
@@ -428,7 +345,8 @@ const Monety: React.FC<{ t: number; c: ReturnType<typeof czasy> }> = ({ t, c }) 
       {stosy.map((p, s) =>
         Array.from({ length: wysokosci[s] }, (_, i) => {
           const kiedy = c.dostawac + s * 0.25 + i * 0.07;
-          const w = interpolate(t, [kiedy, kiedy + 0.35], [0, 1], { ...Z, easing: Easing.out(Easing.cubic) });
+          // dwie dolne monety każdego stosu leżą od początku, reszta spada na „1,5%”
+          const w = i < 2 ? 1 : interpolate(t, [kiedy, kiedy + 0.35], [0, 1], { ...Z, easing: Easing.out(Easing.cubic) });
           if (w <= 0) return null;
           return (
             <mesh key={`${s}-${i}`} position={[p[0] + Math.sin(i * 7.7) * 0.015, 0.03 + i * 0.062 + (1 - w) * 0.9, p[2]]} castShadow receiveShadow>
@@ -546,6 +464,7 @@ const Swiat: React.FC<{ sceny: ScenaOSP[]; t: number; tx: TeksturyStolu; ts: Tek
   return (
     <>
       <Kamera sceny={sceny} t={t} />
+      <Otoczenie sila={0.45} />
       <color attach="background" args={[MARKA.tlo]} />
       <fog attach="fog" args={[MARKA.tlo, 42, 95]} />
       <ambientLight intensity={1.0} color="#9aa0b8" />
@@ -575,7 +494,7 @@ const Swiat: React.FC<{ sceny: ScenaOSP[]; t: number; tx: TeksturyStolu; ts: Tek
       <Monety t={t} c={c} />
       <Protokol t={t} c={c} tx={tx} />
       <Gmina t={t} c={c} tx={tx} />
-      <Helm pozycja={[-3.0, 0.06, 0.3]} obrot={0.3} />
+      <Helm pozycja={[-3.0, 0.06, 0.3]} obrot={0.75} />
       <Dlugopis pozycja={[1.7, 0.1, 4.6]} obrot={0.9} />
     </>
   );

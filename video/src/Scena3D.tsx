@@ -154,26 +154,59 @@ export const Segregator: React.FC<{ otwarcie: number; blask: number; t: Tekstury
   );
 };
 
-export const Helm: React.FC<{ pozycja?: [number, number, number]; obrot?: number }> = ({ pozycja = [2.05, 0.06, -1.25], obrot = 0.7 }) => (
-  <group position={pozycja} rotation={[0, obrot, 0]}>
-    <mesh position={[0, 0.02, 0]} scale={[1, 1, 1.18]} castShadow receiveShadow>
-      <cylinderGeometry args={[0.72, 0.78, 0.04, 48]} />
-      <meshStandardMaterial color="#9E1E16" roughness={0.35} />
-    </mesh>
-    <mesh position={[0, 0.04, 0]} scale={[1, 1.15, 1.12]} castShadow>
-      <sphereGeometry args={[0.55, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2]} />
-      <meshStandardMaterial color="#C0392B" roughness={0.28} metalness={0.1} />
-    </mesh>
-    <mesh position={[0, 0.04, 0]} rotation={[0, Math.PI / 2, 0]} scale={[1.12, 1.15, 1]}>
-      <torusGeometry args={[0.56, 0.05, 12, 48, Math.PI]} />
-      <meshStandardMaterial color="#8E1A13" roughness={0.3} />
-    </mesh>
-    <mesh position={[0, 0.3, 0.6]} rotation={[-0.5, 0, 0]}>
-      <cylinderGeometry args={[0.13, 0.13, 0.02, 32]} />
-      <meshStandardMaterial color={MARKA.zloto} metalness={0.8} roughness={0.3} />
-    </mesh>
-  </group>
-);
+// Hełm strażacki (nowoczesny kształt): skorupa z grzebieniem, złota przyłbica, pasy odblaskowe, osłona karku
+export const Helm: React.FC<{ pozycja?: [number, number, number]; obrot?: number }> = ({ pozycja = [2.05, 0.06, -1.25], obrot = 0.7 }) => {
+  const m = useMemo(
+    () => ({
+      skorupa: new THREE.MeshPhysicalMaterial({ color: "#C3170F", roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.08 }),
+      guma: new THREE.MeshStandardMaterial({ color: "#16171A", roughness: 0.8 }),
+      odblask: new THREE.MeshStandardMaterial({ color: "#E8EAEE", roughness: 0.3, metalness: 0.6, emissive: "#ffffff", emissiveIntensity: 0.12 }),
+      przylbica: new THREE.MeshPhysicalMaterial({ color: "#E2B24A", metalness: 0.55, roughness: 0.12, clearcoat: 1, emissive: "#9A6E14", emissiveIntensity: 0.55, transparent: true, opacity: 0.92, side: THREE.DoubleSide }),
+      zloto: new THREE.MeshStandardMaterial({ color: MARKA.zloto, metalness: 0.85, roughness: 0.25 }),
+    }),
+    [],
+  );
+  const S: [number, number, number] = [1, 1.08, 1.22];
+  return (
+    <group position={pozycja} rotation={[0, obrot, 0]}>
+      {/* skorupa */}
+      <mesh position={[0, 0.16, 0]} scale={S} material={m.skorupa} castShadow receiveShadow>
+        <sphereGeometry args={[0.55, 64, 32, 0, Math.PI * 2, 0, Math.PI / 2]} />
+      </mesh>
+      {/* grzebień */}
+      <mesh position={[0, 0.16, 0]} rotation={[0, Math.PI / 2, 0]} scale={[S[2], S[1], 1]} material={m.skorupa} castShadow>
+        <torusGeometry args={[0.555, 0.035, 12, 64, Math.PI]} />
+      </mesh>
+      {/* pasy odblaskowe */}
+      {[0.32, 0.5].map((k) => (
+        <mesh key={k} position={[0, 0.16, 0]} scale={S} material={m.odblask}>
+          <sphereGeometry args={[0.553, 64, 2, 0, Math.PI * 2, Math.PI / 2 - k - 0.035, 0.035]} />
+        </mesh>
+      ))}
+      {/* gumowy brzeg */}
+      <mesh position={[0, 0.16, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[S[0], S[2], 1]} material={m.guma}>
+        <torusGeometry args={[0.55, 0.028, 10, 64]} />
+      </mesh>
+      {/* osłona karku z tyłu */}
+      <mesh position={[0, 0.16, 0]} scale={S} material={m.guma}>
+        <sphereGeometry args={[0.56, 48, 6, Math.PI * 1.14, Math.PI * 0.72, Math.PI / 2, 0.22]} />
+      </mesh>
+      {/* złota przyłbica z przodu */}
+      <mesh position={[0, 0.17, 0.02]} scale={S} material={m.przylbica}>
+        <sphereGeometry args={[0.585, 48, 12, Math.PI * 0.2, Math.PI * 0.6, Math.PI / 2 - 0.14, 0.4]} />
+      </mesh>
+      {/* emblemat */}
+      <mesh position={[0, 0.48, 0.6]} rotation={[-0.75, 0, 0]} material={m.zloto}>
+        <cylinderGeometry args={[0.085, 0.085, 0.015, 32]} />
+      </mesh>
+      {/* pasek pod brodę */}
+      <mesh position={[0, 0.02, 0.05]} rotation={[0, 0, 0]} scale={[1, 0.25, 1.1]} material={m.guma}>
+        <torusGeometry args={[0.42, 0.012, 6, 40, Math.PI]} />
+      </mesh>
+    </group>
+  );
+};
+
 
 export const Dlugopis: React.FC<{ pozycja?: [number, number, number]; obrot?: number }> = ({ pozycja = [1.15, 0.1, 0.55], obrot = 0.5 }) => (
   <group position={pozycja} rotation={[0, obrot, Math.PI / 2]}>
