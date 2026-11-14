@@ -85,11 +85,18 @@ SMTP_PORT = int(os.environ.get("EUREKA_SMTP_PORT", "465"))
 SMTP_UZYTKOWNIK = os.environ.get("EUREKA_SMTP_UZYTKOWNIK", "")   # adres konta Gmail, z którego wysyłamy
 SMTP_HASLO = os.environ.get("EUREKA_SMTP_HASLO", "")             # HASŁO APLIKACJI Google (nie zwykłe hasło)
 MAIL_DO = [a.strip() for a in os.environ.get("EUREKA_MAIL_DO", "").split(",") if a.strip()]
+# Osobni odbiorcy raportu ESTOŃSKIEGO CIT. Gdy ustawione, bot wysyła dwa maile:
+# ulgi -> EUREKA_MAIL_DO, estoński CIT -> EUREKA_MAIL_DO_ESTONSKI.
+# Gdy puste, jak dotąd: jeden wspólny mail na EUREKA_MAIL_DO.
+MAIL_DO_ESTONSKI = [a.strip() for a in os.environ.get("EUREKA_MAIL_DO_ESTONSKI", "").split(",") if a.strip()]
 
 # Cel rclone, np. "gdrive:EUREKA" (nazwa zdalnego z `rclone config` + folder na Dysku).
 RCLONE_CEL = os.environ.get("EUREKA_RCLONE_CEL", "")
 # Link do folderu na Dysku — tylko do wstawienia w treść maila.
 DRIVE_LINK = os.environ.get("EUREKA_DRIVE_LINK", "")
+# Opcjonalnie link do samego folderu „Estoński CIT” na Dysku (do maila estońskiego);
+# gdy pusty, w mailu estońskim jest EUREKA_DRIVE_LINK.
+DRIVE_LINK_ESTONSKI = os.environ.get("EUREKA_DRIVE_LINK_ESTONSKI", "")
 
 # ---------------------------------------------------------------------------
 # TRYB PRACY

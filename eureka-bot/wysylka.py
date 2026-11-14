@@ -18,14 +18,15 @@ from pathlib import Path
 import config
 
 
-def wyslij_mail(temat: str, tresc_html: str, zalaczniki: list[Path]) -> bool:
-    if not (config.SMTP_UZYTKOWNIK and config.SMTP_HASLO and config.MAIL_DO):
-        print("Mail: pominięto (brak EUREKA_SMTP_UZYTKOWNIK / EUREKA_SMTP_HASLO / EUREKA_MAIL_DO).")
+def wyslij_mail(temat: str, tresc_html: str, zalaczniki: list[Path], odbiorcy: list[str] | None = None) -> bool:
+    odbiorcy = odbiorcy if odbiorcy is not None else config.MAIL_DO
+    if not (config.SMTP_UZYTKOWNIK and config.SMTP_HASLO and odbiorcy):
+        print("Mail: pominięto (brak EUREKA_SMTP_UZYTKOWNIK / EUREKA_SMTP_HASLO / adresu odbiorcy).")
         return False
     wiadomosc = EmailMessage()
     wiadomosc["Subject"] = temat
     wiadomosc["From"] = config.SMTP_UZYTKOWNIK
-    wiadomosc["To"] = ", ".join(config.MAIL_DO)
+    wiadomosc["To"] = ", ".join(odbiorcy)
     wiadomosc.set_content("Raport EUREKA — otwórz wiadomość w wersji HTML albo załączone pliki Excel.")
     wiadomosc.add_alternative(tresc_html, subtype="html")
     for sciezka in zalaczniki:
@@ -36,7 +37,7 @@ def wyslij_mail(temat: str, tresc_html: str, zalaczniki: list[Path]) -> bool:
         with smtplib.SMTP_SSL(config.SMTP_HOST, config.SMTP_PORT, timeout=60) as smtp:
             smtp.login(config.SMTP_UZYTKOWNIK, config.SMTP_HASLO)
             smtp.send_message(wiadomosc)
-        print(f"Mail: wysłano do {', '.join(config.MAIL_DO)}.")
+        print(f"Mail: wysłano do {', '.join(odbiorcy)}.")
         return True
     except (smtplib.SMTPException, OSError) as e:
         print(f"Mail: BŁĄD wysyłki: {e}")

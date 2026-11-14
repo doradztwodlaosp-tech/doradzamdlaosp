@@ -170,12 +170,14 @@ def zapisz_raporty(wynik: dict) -> list[Path]:
 # ===========================================================================
 # MAIL
 # ===========================================================================
-def temat_maila(wynik: dict) -> str:
-    u, e = _grupa(wynik, "ulgi"), _grupa(wynik, "estonski_cit")
+def temat_maila(wynik: dict, grupy: tuple[str, ...] = ("ulgi", "estonski_cit")) -> str:
     znacznik = "" if wynik["status"] == "sukces" else f"[{STATUSY.get(wynik['status'], wynik['status'])}] "
-    return (f"{znacznik}EUREKA {date.today().isoformat()}: ulgi {len(u['pobrano'])} potwierdzonych"
-            f" (+{len(u['do_weryfikacji'])} do weryf.), estoński CIT {len(e['pobrano'])}"
-            f" (+{len(e['do_weryfikacji'])} do weryf.)")
+    czesci = []
+    for grupa, nazwa in (("ulgi", "ulgi"), ("estonski_cit", "estoński CIT")):
+        if grupa in grupy:
+            g = _grupa(wynik, grupa)
+            czesci.append(f"{nazwa} {len(g['pobrano'])} potwierdzonych (+{len(g['do_weryfikacji'])} do weryf.)")
+    return f"{znacznik}EUREKA {date.today().isoformat()}: " + ", ".join(czesci)
 
 
 def _blok(w: dict) -> str:
@@ -187,18 +189,25 @@ def _blok(w: dict) -> str:
             f"<div style='margin:6px 0 0 10px;padding:6px 10px;border-left:3px solid #ccc;font-size:90%'>{s}</div></li>")
 
 
-def tresc_maila_html(wynik: dict, drive_ok: bool | None) -> str:
+def tresc_maila_html(wynik: dict, drive_ok: bool | None,
+                     grupy: tuple[str, ...] = ("estonski_cit", "ulgi"), drive_link: str | None = None) -> str:
     l = wynik["licznik"]
-    czesci = [f"<h2>EUREKA — raport z biegu #{wynik['bieg_id']}</h2>",
+    tytul = "EUREKA" if len(grupy) > 1 else f"EUREKA — {GRUPY[grupy[0]]}"
+    czesci = [f"<h2>{tytul} — raport z biegu #{wynik['bieg_id']}</h2>",
               f"<p><b>Status:</b> {escape(STATUSY.get(wynik['status'], wynik['status']))}<br>"
-              f"<b>Okno dat wydania:</b> {wynik['od']} .. {wynik['do']}<br>"
-              f"<b>Nowych znalezionych:</b> {l['znaleziono']} — potwierdzonych {l['potwierdzone']}, "
-              f"do weryfikacji {l['do_weryfikacji']}, odrzuconych bez pobierania {l['odrzucone']}, "
-              f"błędów {l['bledy']}</p>"]
+              f"<b>Okno dat wydania:</b> {wynik['od']} .. {wynik['do']}<br>"]
+    if len(grupy) > 1:
+        czesci[-1] += (f"<b>Nowych znalezionych:</b> {l['znaleziono']} — potwierdzonych {l['potwierdzone']}, "
+                       f"do weryfikacji {l['do_weryfikacji']}, odrzuconych bez pobierania {l['odrzucone']}, "
+                       f"błędów {l['bledy']}</p>")
+    else:
+        g = _grupa(wynik, grupy[0])
+        czesci[-1] += (f"<b>{GRUPY[grupy[0]]}:</b> potwierdzonych {len(g['pobrano'])}, do weryfikacji "
+                       f"{len(g['do_weryfikacji'])}, odrzuconych bez pobierania {len(g['odrzucona'])}</p>")
     if wynik.get("komunikat"):
         czesci.append(f"<p style='color:#b00'><b>Uwaga:</b> {escape(wynik['komunikat'])}</p>")
 
-    for grupa in ("estonski_cit", "ulgi"):
+    for grupa in grupy:
         g = _grupa(wynik, grupa)
         czesci.append(f"<h3>{GRUPY[grupa]}: {len(g['pobrano'])} potwierdzonych, "
                       f"{len(g['do_weryfikacji'])} do weryfikacji</h3>")
@@ -214,8 +223,9 @@ def tresc_maila_html(wynik: dict, drive_ok: bool | None) -> str:
             czesci.append(f"<p><small>Odrzuconych bez pobierania: {len(g['odrzucona'])} — lista w Excelu "
                           f"(arkusz „Odrzucone (bez PDF)”).</small></p>")
 
-    if drive_ok is True and config.DRIVE_LINK:
-        czesci.append(f"<p>Pliki PDF i raporty: <a href='{escape(config.DRIVE_LINK)}'>folder na Dysku Google</a></p>")
+    link = drive_link or config.DRIVE_LINK
+    if drive_ok is True and link:
+        czesci.append(f"<p>Pliki PDF i raporty: <a href='{escape(link)}'>folder na Dysku Google</a></p>")
     elif drive_ok is False:
         czesci.append("<p style='color:#b00'>Wysyłka na Dysk Google nie powiodła się — pliki są na serwerze.</p>")
     return "\n".join(czesci)

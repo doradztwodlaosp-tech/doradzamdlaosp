@@ -59,8 +59,12 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.test_maila:
-        ok = wysylka.wyslij_mail("EUREKA — mail testowy",
-                                 "<p>Konfiguracja wysyłki działa.</p>", [])
+        ok = wysylka.wyslij_mail("EUREKA — mail testowy (ulgi)",
+                                 "<p>Konfiguracja wysyłki działa. Tu przychodzą raporty ulg.</p>", [])
+        if config.MAIL_DO_ESTONSKI:
+            ok = wysylka.wyslij_mail("EUREKA — mail testowy (estoński CIT)",
+                                     "<p>Konfiguracja wysyłki działa. Tu przychodzą raporty estońskiego CIT.</p>",
+                                     [], config.MAIL_DO_ESTONSKI) and ok
         return 0 if ok else 1
 
     if args.tylko_raport:
@@ -121,7 +125,18 @@ def _raporty_i_wysylka(wynik: dict, bez_wysylki: bool) -> int:
         print(f"Raport: {s}")
     if not bez_wysylki:
         drive_ok = wysylka.synchronizuj_dysk()
-        wysylka.wyslij_mail(reports.temat_maila(wynik), reports.tresc_maila_html(wynik, drive_ok), sciezki)
+        xlsx_ulgi, xlsx_est, txt_ulgi, txt_est = sciezki
+        if config.MAIL_DO_ESTONSKI:
+            # Dwa maile: ulgi na EUREKA_MAIL_DO, estoński CIT na EUREKA_MAIL_DO_ESTONSKI.
+            wysylka.wyslij_mail(reports.temat_maila(wynik, ("ulgi",)),
+                                reports.tresc_maila_html(wynik, drive_ok, ("ulgi",)),
+                                [xlsx_ulgi, txt_ulgi], config.MAIL_DO)
+            wysylka.wyslij_mail(reports.temat_maila(wynik, ("estonski_cit",)),
+                                reports.tresc_maila_html(wynik, drive_ok, ("estonski_cit",),
+                                                         config.DRIVE_LINK_ESTONSKI or None),
+                                [xlsx_est, txt_est], config.MAIL_DO_ESTONSKI)
+        else:
+            wysylka.wyslij_mail(reports.temat_maila(wynik), reports.tresc_maila_html(wynik, drive_ok), sciezki)
     return 0
 
 

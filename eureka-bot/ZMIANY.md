@@ -35,6 +35,14 @@ robi streszczenia i wysyła raport na Gmaila, a pliki na Dysk Google.
    Do weryfikacji / Odrzucone (bez PDF) / Błędy, ze streszczeniami) i czytelny plik
    `STRESZCZENIA_*.txt`. Mail ze streszczeniami i załącznikami, pliki na Dysk (rclone).
 
+## Maile
+- `EUREKA_MAIL_DO` — odbiorcy raportu **ulg**.
+- `EUREKA_MAIL_DO_ESTONSKI` — odbiorcy raportu **estońskiego CIT**. Gdy ustawione, z każdego
+  biegu wychodzą dwa maile (każdy ze swoimi streszczeniami i swoim Excelem). Gdy puste —
+  jeden wspólny mail na `EUREKA_MAIL_DO`, jak wcześniej.
+- `EUREKA_DRIVE_LINK_ESTONSKI` (opcjonalnie) — link do samego folderu „Estoński CIT” w mailu estońskim.
+- Pliki na Dysku bez zmian (folder „Estoński CIT” jak dotąd).
+
 ## Foldery
 ```
 eureka-dane/

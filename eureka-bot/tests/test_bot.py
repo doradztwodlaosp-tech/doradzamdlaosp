@@ -278,5 +278,43 @@ class TestBieg(unittest.TestCase):
         self.assertTrue(all(s.exists() for s in reports.zapisz_raporty(w)))
 
 
+    def test_5_estonski_cit_na_osobny_adres(self):
+        import main
+        import wysylka
+        w = main.wynik_z_rejestru(1)
+        wyslane = []
+        with mock.patch.object(wysylka, "synchronizuj_dysk", lambda: True), \
+             mock.patch.object(wysylka, "wyslij_mail",
+                               lambda temat, html, zal, odbiorcy=None: wyslane.append((temat, html, zal, odbiorcy)) or True), \
+             mock.patch.object(config, "MAIL_DO", ["ulgi@example.com"]), \
+             mock.patch.object(config, "MAIL_DO_ESTONSKI", ["estonski@example.com"]):
+            main._raporty_i_wysylka(w, bez_wysylki=False)
+        self.assertEqual(len(wyslane), 2)
+        (t_u, h_u, z_u, o_u), (t_e, h_e, z_e, o_e) = wyslane
+        self.assertEqual(o_u, ["ulgi@example.com"])
+        self.assertEqual(o_e, ["estonski@example.com"])
+        self.assertIn("ulgi", t_u); self.assertNotIn("estoński", t_u)
+        self.assertIn("estoński CIT", t_e); self.assertNotIn("ulgi", t_e)
+        self.assertTrue(all("ulgi" in z.name for z in z_u))
+        self.assertTrue(all("estonski_cit" in z.name for z in z_e))
+        self.assertIn("ID201", "".join(open(z, encoding="utf-8", errors="ignore").read() for z in z_u if z.suffix == ".txt"))
+        self.assertNotIn("Estoński CIT:", h_u)   # mail ulg nie zawiera sekcji estońskiej
+        self.assertNotIn("Ulgi podatkowe:", h_e)  # mail estoński nie zawiera sekcji ulg
+
+    def test_6_bez_osobnego_adresu_jeden_wspolny_mail(self):
+        import main
+        import wysylka
+        w = main.wynik_z_rejestru(1)
+        wyslane = []
+        with mock.patch.object(wysylka, "synchronizuj_dysk", lambda: True), \
+             mock.patch.object(wysylka, "wyslij_mail",
+                               lambda temat, html, zal, odbiorcy=None: wyslane.append((temat, zal, odbiorcy)) or True), \
+             mock.patch.object(config, "MAIL_DO_ESTONSKI", []):
+            main._raporty_i_wysylka(w, bez_wysylki=False)
+        self.assertEqual(len(wyslane), 1)
+        self.assertIn("ulgi", wyslane[0][0]); self.assertIn("estoński CIT", wyslane[0][0])
+        self.assertEqual(len(wyslane[0][1]), 4)
+
+
 if __name__ == "__main__":
     unittest.main()
