@@ -6,6 +6,7 @@ import { AbsoluteFill, Easing, continueRender, delayRender, interpolate, spring,
 import { FONT, MARKA } from "./marka";
 import { Otoczenie, WozStrazacki } from "./Woz3D";
 import { BudynekRemizy } from "./Remiza3D";
+import { RYSUNEK, SiatkaKreslarska, TrybRysunku } from "./Rysunek3D";
 import { LaptopPro, StosDokumentow, StosyMonet, useBlat } from "./Przedmioty3D";
 import { Dlugopis, Helm, Segregator, type Tekstury, useTekstury } from "./Scena3D";
 import { type ScenaOSP, czasSlowa } from "./typy";
@@ -275,7 +276,7 @@ const Tabliczka: React.FC<{ t: number; c: ReturnType<typeof czasy>; tx: Tekstury
         <boxGeometry args={[2.4, 0.62, 0.06]} />
         <meshStandardMaterial color="#1C1D23" roughness={0.4} />
       </mesh>
-      <mesh position={[0, 0.42, 0.056]} rotation={[-0.22, 0, 0]}>
+      <mesh userData={{ tekst: true }} position={[0, 0.42, 0.056]} rotation={[-0.22, 0, 0]}>
         <planeGeometry args={[2.36, 0.59]} />
         <meshStandardMaterial map={tx.tabliczka} roughness={0.35} metalness={0.15} emissive="#ffffff" emissiveMap={tx.tabliczka} emissiveIntensity={0.08 + 0.22 * blask} />
       </mesh>
@@ -296,12 +297,12 @@ const Protokol: React.FC<{ t: number; c: ReturnType<typeof czasy>; tx: TeksturyS
         <boxGeometry args={[1.3, 0.012, 1.8]} />
         <meshStandardMaterial color="#E7DFCC" roughness={0.95} />
       </mesh>
-      <mesh position={[0, 0.0195, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh userData={{ tekst: true }} position={[0, 0.0195, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[1.28, 1.77]} />
         <meshStandardMaterial map={tx.protokol} roughness={0.9} />
       </mesh>
       {st > 0 ? (
-        <mesh position={[0.05, 0.022 + (1 - st) * 0.8, 0.1]} rotation={[-Math.PI / 2, 0, -0.18]} scale={1 + (1 - st) * 0.5}>
+        <mesh userData={{ bezRysunku: true }} position={[0.05, 0.022 + (1 - st) * 0.8, 0.1]} rotation={[-Math.PI / 2, 0, -0.18]} scale={1 + (1 - st) * 0.5}>
           <planeGeometry args={[1.05, 0.385]} />
           <meshBasicMaterial map={tx.pieczec} transparent opacity={0.92 * st} depthWrite={false} />
         </mesh>
@@ -383,7 +384,7 @@ const Gmina: React.FC<{ t: number; c: ReturnType<typeof czasy>; tx: TeksturyStol
   );
 };
 
-const Swiat: React.FC<{ sceny: ScenaOSP[]; t: number; tx: TeksturyStolu; ts: Tekstury }> = ({ sceny, t, tx, ts }) => {
+const Swiat: React.FC<{ sceny: ScenaOSP[]; t: number; tx: TeksturyStolu; ts: Tekstury; rysunek?: boolean }> = ({ sceny, t, tx, ts, rysunek }) => {
   const c = czasy(sceny);
   const blat = useBlat();
   const otw = c.otwarty ? interpolate(t, [c.otwarcie, c.otwarcie + 2.0], [0, 1], { ...Z, easing: Easing.bezier(0.55, 0, 0.25, 1) }) : 0;
@@ -392,8 +393,10 @@ const Swiat: React.FC<{ sceny: ScenaOSP[]; t: number; tx: TeksturyStolu; ts: Tek
     <>
       <Kamera sceny={sceny} t={t} />
       <Otoczenie sila={0.6} />
-      <color attach="background" args={[TLO_POKOJU]} />
-      <fog attach="fog" args={[TLO_POKOJU, 30, 75]} />
+      <color attach="background" args={[rysunek ? RYSUNEK.tlo : TLO_POKOJU]} />
+      <fog attach="fog" args={[rysunek ? RYSUNEK.tlo : TLO_POKOJU, 30, 75]} />
+      {rysunek ? <TrybRysunku /> : null}
+      {rysunek ? <SiatkaKreslarska /> : null}
       <ambientLight intensity={0.9} color="#B8B0A4" />
       <directionalLight position={[-6, 9, 12]} intensity={1.1} color="#FFE6C4" />
       <hemisphereLight args={["#ffe2b0", "#15161B", 1.1]} />
@@ -410,7 +413,7 @@ const Swiat: React.FC<{ sceny: ScenaOSP[]; t: number; tx: TeksturyStolu; ts: Tek
         shadow-bias={-0.0004}
       />
       <pointLight position={[-7, 3, -5]} intensity={10} color={MARKA.zloto} />
-      <mesh position={[0, -0.05, 0]} receiveShadow>
+      <mesh position={[0, -0.05, 0]} receiveShadow visible={!rysunek}>
         <boxGeometry args={[60, 0.1, 40]} />
         <meshStandardMaterial map={blat} roughness={0.62} />
       </mesh>
@@ -479,7 +482,7 @@ const Licznik: React.FC<{ t: number; od: number; do: number }> = ({ t, od, do: k
   );
 };
 
-export const StolOSP: React.FC<PropsMapy> = ({ sceny, klatkaStartu }) => {
+export const StolOSP: React.FC<PropsMapy> = ({ sceny, klatkaStartu, wyglad }) => {
   const frame = useCurrentFrame();
   const { fps, width, height } = useVideoConfig();
   const t = (klatkaStartu + frame) / fps;
@@ -492,7 +495,7 @@ export const StolOSP: React.FC<PropsMapy> = ({ sceny, klatkaStartu }) => {
     <AbsoluteFill style={{ opacity: klatkaStartu === 0 ? 1 : wejscie }}>
       {tx && ts ? (
         <ThreeCanvas width={width} height={height} shadows camera={{ fov: 32, near: 0.1, far: 120 }} gl={{ antialias: true }}>
-          <Swiat sceny={sceny} t={t} tx={tx} ts={ts} />
+          <Swiat sceny={sceny} t={t} tx={tx} ts={ts} rysunek={wyglad === "rysunek"} />
         </ThreeCanvas>
       ) : null}
       

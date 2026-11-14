@@ -131,7 +131,7 @@ export const StosDokumentow: React.FC<{ t: number; stos: number; pozycja: [numbe
         if (spad <= 0) return null;
         const mat = [m.krawedz, m.krawedz, m.tekstury[k.wariant], m.krawedz, m.krawedz, m.krawedz];
         return (
-          <mesh
+          <mesh userData={{ tekst: true }}
             key={i}
             position={[k.dx, 0.03 + i * 0.019 + (1 - spad) * 1.6, k.dz]}
             rotation={[k.pochyl * spad, k.obrot + (1 - spad) * 0.7, k.pochyl * 0.6 * spad + (1 - spad) * 0.2]}
@@ -211,7 +211,7 @@ export const LaptopPro: React.FC<{ otwarcie: number; ekran: THREE.Texture; pozyc
           <planeGeometry args={[1.66, 1.08]} />
           <meshStandardMaterial color="#0B0C0F" roughness={0.15} metalness={0.3} />
         </mesh>
-        <mesh position={[0, 0.575, 0.001]}>
+        <mesh userData={{ tekst: true }} position={[0, 0.575, 0.001]}>
           <planeGeometry args={[1.56, 0.97]} />
           <meshBasicMaterial map={ekran} toneMapped={false} />
         </mesh>
@@ -288,6 +288,7 @@ export const StosyMonet: React.FC<{ t: number; od: number; pozycja: [number, num
               position={[p[0] + (los(i + s * 20) - 0.5) * 0.03, 0.03 + i * 0.062 + (1 - w) * 0.9, p[1] + (los(i + s * 40) - 0.5) * 0.03]}
               rotation={[0, los(i * 3 + s) * 6, 0]}
               material={mat}
+              userData={{ zloty: true }}
               castShadow
               receiveShadow
             >
@@ -297,7 +298,7 @@ export const StosyMonet: React.FC<{ t: number; od: number; pozycja: [number, num
         }),
       )}
       {/* moneta oparta o stos */}
-      <mesh position={[1.05, 0.22, -0.2]} rotation={[0.2, 0.6, 1.2]} material={mat} castShadow>
+      <mesh position={[1.05, 0.22, -0.2]} rotation={[0.2, 0.6, 1.2]} material={mat} userData={{ zloty: true }} castShadow>
         <cylinderGeometry args={[0.26, 0.26, 0.055, 48]} />
       </mesh>
       <pointLight position={[0, 1.6, 1.2]} intensity={3} distance={4} color={MARKA.zloto} />

@@ -1310,5 +1310,6 @@
   ],
   "szkic": "Czasy szacunkowe (bez lektora). Po dodaniu lektor.mp3 uruchom: npm run czasy -- kim-jestesmy",
   "styl": "makieta",
-  "hakPostac": false
+  "hakPostac": false,
+  "wyglad3d": "rysunek"
 }

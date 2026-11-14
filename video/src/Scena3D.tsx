@@ -132,7 +132,7 @@ export const Segregator: React.FC<{ otwarcie: number; blask: number; t: Tekstury
         <meshStandardMaterial color="#23252D" roughness={0.6} />
       </mesh>
       {/* blok kartek */}
-      <mesh position={[0.02, 0.13, 0]} castShadow receiveShadow material={stronaMat}>
+      <mesh userData={{ tekst: true }} position={[0.02, 0.13, 0]} castShadow receiveShadow material={stronaMat}>
         <boxGeometry args={[SZ - 0.1, 0.2, GL - 0.1]} />
       </mesh>
       {/* podkreślenie paragrafu */}
@@ -146,7 +146,7 @@ export const Segregator: React.FC<{ otwarcie: number; blask: number; t: Tekstury
       </mesh>
       {/* przednia okładka na zawiasie przy grzbiecie */}
       <group position={[-SZ / 2, 0.27, 0]} rotation={[0, 0, otwarcie * Math.PI * 0.96]}>
-        <mesh position={[SZ / 2, 0.015, 0]} castShadow receiveShadow material={okladkaMat}>
+        <mesh userData={{ tekst: true }} position={[SZ / 2, 0.015, 0]} castShadow receiveShadow material={okladkaMat}>
           <boxGeometry args={[SZ, 0.03, GL]} />
         </mesh>
       </group>
