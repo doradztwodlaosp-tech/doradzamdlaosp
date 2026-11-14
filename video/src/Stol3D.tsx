@@ -54,7 +54,7 @@ const kluczeKamery = (sceny: ScenaOSP[]): KluczKamery[] => {
     (s.ujeciaKamery ?? []).forEach((u) => {
       const z = STACJE[u.kamera ?? ""] ?? baza;
       const st: Stacja = { cel: u.cel ?? z.cel, kat: u.kat ?? z.kat, odl: u.odl ?? z.odl, wys: u.wys ?? z.wys };
-      k.push({ t: (czasSlowa(s, u.slowo) ?? s.start) - 0.25, st, dur: 1.1 });
+      k.push({ t: (czasSlowa(s, u.slowo) ?? s.start) - 0.25, st, dur: 1.7 });
     });
   });
   return k.sort((a, b) => a.t - b.t);

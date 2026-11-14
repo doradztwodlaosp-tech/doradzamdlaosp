@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import {
+import { Easing,
   AbsoluteFill,
   CalculateMetadataFunction,
   Img,
@@ -210,7 +210,7 @@ const Emblemat: React.FC<{ dane: Odcinek }> = ({ dane }) => {
   if (!scena || scena.plansza || scena.studio) return null;
   const w = interpolate(t, [(dane.wstep ?? 0) - 0.2, (dane.wstep ?? 0) + 0.4], [0, 1], ZAKRES);
   return (
-    <div style={{ position: "absolute", top: 1376, left: KOLUMNA.lewo, width: KOLUMNA.szer, display: "flex", justifyContent: "center", opacity: w }}>
+    <div style={{ position: "absolute", top: 1360, left: 0, width: 1080, display: "flex", justifyContent: "center", opacity: w }}>
       {dane.emblemat ? (
         <Img src={staticFile(dane.emblemat)} style={{ height: 52 }} />
       ) : (
@@ -222,13 +222,13 @@ const Emblemat: React.FC<{ dane: Odcinek }> = ({ dane }) => {
             background: MARKA.tlo,
             border: `1.5px solid ${MARKA.zloto}`,
             borderRadius: 999,
-            padding: "6px 18px 6px 12px",
+            padding: "10px 28px 10px 20px",
             fontFamily: FONT,
             boxShadow: "0 6px 18px rgba(0,0,0,0.25)",
           }}
         >
-          <span style={{ color: MARKA.zloto, fontWeight: 800, fontSize: 30, lineHeight: 1 }}>§</span>
-          <span style={{ color: MARKA.bialy, fontWeight: 700, fontSize: 19, letterSpacing: 2.5 }}>DORADZTWO DLA OSP</span>
+          <span style={{ color: MARKA.zloto, fontWeight: 800, fontSize: 44, lineHeight: 1 }}>§</span>
+          <span style={{ color: MARKA.bialy, fontWeight: 800, fontSize: 28, letterSpacing: 3.5 }}>DORADZTWO DLA OSP</span>
         </div>
       )}
     </div>
@@ -256,7 +256,9 @@ const ZnacznikCzesci: React.FC<{ dane: Odcinek; jasny?: boolean }> = ({ dane, ja
       style={{
         position: "absolute",
         top: 182,
-        left: KOLUMNA.lewo,
+        left: 0,
+        width: 1080,
+        justifyContent: "center",
         display: "flex",
         alignItems: "baseline",
         gap: 18,
@@ -294,17 +296,16 @@ const HaslaScen: React.FC<{ dane: Odcinek; jasny: boolean }> = ({ dane, jasny })
             key={i}
             style={{
               position: "absolute",
-              top: 255,
-              left: KOLUMNA.lewo,
-              width: KOLUMNA.szer,
+              top: 300,
+              left: 110,
+              width: 860,
               fontFamily: FONT,
               fontWeight: 800,
               fontSize: rozmiar,
               lineHeight: 1.12,
-              textAlign: studio ? "center" : "left",
+              textAlign: "center",
               color: jasny ? "#23242A" : MARKA.bialy,
               opacity: w,
-              transform: `translateY(${(1 - wej) * 18}px)`,
               textWrap: "balance",
             }}
           >
@@ -463,14 +464,14 @@ const Nadtytul: React.FC<{ tekst: string; jasny?: boolean }> = ({ tekst, jasny }
     style={{
       position: "absolute",
       top: U.nadtytulOdGory,
-      left: jasny ? KOLUMNA.lewo : SRODEK_X - SZEROKOSC_TRESCI / 2,
-      width: jasny ? KOLUMNA.szer : SZEROKOSC_TRESCI,
+      left: jasny ? 0 : SRODEK_X - SZEROKOSC_TRESCI / 2,
+      width: jasny ? 1080 : SZEROKOSC_TRESCI,
       textAlign: "center",
       fontFamily: FONT,
       fontWeight: 700,
-      fontSize: U.nadtytulRozmiar,
-      letterSpacing: 5,
-      color: jasny ? "#5A4A2A" : MARKA.nadtytul,
+      fontSize: jasny ? 42 : U.nadtytulRozmiar,
+      letterSpacing: jasny ? 7 : 5,
+      color: jasny ? "#A8781A" : MARKA.nadtytul,
       textTransform: "uppercase",
     }}
   >
@@ -767,6 +768,47 @@ const Hak: React.FC<{ linie: LiniaHasla[]; postac?: boolean }> = ({
 };
 
 // Plansza końcowa: nic na siebie nie nachodzi, wszystko w bezpiecznej strefie
+// Plansza końcowa w jasnej odsłonie marki: duża nazwa, hasło, prośba o obserwowanie i kontakt (bez maskotki)
+const PlanszaJasna: React.FC<NonNullable<Odcinek["plansza"]>> = ({ haslo, pigulka, kontakt, stopka }) => {
+  const frame = useCurrentFrame();
+  const tlo = interpolate(frame, [0, 12], [0, 1], ZAKRES);
+  const w = (od: number) => interpolate(frame, [od, od + 14], [0, 1], { ...ZAKRES, easing: Easing.out(Easing.cubic) });
+  const blok: React.CSSProperties = { position: "absolute", left: 90, width: 900, textAlign: "center", fontFamily: FONT };
+  const ZLOTO = "#A8781A";
+  return (
+    <AbsoluteFill style={{ backgroundColor: "#F2ECE1", opacity: tlo }}>
+      <AbsoluteFill style={{ background: "radial-gradient(ellipse 70% 45% at 50% 40%, #FBF8F2 0%, rgba(242,236,225,0) 75%)" }} />
+      {/* znak: złoty § w grafitowym kole */}
+      <div style={{ ...blok, top: 250, display: "flex", justifyContent: "center", opacity: w(2), transform: `scale(${0.9 + 0.1 * w(2)})` }}>
+        <div style={{ width: 150, height: 150, borderRadius: 75, background: MARKA.tlo, border: `4px solid ${MARKA.zloto}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <span style={{ color: MARKA.zloto, fontWeight: 800, fontSize: 100, lineHeight: 1, marginTop: 6 }}>§</span>
+        </div>
+      </div>
+      <div style={{ ...blok, top: 440, fontWeight: 800, fontSize: 104, lineHeight: 1.02, color: "#23242A", letterSpacing: 1, opacity: w(8) }}>
+        DORADZTWO
+        <br />
+        DLA <span style={{ color: ZLOTO }}>OSP</span>
+      </div>
+      <div style={{ ...blok, top: 690, width: 900, height: 4, display: "flex", justifyContent: "center", opacity: w(14) }}>
+        <div style={{ width: 160, height: 4, background: MARKA.zloto, borderRadius: 2 }} />
+      </div>
+      <div style={{ ...blok, top: 730, fontWeight: 700, fontSize: 50, lineHeight: 1.2, color: "#23242A", opacity: w(18) }}>
+        {haslo.map((l, i) => (
+          <span key={i} style={{ color: l.zloty ? ZLOTO : "#23242A" }}>
+            {l.tekst}{" "}
+          </span>
+        ))}
+      </div>
+      <div style={{ ...blok, top: 930, display: "flex", justifyContent: "center", opacity: w(26), transform: `translateY(${(1 - w(26)) * 12}px)` }}>
+        <div style={{ background: MARKA.tlo, color: MARKA.bialy, fontWeight: 800, fontSize: 40, borderRadius: 999, padding: "20px 46px", border: `3px solid ${MARKA.zloto}` }}>{pigulka}</div>
+      </div>
+      <div style={{ ...blok, top: 1080, fontWeight: 700, fontSize: 46, color: "#23242A", opacity: w(34) }}>{kontakt}</div>
+      <div style={{ ...blok, top: 1150, fontWeight: 700, fontSize: 40, color: ZLOTO, opacity: w(38) }}>{MARKA.adres}</div>
+      <div style={{ ...blok, top: 1330, fontWeight: 600, fontSize: 24, color: "#7A7468", opacity: w(42) }}>{stopka}</div>
+    </AbsoluteFill>
+  );
+};
+
 const Plansza: React.FC<NonNullable<Odcinek["plansza"]>> = ({
   haslo,
   pigulka,
@@ -1173,7 +1215,7 @@ export const RolkaOSP: React.FC<RolkaProps> = ({
         );
       })}
 
-      {dane.cta && scenaPytania && (
+      {dane.cta && scenaPytania && dane.napisy !== "haslo" && (
         <Sequence
           from={klatka(
             scenaPytania.telefon
@@ -1202,7 +1244,7 @@ export const RolkaOSP: React.FC<RolkaProps> = ({
 
       {dane.plansza && planszaOd !== null && (
         <Sequence from={planszaOd} layout="none">
-          <Plansza {...dane.plansza} />
+          {dane.wyglad3d === "jasny" ? <PlanszaJasna {...dane.plansza} /> : <Plansza {...dane.plansza} />}
         </Sequence>
       )}
 

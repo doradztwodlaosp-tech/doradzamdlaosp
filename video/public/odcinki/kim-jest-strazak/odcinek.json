@@ -2,7 +2,7 @@
   "tytul": "Strażak ochotnik. Kim jest w świetle prawa?",
   "nadtytul": "DORADZTWO DLA OSP",
   "glos": "lektor.mp3",
-  "maskotka": true,
+  "maskotka": false,
   "hakPostac": false,
   "styl": "makieta",
   "wyglad3d": "jasny",
@@ -23,18 +23,15 @@
   "plansza": {
     "haslo": [
       {
-        "tekst": "POMAGAMY TYM,",
+        "tekst": "Pomagamy tym,"
+      },
+      {
+        "tekst": "którzy pomagają innym.",
         "zloty": true
-      },
-      {
-        "tekst": "KTÓRZY POMAGAJĄ"
-      },
-      {
-        "tekst": "INNYM."
       }
     ],
-    "pigulka": "Zaobserwuj nas • doradztwodlaosp.pl",
-    "kontakt": "WhatsApp: 720 868 902",
+    "pigulka": "Zaobserwuj nas",
+    "kontakt": "Zadzwoń lub napisz: 720 868 902",
     "stopka": "Materiał informacyjny. Nie zastępuje indywidualnej analizy."
   },
   "sceny": [
@@ -210,35 +207,13 @@
         {
           "slowo": "ekwiwalent",
           "cel": [
-            -1.9,
-            0.05,
-            0.33
+            -2.65,
+            0.1,
+            1.1
           ],
           "kat": 0.5,
-          "odl": 3.7,
-          "wys": 2.6
-        },
-        {
-          "slowo": "zwolnienie",
-          "cel": [
-            -3.57,
-            0.05,
-            1.24
-          ],
-          "kat": 0.5,
-          "odl": 3.7,
-          "wys": 2.6
-        },
-        {
-          "slowo": "świadczenie",
-          "cel": [
-            -2.75,
-            0.3,
-            0.8
-          ],
-          "kat": 0.5,
-          "odl": 5.4,
-          "wys": 2.9
+          "odl": 6.0,
+          "wys": 3.8
         }
       ],
       "akcje": [
@@ -247,38 +222,40 @@
           "typ": "kartka",
           "tekst": "EKWIWALENT|ZA AKCJE",
           "poz": [
-            -1.9,
-            0.33
+            -1.95,
+            0.76
           ],
-          "obrot": -0.25
+          "obrot": -0.25,
+          "rozmiar": 0.8
         },
         {
           "slowo": "zwolnienie",
           "typ": "kartka",
           "tekst": "ZWOLNIENIE|Z PRACY",
           "poz": [
-            -3.57,
-            1.24
+            -3.18,
+            1.42
           ],
-          "obrot": 0.15
+          "obrot": 0.15,
+          "rozmiar": 0.8
         },
         {
           "slowo": "zwolnienie",
           "typ": "pieczec",
           "tekst": "PRZYSŁUGUJE",
           "poz": [
-            -3.57,
-            1.24
+            -3.18,
+            1.42
           ],
           "obrot": 0.15,
-          "opoznienie": 0.9
+          "opoznienie": 1.1
         },
         {
           "slowo": "świadczenie",
           "typ": "moneta",
           "poz": [
-            -2.47,
-            1.27
+            -2.4,
+            1.75
           ]
         }
       ],
@@ -579,11 +556,6 @@
       "tekst": "Czy każdy w Waszej OSP zna swoje uprawnienia?",
       "lektor": "Czy każdy w Waszej o-es-pe zna swoje uprawnienia?",
       "haslo": "Znacie swoje *uprawnienia*?",
-      "studio": true,
-      "postac": {
-        "plan": "pelny",
-        "poza": "tlumaczy"
-      },
       "start": 32.786,
       "koniec": 36.286,
       "slowa": [
@@ -627,59 +599,51 @@
           "s": 35.242,
           "e": 36.286
         }
-      ]
+      ],
+      "mapa": "stol-osp",
+      "kamera": "calosc"
     },
     {
-      "tekst": "Zaobserwuj Doradztwo dla OSP. Pomagamy tym, którzy pomagają innym.",
-      "lektor": "Zaobserwuj Doradztwo dla o-es-pe. Pomagamy tym, którzy pomagają innym.",
+      "tekst": "Pomagamy tym, którzy pomagają innym. Zaobserwuj nas.",
+      "lektor": "Pomagamy tym, którzy pomagają innym. Zaobserwuj nas.",
       "plansza": true,
       "start": 36.786,
-      "koniec": 41.786,
+      "koniec": 40.5,
       "slowa": [
         {
-          "w": "Zaobserwuj",
-          "s": 36.786,
-          "e": 37.492
-        },
-        {
-          "w": "Doradztwo",
-          "s": 37.492,
-          "e": 38.139
-        },
-        {
-          "w": "dla",
-          "s": 38.139,
-          "e": 38.433
-        },
-        {
-          "w": "OSP.",
-          "s": 38.433,
-          "e": 38.962
-        },
-        {
           "w": "Pomagamy",
-          "s": 38.962,
-          "e": 39.55
+          "s": 36.786,
+          "e": 37.324
         },
         {
           "w": "tym,",
-          "s": 39.55,
-          "e": 40.08
+          "s": 37.324,
+          "e": 37.808
         },
         {
           "w": "którzy",
-          "s": 40.08,
-          "e": 40.55
+          "s": 37.808,
+          "e": 38.239
         },
         {
           "w": "pomagają",
-          "s": 40.55,
-          "e": 41.139
+          "s": 38.239,
+          "e": 38.777
         },
         {
           "w": "innym.",
-          "s": 41.139,
-          "e": 41.786
+          "s": 38.777,
+          "e": 39.37
+        },
+        {
+          "w": "Zaobserwuj",
+          "s": 39.37,
+          "e": 40.016
+        },
+        {
+          "w": "nas.",
+          "s": 40.016,
+          "e": 40.5
         }
       ]
     }
