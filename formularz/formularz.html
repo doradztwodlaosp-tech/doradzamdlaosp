@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Formularz kontaktowy – podgląd</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<style>
+  /* Tło tylko do podglądu – na stronie NIE kopiuj reguły body */
+  body { margin: 0; padding: 24px 16px 60px; background: #0A0A0A; font-family: Montserrat, "Segoe UI", Arial, sans-serif; }
+
+  /* ================= FORMULARZ – skopiuj od tego miejsca ================= */
+  .osp-form {
+    --zloto: #D4AF37;
+    --zloto-jasne: #E6C552;
+    --czern: #0A0A0A;
+    --karta: #141414;
+    --ramka: #2C2C2C;
+    --tekst: #F2F2F2;
+    --szary: #9A9A9A;
+    --blad: #E5484D;
+
+    box-sizing: border-box;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 32px 24px 28px;
+    background: var(--karta);
+    border: 1px solid var(--ramka);
+    border-top: 3px solid var(--zloto);
+    border-radius: 14px;
+    font-family: Montserrat, "Segoe UI", Arial, sans-serif;
+    color: var(--tekst);
+  }
+  .osp-form *, .osp-form *::before, .osp-form *::after { box-sizing: border-box; }
+
+  .osp-form__tytul {
+    margin: 0 0 6px;
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 1.7rem; line-height: 1.2; font-weight: 700; color: #fff;
+  }
+  .osp-form__tytul em { color: var(--zloto); }
+  .osp-form__opis { margin: 0 0 26px; font-size: .95rem; line-height: 1.6; color: var(--szary); }
+
+  .osp-form__siatka { display: grid; grid-template-columns: 1fr; gap: 20px; }
+  .osp-form__pole { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+
+  .osp-form label.osp-form__etykieta {
+    font-size: .78rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--zloto);
+  }
+  .osp-form__etykieta span { color: var(--szary); font-weight: 500; letter-spacing: .02em; text-transform: none; }
+
+  .osp-form input[type="text"],
+  .osp-form input[type="tel"],
+  .osp-form input[type="email"],
+  .osp-form select {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 16px;
+    background: var(--czern);
+    border: 1px solid var(--ramka);
+    border-radius: 8px;
+    color: var(--tekst);
+    font: inherit; font-size: 16px; /* 16px = brak auto-zoomu na iPhonie */
+    transition: border-color .15s, box-shadow .15s;
+    appearance: none; -webkit-appearance: none;
+  }
+  .osp-form ::placeholder { color: #6E6E6E; opacity: 1; }
+  .osp-form input:hover, .osp-form select:hover { border-color: #444; }
+  .osp-form input:focus-visible, .osp-form select:focus-visible {
+    outline: none;
+    border-color: var(--zloto);
+    box-shadow: 0 0 0 3px rgba(212,175,55,.22);
+  }
+  /* Czerwona ramka dopiero po próbie wpisania błędnej wartości */
+  .osp-form input:user-invalid, .osp-form select:user-invalid { border-color: var(--blad); }
+
+  .osp-form select {
+    padding-right: 44px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'%3E%3Cpath d='M1 1l6 6 6-6' fill='none' stroke='%23D4AF37' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    cursor: pointer;
+  }
+  .osp-form select option { background: var(--karta); color: var(--tekst); }
+
+  .osp-form__podpowiedz { font-size: .8rem; line-height: 1.45; color: var(--szary); }
+
+  .osp-form__zgoda {
+    display: grid; grid-template-columns: 24px 1fr; gap: 12px; align-items: start;
+    margin-top: 22px; font-size: .86rem; line-height: 1.55; color: var(--szary); cursor: pointer;
+  }
+  .osp-form__zgoda input {
+    appearance: none; -webkit-appearance: none;
+    width: 24px; height: 24px; margin: 0;
+    background: var(--czern); border: 1px solid #555; border-radius: 6px; cursor: pointer;
+    display: grid; place-content: center;
+    transition: background .15s, border-color .15s;
+  }
+  .osp-form__zgoda input::after {
+    content: ""; width: 12px; height: 7px; margin-top: -3px;
+    border-left: 2.5px solid var(--czern); border-bottom: 2.5px solid var(--czern);
+    transform: rotate(-45deg) scale(0); transition: transform .12s;
+  }
+  .osp-form__zgoda input:checked { background: var(--zloto); border-color: var(--zloto); }
+  .osp-form__zgoda input:checked::after { transform: rotate(-45deg) scale(1); }
+  .osp-form__zgoda input:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(212,175,55,.3); }
+  .osp-form__zgoda a { color: var(--zloto); text-underline-offset: 3px; }
+
+  .osp-form__wyslij {
+    width: 100%; min-height: 56px; margin-top: 22px; padding: 0 20px;
+    background: var(--zloto); color: #111;
+    border: 0; border-radius: 8px; cursor: pointer;
+    font: inherit; font-size: .95rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+    transition: background .15s, transform .1s, box-shadow .15s;
+  }
+  .osp-form__wyslij:hover { background: var(--zloto-jasne); box-shadow: 0 8px 26px rgba(212,175,55,.28); }
+  .osp-form__wyslij:active { transform: translateY(1px); }
+  .osp-form__wyslij:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+  .osp-form__stopka { margin: 14px 0 0; text-align: center; font-size: .8rem; color: var(--szary); }
+
+  @media (min-width: 640px) {
+    .osp-form { padding: 40px 40px 34px; }
+    .osp-form__siatka { grid-template-columns: 1fr 1fr; gap: 22px 20px; }
+    .osp-form__pole--cale { grid-column: 1 / -1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .osp-form * { transition: none !important; }
+  }
+  /* ================= koniec stylów formularza ================= */
+</style>
+</head>
+<body>
+
+<!-- ================= FORMULARZ – skopiuj od tego miejsca =================
+     WAŻNE: atrybuty action / method oraz name="" przepisz z OBECNEGO formularza,
+     inaczej zgłoszenia przestaną dochodzić na maila. -->
+<form class="osp-form" action="TUTAJ_OBECNY_ADRES_WYSYLKI" method="post">
+  <h2 class="osp-form__tytul">Zostaw kontakt — <em>oddzwonimy</em></h2>
+  <p class="osp-form__opis">Wypełnienie zajmuje minutę. Odezwiemy się najpóźniej w kolejnym dniu roboczym.</p>
+
+  <div class="osp-form__siatka">
+    <div class="osp-form__pole osp-form__pole--cale">
+      <label class="osp-form__etykieta" for="osp-nazwa">Nazwa OSP</label>
+      <input type="text" id="osp-nazwa" name="Nazwa OSP" placeholder="np. OSP Nowa Wieś" autocomplete="organization" required>
+    </div>
+
+    <div class="osp-form__pole">
+      <label class="osp-form__etykieta" for="osp-osoba">Imię i nazwisko</label>
+      <input type="text" id="osp-osoba" name="Imię i Nazwisko" placeholder="Osoba do kontaktu" autocomplete="name" required>
+    </div>
+
+    <div class="osp-form__pole">
+      <label class="osp-form__etykieta" for="osp-telefon">Telefon</label>
+      <input type="tel" id="osp-telefon" name="Telefon" placeholder="np. 600 100 200" autocomplete="tel" inputmode="tel"
+             pattern="[0-9+ ()\-]{9,18}" title="Podaj numer telefonu, np. 600 100 200" required>
+    </div>
+
+    <div class="osp-form__pole">
+      <label class="osp-form__etykieta" for="osp-email">E-mail <span>(opcjonalnie)</span></label>
+      <input type="email" id="osp-email" name="Email" placeholder="osp@example.pl" autocomplete="email" aria-describedby="osp-email-opis">
+      <div class="osp-form__podpowiedz" id="osp-email-opis">Na ten adres wyślemy potwierdzenie zgłoszenia.</div>
+    </div>
+
+    <div class="osp-form__pole">
+      <label class="osp-form__etykieta" for="osp-temat">W czym możemy pomóc?</label>
+      <!-- Opcje przepisz z obecnego formularza -->
+      <select id="osp-temat" name="Temat" required>
+        <option>Status OPP</option>
+        <option>Zmiana Statutu</option>
+        <option>Inne</option>
+      </select>
+    </div>
+  </div>
+
+  <label class="osp-form__zgoda">
+    <input type="checkbox" name="Zgoda" required>
+    <span>Wyrażam zgodę na przetwarzanie danych osobowych. Szczegóły w <a href="/polityka-prywatnosci">Polityce Prywatności</a>.</span>
+  </label>
+
+  <button type="submit" class="osp-form__wyslij">Wyślij zgłoszenie</button>
+  <p class="osp-form__stopka">Twoje dane wykorzystamy wyłącznie do kontaktu w tej sprawie.</p>
+</form>
+<!-- ================= koniec formularza ================= -->
+
+</body>
+</html>
