@@ -17,7 +17,7 @@ for ((od = 0; od < KLATEK; od += KAWALEK)); do
   [ "$do_" -ge "$KLATEK" ] && do_=$((KLATEK - 1))
   plik="$DIR/v-$(printf %05d "$od").mp4"
   if [ -s "$plik" ]; then echo "pomijam $plik"; continue; fi
-  npx remotion render RolkaOSP "$plik.tmp.mp4" --props="$PROPS" --frames="$od-$do_" --muted --crf=24 --concurrency="$(nproc)" "${PRZ[@]}" >/dev/null
+  npx remotion render RolkaOSP "$plik.tmp.mp4" --props="$PROPS" --frames="$od-$do_" --muted --crf=18 --concurrency="$(nproc)" "${PRZ[@]}" >/dev/null
   mv "$plik.tmp.mp4" "$plik"
   echo "gotowe $plik"
 done

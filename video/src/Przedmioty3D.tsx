@@ -15,9 +15,17 @@ const los = (i: number) => {
 
 const plotno = (w: number, h: number, rysuj: (c: CanvasRenderingContext2D) => void, powt?: [number, number]) => {
   const el = document.createElement("canvas");
-  el.width = w;
-  el.height = h;
-  rysuj(el.getContext("2d")!);
+  // tekstury w podwójnej rozdzielczości: ostre napisy i krawędzie przy zbliżeniach
+
+  el.width = w * 2;
+
+  el.height = h * 2;
+
+  const kontekst = el.getContext("2d")!;
+
+  kontekst.scale(2, 2);
+
+  rysuj(kontekst);
   const t = new THREE.CanvasTexture(el);
   t.colorSpace = THREE.SRGBColorSpace;
   t.anisotropy = 8;
@@ -129,13 +137,13 @@ export const StosDokumentow: React.FC<{ t: number; stos: number; pozycja: [numbe
       </mesh>
       {kartki.map((k, i) => {
         const odKiedy = stos - 0.6 + (i - 6) * 0.11;
-        const spad = i < 6 ? 1 : interpolate(t, [odKiedy, odKiedy + 0.6], [0, 1], { ...Z, easing: Easing.out(Easing.cubic) });
+        const spad = i < 6 ? 1 : interpolate(t, [odKiedy, odKiedy + 1.0], [0, 1], { ...Z, easing: Easing.inOut(Easing.cubic) });
         if (spad <= 0) return null;
         const mat = [m.krawedz, m.krawedz, m.tekstury[k.wariant], m.krawedz, m.krawedz, m.krawedz];
         return (
           <mesh userData={{ tekst: true }}
             key={i}
-            position={[k.dx, 0.03 + i * 0.019 + (1 - spad) * 1.6, k.dz]}
+            position={[k.dx, 0.03 + i * 0.019 + (1 - spad) * 0.7, k.dz]}
             rotation={[k.pochyl * spad, k.obrot + (1 - spad) * 0.7, k.pochyl * 0.6 * spad + (1 - spad) * 0.2]}
             material={mat}
             castShadow
@@ -366,11 +374,11 @@ export const KsiegiUstaw: React.FC<{ t: number; spadek: number; pozycja: [number
     }),
     [],
   );
-  const s = interpolate(t, [spadek - 0.1, spadek + 0.55], [0, 1], { ...Z, easing: Easing.out(Easing.cubic) });
+  const s = interpolate(t, [spadek - 0.2, spadek + 1.4], [0, 1], { ...Z, easing: Easing.inOut(Easing.cubic) });
   return (
     <group position={pozycja}>
       <Ksiega okladka={okl.stow} pozycja={[0, 0, 0]} obrot={0.1} grubosc={0.26} />
-      {s > 0 ? <Ksiega okladka={okl.osp} pozycja={[0.06, 0.26 + (1 - s) * 1.6, -0.04]} obrot={-0.06 + (1 - s) * 0.5} grubosc={0.22} /> : null}
+      {s > 0 ? <Ksiega okladka={okl.osp} pozycja={[0.06, 0.26 + (1 - s) * 0.5, -0.04 - (1 - s) * 0.6]} obrot={-0.06 + (1 - s) * 0.15} grubosc={0.22} /> : null}
     </group>
   );
 };
@@ -412,11 +420,11 @@ type Akcja = NonNullable<import("./typy").ScenaOSP["akcje"]>[number];
 
 const KartkaWjezdza: React.FC<{ a: Akcja; t: number; od: number }> = ({ a, t, od }) => {
   const tex = useMemo(() => kartkaZTytulem(a.tekst ?? ""), [a.tekst]);
-  const p = interpolate(t, [od, od + 0.9], [0, 1], { ...Z, easing: Easing.inOut(Easing.cubic) });
+  const p = interpolate(t, [od - 0.1, od + 1.3], [0, 1], { ...Z, easing: Easing.inOut(Easing.cubic) });
   if (p <= 0) return null;
   const s = (a.rozmiar ?? 1) * (0.9 + 0.1 * p);
   return (
-    <group position={[a.poz[0], 0.012 + (1 - p) * 0.9, a.poz[1] - (1 - p) * 1.2]} rotation={[0, (a.obrot ?? 0) + (1 - p) * 0.5, 0]} scale={s}>
+    <group position={[a.poz[0], 0.012 + (1 - p) * 0.35, a.poz[1] - (1 - p) * 0.6]} rotation={[0, (a.obrot ?? 0) + (1 - p) * 0.15, 0]} scale={s}>
       <mesh castShadow receiveShadow>
         <boxGeometry args={[0.72, 0.008, 1.0]} />
         <meshStandardMaterial color="#ECE6DA" roughness={0.9} />
@@ -431,14 +439,14 @@ const KartkaWjezdza: React.FC<{ a: Akcja; t: number; od: number }> = ({ a, t, od
 
 const PieczecUderza: React.FC<{ a: Akcja; t: number; od: number }> = ({ a, t, od }) => {
   const tex = useMemo(() => odciskPieczeci(a.tekst ?? ""), [a.tekst]);
-  const zejscie = interpolate(t, [od - 0.35, od], [1, 0], { ...Z, easing: Easing.in(Easing.quad) });
-  const powrot = interpolate(t, [od + 0.25, od + 0.8], [0, 1], { ...Z, easing: Easing.out(Easing.quad) });
+  const zejscie = interpolate(t, [od - 0.7, od], [1, 0], { ...Z, easing: Easing.inOut(Easing.quad) });
+  const powrot = interpolate(t, [od + 0.35, od + 1.2], [0, 1], { ...Z, easing: Easing.inOut(Easing.quad) });
   const wys = t < od ? zejscie : powrot * 1.3;
-  const widac = t > od - 0.4 && t < od + 0.9;
+  const widac = t > od - 0.75 && t < od + 1.3;
   return (
     <group position={[a.poz[0], 0, a.poz[1]]} rotation={[0, a.obrot ?? 0, 0]}>
       {widac ? (
-        <group position={[0, 0.03 + wys * 0.9, 0]}>
+        <group position={[0, 0.03 + wys * 0.6, 0]}>
           <mesh position={[0, 0.06, 0]} castShadow>
             <boxGeometry args={[0.42, 0.12, 0.2]} />
             <meshStandardMaterial color="#2A2C33" roughness={0.4} metalness={0.3} />
@@ -465,14 +473,14 @@ const PieczecUderza: React.FC<{ a: Akcja; t: number; od: number }> = ({ a, t, od
 
 const MonetaSpada: React.FC<{ a: Akcja; t: number; od: number }> = ({ a, t, od }) => {
   const mat = useMonety();
-  const lot = interpolate(t, [od, od + 0.45], [1, 0], { ...Z, easing: Easing.in(Easing.quad) });
-  const odbicie = t > od + 0.45 ? Math.abs(Math.sin((t - od - 0.45) * 9)) * 0.12 * Math.exp(-(t - od - 0.45) * 4) : 0;
-  const wir = t > od + 0.45 ? Math.exp(-(t - od - 0.45) * 1.6) : 1;
+  const lot = interpolate(t, [od, od + 1.0], [1, 0], { ...Z, easing: Easing.inOut(Easing.cubic) });
+  const odbicie = 0;
+  const wir = t > od + 1.0 ? Math.exp(-(t - od - 1.0) * 1.2) : 1;
   if (t < od) return null;
   return (
     <mesh
-      position={[a.poz[0], 0.03 + lot * 1.6 + odbicie, a.poz[1]]}
-      rotation={[wir * Math.sin(t * 7) * 0.5, t * 3 * wir, 0]}
+      position={[a.poz[0], 0.03 + lot * 0.7 + odbicie, a.poz[1]]}
+      rotation={[wir * Math.sin(t * 2.5) * 0.25, t * 1.2 * wir, 0]}
       material={mat}
       userData={{ zloty: true }}
       castShadow

@@ -24,7 +24,9 @@ const TLO_POKOJU = "#5E4D40";
 const TLO_JASNE = "#EEE7DA";
 // złoto marki przyciemnione tak, by było czytelne na jasnym tle
 const ZLOTO_NA_JASNYM = "#A8781A";
-const PRZEJAZD = 2.2; // sekundy przejazdu kamery między miejscami (spokojnie)
+const PRZEJAZD = 2.4;
+// Obraz 3D liczony w wyższej rozdzielczości i zmniejszany: gładkie krawędzie, bez migotania przy ruchu kamery
+const SUPERSAMPLING = 1.75; // sekundy przejazdu kamery między miejscami (spokojnie)
 
 type Stacja = { cel: [number, number, number]; kat: number; odl: number; wys: number };
 const STACJE: Record<string, Stacja> = {
@@ -54,7 +56,7 @@ const kluczeKamery = (sceny: ScenaOSP[]): KluczKamery[] => {
     (s.ujeciaKamery ?? []).forEach((u) => {
       const z = STACJE[u.kamera ?? ""] ?? baza;
       const st: Stacja = { cel: u.cel ?? z.cel, kat: u.kat ?? z.kat, odl: u.odl ?? z.odl, wys: u.wys ?? z.wys };
-      k.push({ t: (czasSlowa(s, u.slowo) ?? s.start) - 0.25, st, dur: 1.7 });
+      k.push({ t: (czasSlowa(s, u.slowo) ?? s.start) - 0.25, st, dur: 2.2 });
     });
   });
   return k.sort((a, b) => a.t - b.t);
@@ -138,9 +140,17 @@ type TeksturyStolu = { brama: THREE.Texture; szyld: THREE.Texture; tabliczka: TH
 
 const plotno = (w: number, h: number, rysuj: (c: CanvasRenderingContext2D) => void) => {
   const el = document.createElement("canvas");
-  el.width = w;
-  el.height = h;
-  rysuj(el.getContext("2d")!);
+  // tekstury w podwójnej rozdzielczości: ostre napisy i krawędzie przy zbliżeniach
+
+  el.width = w * 2;
+
+  el.height = h * 2;
+
+  const kontekst = el.getContext("2d")!;
+
+  kontekst.scale(2, 2);
+
+  rysuj(kontekst);
   const t = new THREE.CanvasTexture(el);
   t.colorSpace = THREE.SRGBColorSpace;
   t.anisotropy = 8;
@@ -546,7 +556,7 @@ export const StolOSP: React.FC<PropsMapy> = ({ sceny, klatkaStartu, wyglad }) =>
   return (
     <AbsoluteFill style={{ opacity: klatkaStartu === 0 ? 1 : wejscie }}>
       {tx && ts ? (
-        <ThreeCanvas width={width} height={height} shadows camera={{ fov: 32, near: 0.1, far: 120 }} gl={{ antialias: true }}>
+        <ThreeCanvas width={width} height={height} shadows dpr={SUPERSAMPLING} camera={{ fov: 32, near: 0.1, far: 120 }} gl={{ antialias: true }}>
           <Swiat sceny={sceny} t={t} tx={tx} ts={ts} rysunek={wyglad === "rysunek"} jasny={wyglad === "jasny"} />
         </ThreeCanvas>
       ) : null}

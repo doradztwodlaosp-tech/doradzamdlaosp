@@ -21,9 +21,17 @@ export const useTekstury = () => {
     document.fonts.load(`800 80px ${FONT}`).then(() => {
       const plotno = (w: number, h: number, rysuj: (c: CanvasRenderingContext2D) => void) => {
         const el = document.createElement("canvas");
-        el.width = w;
-        el.height = h;
-        rysuj(el.getContext("2d")!);
+        // tekstury w podwójnej rozdzielczości: ostre napisy i krawędzie przy zbliżeniach
+
+        el.width = w * 2;
+
+        el.height = h * 2;
+
+        const kontekst = el.getContext("2d")!;
+
+        kontekst.scale(2, 2);
+
+        rysuj(kontekst);
         const t = new THREE.CanvasTexture(el);
         t.colorSpace = THREE.SRGBColorSpace;
         t.anisotropy = 8;

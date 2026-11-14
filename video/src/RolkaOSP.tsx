@@ -210,7 +210,7 @@ const Emblemat: React.FC<{ dane: Odcinek }> = ({ dane }) => {
   if (!scena || scena.plansza || scena.studio) return null;
   const w = interpolate(t, [(dane.wstep ?? 0) - 0.2, (dane.wstep ?? 0) + 0.4], [0, 1], ZAKRES);
   return (
-    <div style={{ position: "absolute", top: 1360, left: 0, width: 1080, display: "flex", justifyContent: "center", opacity: w }}>
+    <div style={{ position: "absolute", top: 1440, left: 0, width: 1080, display: "flex", justifyContent: "center", opacity: w }}>
       {dane.emblemat ? (
         <Img src={staticFile(dane.emblemat)} style={{ height: 52 }} />
       ) : (
@@ -222,13 +222,13 @@ const Emblemat: React.FC<{ dane: Odcinek }> = ({ dane }) => {
             background: MARKA.tlo,
             border: `1.5px solid ${MARKA.zloto}`,
             borderRadius: 999,
-            padding: "10px 28px 10px 20px",
+            padding: "14px 36px 14px 26px",
             fontFamily: FONT,
             boxShadow: "0 6px 18px rgba(0,0,0,0.25)",
           }}
         >
-          <span style={{ color: MARKA.zloto, fontWeight: 800, fontSize: 44, lineHeight: 1 }}>§</span>
-          <span style={{ color: MARKA.bialy, fontWeight: 800, fontSize: 28, letterSpacing: 3.5 }}>DORADZTWO DLA OSP</span>
+          <span style={{ color: MARKA.zloto, fontWeight: 800, fontSize: 56, lineHeight: 1 }}>§</span>
+          <span style={{ color: MARKA.bialy, fontWeight: 800, fontSize: 36, letterSpacing: 4 }}>DORADZTWO DLA OSP</span>
         </div>
       )}
     </div>
