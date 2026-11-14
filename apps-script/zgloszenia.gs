@@ -306,6 +306,35 @@ function sformatujArkusz() {
   sheet.getRange(1, 1, sheet.getMaxRows(), kolumn).createFilter();
 }
 
+// Diagnostyka Telegrama: uruchom ręcznie i zobacz wynik w Dzienniku wykonywania.
+// Sprawdza token, wysyła wiadomość testową do każdego odbiorcy i podaje przyczynę błędu.
+function testTelegrama() {
+  if (!TELEGRAM_TOKEN) { Logger.log("BŁĄD: brak właściwości TELEGRAM_TOKEN."); return; }
+  if (!TELEGRAM_CHAT_ID) { Logger.log("BŁĄD: brak właściwości TELEGRAM_CHAT_ID."); return; }
+
+  const baza = "https://api.telegram.org/bot" + TELEGRAM_TOKEN;
+
+  const me = UrlFetchApp.fetch(baza + "/getMe", { muteHttpExceptions: true });
+  Logger.log("Token: HTTP " + me.getResponseCode() + " " + me.getContentText());
+  if (me.getResponseCode() !== 200) {
+    Logger.log("=> TOKEN JEST BŁĘDNY lub unieważniony. Skopiuj go ponownie z @BotFather.");
+    return;
+  }
+
+  TELEGRAM_CHAT_ID.split(",").map(function (x) { return x.trim(); }).filter(Boolean).forEach(function (chatId) {
+    const res = UrlFetchApp.fetch(baza + "/sendMessage", {
+      method: "post",
+      contentType: "application/json",
+      payload: JSON.stringify({ chat_id: chatId, text: "✅ Test powiadomień – działa." }),
+      muteHttpExceptions: true
+    });
+    const kod = res.getResponseCode();
+    Logger.log("Odbiorca " + chatId + ": HTTP " + kod + " " + res.getContentText());
+    if (kod === 403) Logger.log("=> " + chatId + ": ta osoba musi otworzyć bota i kliknąć Start.");
+    if (kod === 400) Logger.log("=> " + chatId + ": zły numer chat ID (sprawdź w @userinfobot).");
+  });
+}
+
 // Wysyła testowy autoresponder na Twój własny adres – do podglądu wyglądu.
 function testAutorespondera() {
   wyslijAutoresponderHTML(Session.getEffectiveUser().getEmail(), "OSP Testowa");
