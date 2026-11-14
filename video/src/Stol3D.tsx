@@ -512,7 +512,7 @@ const LicznikOgolny: React.FC<{ t: number; od: number; do: number; jasny?: boole
   const v = interpolate(t, [od, od + 1.8], [0, l.do], { ...Z, easing: Easing.out(Easing.cubic) });
   const tekst = v.toLocaleString("pl-PL", { minimumFractionDigits: l.miejsca ?? 0, maximumFractionDigits: l.miejsca ?? 0 }).replace(/\u00a0/g, " ");
   return (
-    <div style={{ position: "absolute", top: 400, left: KOLUMNA.lewo, width: KOLUMNA.szer, textAlign: "center", fontFamily: FONT, opacity: w, transform: `translateY(${(1 - w) * 20}px)` }}>
+    <div style={{ position: "absolute", top: 455, left: KOLUMNA.lewo, width: KOLUMNA.szer, textAlign: "center", fontFamily: FONT, opacity: w, transform: `translateY(${(1 - w) * 20}px)` }}>
       <div style={{ fontWeight: 800, fontSize: 140, color: jasny ? ZLOTO_NA_JASNYM : MARKA.zloto, lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
         {tekst}
         {l.sufiks ?? ""}
@@ -527,7 +527,7 @@ const Licznik: React.FC<{ t: number; od: number; do: number; jasny?: boolean }> 
   const w = interpolate(t, [od, od + 0.6], [0, 1], Z) * interpolate(t, [koniec, koniec + 0.5], [1, 0], Z);
   const liczba = interpolate(t, [od, od + 1.6], [0, 1.5], { ...Z, easing: Easing.out(Easing.cubic) });
   return (
-    <div style={{ position: "absolute", top: 400, left: KOLUMNA.lewo, width: KOLUMNA.szer, textAlign: "center", fontFamily: FONT, opacity: w, transform: `translateY(${(1 - w) * 20}px)` }}>
+    <div style={{ position: "absolute", top: 455, left: KOLUMNA.lewo, width: KOLUMNA.szer, textAlign: "center", fontFamily: FONT, opacity: w, transform: `translateY(${(1 - w) * 20}px)` }}>
       <div style={{ fontWeight: 800, fontSize: 150, color: jasny ? ZLOTO_NA_JASNYM : MARKA.zloto, lineHeight: 1, textShadow: jasny ? "0 6px 24px rgba(120,90,30,0.25)" : "0 10px 40px rgba(0,0,0,0.6)" }}>{liczba.toFixed(1).replace(".", ",")}%</div>
       <div style={{ marginTop: 12, fontWeight: 700, fontSize: 38, color: jasny ? "#23242A" : "white", textShadow: jasny ? "none" : "0 4px 18px rgba(0,0,0,0.8)" }}>podatku od mieszkańców co roku</div>
     </div>
