@@ -65,7 +65,11 @@ export type ScenaOSP = {
   karta?: { tytul?: string; wiersze: { tekst: string; slowo: string }[] }; // przy mapach 3D: karta nad przedmiotem, wiersze wchodzą na słowa
   czesc?: { numer: string; tytul: string } | null; // od tej sceny: znacznik części filmu, np. 1/2 JEDNOSTKI (null = koniec znacznika)
   liczba?: { slowo: string; do: number; miejsca?: number; sufiks?: string; podpis: string }; // duża liczba nad przedmiotem (od słowa)
-  kamera?: string; // przy mapach 3D: nazwa miejsca, do którego kamera płynie w tej scenie (np. "remiza")
+  kamera?: string;
+  // przy mapach 3D: dodatkowe ujęcia kamery w tej scenie, każde od wskazanego słowa (nazwa miejsca i/lub własne liczby)
+  ujeciaKamery?: { slowo: string; kamera?: string; cel?: [number, number, number]; kat?: number; odl?: number; wys?: number }[];
+  // przy mapach 3D: przedmioty, które „dzieją się” na słowo lektora (kartka wjeżdża, pieczątka uderza, moneta spada)
+  akcje?: { slowo: string; typ: "kartka" | "pieczec" | "moneta"; tekst?: string; poz: [number, number]; obrot?: number; opoznienie?: number; rozmiar?: number }[]; // przy mapach 3D: nazwa miejsca, do którego kamera płynie w tej scenie (np. "remiza")
   ilustracja?: string; // starsze rysowane ilustracje (src/ScenyPion.tsx)
   prompt?: string;
   postac?: UstawieniaPostaci;

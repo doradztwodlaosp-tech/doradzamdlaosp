@@ -374,3 +374,125 @@ export const KsiegiUstaw: React.FC<{ t: number; spadek: number; pozycja: [number
     </group>
   );
 };
+
+// ───────────── Akcje na słowa lektora ─────────────
+const kartkaZTytulem = (tytul: string) =>
+  plotno(520, 720, (c) => {
+    c.fillStyle = "#F6F2EA";
+    c.fillRect(0, 0, 520, 720);
+    c.fillStyle = MARKA.zloto;
+    c.fillRect(0, 0, 520, 14);
+    c.fillStyle = "#23242A";
+    c.textAlign = "center";
+    let r = 52;
+    c.font = `800 ${r}px ${FONT}`;
+    const linie = tytul.split("|");
+    while (Math.max(...linie.map((l) => c.measureText(l).width)) > 440 && r > 24) c.font = `800 ${--r}px ${FONT}`;
+    linie.forEach((l, i) => c.fillText(l, 260, 120 + i * (r + 12)));
+    c.fillStyle = "#A9A59C";
+    for (let i = 0; i < 12; i++) c.fillRect(50, 240 + i * 34, i % 4 === 3 ? 220 : 420, 9);
+    c.fillStyle = "#23242A";
+    c.fillRect(290, 680, 180, 2);
+  });
+
+const odciskPieczeci = (tekst: string) =>
+  plotno(600, 240, (c) => {
+    c.strokeStyle = "#B22A1E";
+    c.lineWidth = 12;
+    c.strokeRect(16, 16, 568, 208);
+    c.fillStyle = "#B22A1E";
+    c.textAlign = "center";
+    let r = 84;
+    c.font = `800 ${r}px ${FONT}`;
+    while (c.measureText(tekst).width > 520 && r > 30) c.font = `800 ${--r}px ${FONT}`;
+    c.fillText(tekst, 300, 120 + r * 0.36);
+  });
+
+type Akcja = NonNullable<import("./typy").ScenaOSP["akcje"]>[number];
+
+const KartkaWjezdza: React.FC<{ a: Akcja; t: number; od: number }> = ({ a, t, od }) => {
+  const tex = useMemo(() => kartkaZTytulem(a.tekst ?? ""), [a.tekst]);
+  const p = interpolate(t, [od, od + 0.7], [0, 1], { ...Z, easing: Easing.out(Easing.cubic) });
+  if (p <= 0) return null;
+  const s = a.rozmiar ?? 1;
+  return (
+    <group position={[a.poz[0], 0.012 + (1 - p) * 0.9, a.poz[1] - (1 - p) * 1.2]} rotation={[0, (a.obrot ?? 0) + (1 - p) * 0.5, 0]} scale={s}>
+      <mesh castShadow receiveShadow>
+        <boxGeometry args={[0.72, 0.008, 1.0]} />
+        <meshStandardMaterial color="#ECE6DA" roughness={0.9} />
+      </mesh>
+      <mesh userData={{ tekst: true }} position={[0, 0.0045, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[0.72, 1.0]} />
+        <meshStandardMaterial map={tex} roughness={0.85} />
+      </mesh>
+    </group>
+  );
+};
+
+const PieczecUderza: React.FC<{ a: Akcja; t: number; od: number }> = ({ a, t, od }) => {
+  const tex = useMemo(() => odciskPieczeci(a.tekst ?? ""), [a.tekst]);
+  const zejscie = interpolate(t, [od - 0.35, od], [1, 0], { ...Z, easing: Easing.in(Easing.quad) });
+  const powrot = interpolate(t, [od + 0.25, od + 0.8], [0, 1], { ...Z, easing: Easing.out(Easing.quad) });
+  const wys = t < od ? zejscie : powrot * 1.3;
+  const widac = t > od - 0.4 && t < od + 0.9;
+  return (
+    <group position={[a.poz[0], 0, a.poz[1]]} rotation={[0, a.obrot ?? 0, 0]}>
+      {widac ? (
+        <group position={[0, 0.03 + wys * 0.9, 0]}>
+          <mesh position={[0, 0.06, 0]} castShadow>
+            <boxGeometry args={[0.42, 0.12, 0.2]} />
+            <meshStandardMaterial color="#2A2C33" roughness={0.4} metalness={0.3} />
+          </mesh>
+          <mesh position={[0, 0.2, 0]} castShadow>
+            <cylinderGeometry args={[0.045, 0.06, 0.18, 20]} />
+            <meshStandardMaterial color="#6B4429" roughness={0.6} />
+          </mesh>
+          <mesh position={[0, 0.33, 0]} castShadow>
+            <sphereGeometry args={[0.08, 20, 14]} />
+            <meshStandardMaterial color="#6B4429" roughness={0.6} />
+          </mesh>
+        </group>
+      ) : null}
+      {t >= od ? (
+        <mesh userData={{ bezRysunku: true }} position={[0, 0.0215, 0.05]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[0.62, 0.25]} />
+          <meshBasicMaterial map={tex} transparent opacity={interpolate(t, [od, od + 0.12], [0, 0.92], Z)} depthWrite={false} />
+        </mesh>
+      ) : null}
+    </group>
+  );
+};
+
+const MonetaSpada: React.FC<{ a: Akcja; t: number; od: number }> = ({ a, t, od }) => {
+  const mat = useMonety();
+  const lot = interpolate(t, [od, od + 0.45], [1, 0], { ...Z, easing: Easing.in(Easing.quad) });
+  const odbicie = t > od + 0.45 ? Math.abs(Math.sin((t - od - 0.45) * 9)) * 0.12 * Math.exp(-(t - od - 0.45) * 4) : 0;
+  const wir = t > od + 0.45 ? Math.exp(-(t - od - 0.45) * 1.6) : 1;
+  if (t < od) return null;
+  return (
+    <mesh
+      position={[a.poz[0], 0.03 + lot * 1.6 + odbicie, a.poz[1]]}
+      rotation={[wir * Math.sin(t * 7) * 0.5, t * 3 * wir, 0]}
+      material={mat}
+      userData={{ zloty: true }}
+      castShadow
+    >
+      <cylinderGeometry args={[0.26 * (a.rozmiar ?? 1), 0.26 * (a.rozmiar ?? 1), 0.055, 48]} />
+    </mesh>
+  );
+};
+
+export const AkcjeNaSlowa: React.FC<{ sceny: import("./typy").ScenaOSP[]; t: number }> = ({ sceny, t }) => (
+  <>
+    {sceny.flatMap((s, i) =>
+      (s.akcje ?? []).map((a, j) => {
+        const slowo = s.slowa.find((w) => w.w.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "").startsWith(a.slowo.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "")));
+        const od = (slowo?.s ?? s.start) + (a.opoznienie ?? 0);
+        const k = `${i}-${j}`;
+        if (a.typ === "kartka") return <KartkaWjezdza key={k} a={a} t={t} od={od} />;
+        if (a.typ === "pieczec") return <PieczecUderza key={k} a={a} t={t} od={od} />;
+        return <MonetaSpada key={k} a={a} t={t} od={od} />;
+      }),
+    )}
+  </>
+);

@@ -94,6 +94,19 @@
           "s": 3.131,
           "e": 3.643
         }
+      ],
+      "ujeciaKamery": [
+        {
+          "slowo": "wóz",
+          "cel": [
+            -6.55,
+            0.35,
+            -1.6
+          ],
+          "kat": 0.6,
+          "odl": 5.2,
+          "wys": 2.0
+        }
       ]
     },
     {
@@ -256,6 +269,19 @@
           "s": 17.25,
           "e": 18.457
         }
+      ],
+      "ujeciaKamery": [
+        {
+          "slowo": "ustawę",
+          "cel": [
+            3.26,
+            0.45,
+            6.76
+          ],
+          "kat": 0.25,
+          "odl": 3.9,
+          "wys": 3.0
+        }
       ]
     },
     {
@@ -268,22 +294,6 @@
       "czesc": {
         "numer": "1/2",
         "tytul": "UPRAWNIENIA"
-      },
-      "karta": {
-        "wiersze": [
-          {
-            "tekst": "Ekwiwalent za akcje",
-            "slowo": "ekwiwalent"
-          },
-          {
-            "tekst": "Zwolnienie z pracy",
-            "slowo": "zwolnienie"
-          },
-          {
-            "tekst": "Świadczenie ratownicze",
-            "slowo": "świadczenie"
-          }
-        ]
       },
       "start": 19.007,
       "koniec": 27.579,
@@ -378,6 +388,82 @@
           "s": 26.652,
           "e": 27.579
         }
+      ],
+      "ujeciaKamery": [
+        {
+          "slowo": "ekwiwalent",
+          "cel": [
+            -1.9,
+            0.05,
+            0.33
+          ],
+          "kat": 0.5,
+          "odl": 3.7,
+          "wys": 2.6
+        },
+        {
+          "slowo": "zwolnienie",
+          "cel": [
+            -3.57,
+            0.05,
+            1.24
+          ],
+          "kat": 0.5,
+          "odl": 3.7,
+          "wys": 2.6
+        },
+        {
+          "slowo": "świadczenie",
+          "cel": [
+            -2.75,
+            0.3,
+            0.8
+          ],
+          "kat": 0.5,
+          "odl": 5.4,
+          "wys": 2.9
+        }
+      ],
+      "akcje": [
+        {
+          "slowo": "ekwiwalent",
+          "typ": "kartka",
+          "tekst": "EKWIWALENT|ZA AKCJE",
+          "poz": [
+            -1.9,
+            0.33
+          ],
+          "obrot": -0.25
+        },
+        {
+          "slowo": "zwolnienie",
+          "typ": "kartka",
+          "tekst": "ZWOLNIENIE|Z PRACY",
+          "poz": [
+            -3.57,
+            1.24
+          ],
+          "obrot": 0.15
+        },
+        {
+          "slowo": "zwolnienie",
+          "typ": "pieczec",
+          "tekst": "PRZYSŁUGUJE",
+          "poz": [
+            -3.57,
+            1.24
+          ],
+          "obrot": 0.15,
+          "opoznienie": 0.9
+        },
+        {
+          "slowo": "świadczenie",
+          "typ": "moneta",
+          "poz": [
+            -2.47,
+            1.27
+          ]
+        }
       ]
     },
     {
@@ -390,26 +476,6 @@
       "czesc": {
         "numer": "2/2",
         "tytul": "OBOWIĄZKI"
-      },
-      "karta": {
-        "wiersze": [
-          {
-            "tekst": "Szkolenia",
-            "slowo": "szkolenia,"
-          },
-          {
-            "tekst": "Badania lekarskie",
-            "slowo": "badania"
-          },
-          {
-            "tekst": "Gotowość do działań",
-            "slowo": "gotowość"
-          },
-          {
-            "tekst": "Porządek w dokumentach",
-            "slowo": "porządek"
-          }
-        ]
       },
       "start": 28.129,
       "koniec": 35.414,
@@ -483,6 +549,65 @@
           "w": "dokumentach.",
           "s": 34.454,
           "e": 35.414
+        }
+      ],
+      "ujeciaKamery": [
+        {
+          "slowo": "szkolenia",
+          "cel": [
+            0,
+            0.1,
+            -2.85
+          ],
+          "kat": 0.12,
+          "odl": 5.6,
+          "wys": 4.8
+        }
+      ],
+      "akcje": [
+        {
+          "slowo": "szkolenia",
+          "typ": "kartka",
+          "tekst": "SZKOLENIE",
+          "poz": [
+            -0.8,
+            -3.3
+          ],
+          "obrot": -0.12,
+          "rozmiar": 0.7
+        },
+        {
+          "slowo": "badania",
+          "typ": "kartka",
+          "tekst": "BADANIA|LEKARSKIE",
+          "poz": [
+            0.8,
+            -3.3
+          ],
+          "obrot": 0.05,
+          "rozmiar": 0.7
+        },
+        {
+          "slowo": "gotowość",
+          "typ": "kartka",
+          "tekst": "GOTOWOŚĆ",
+          "poz": [
+            -0.8,
+            -2.35
+          ],
+          "obrot": -0.04,
+          "rozmiar": 0.7
+        },
+        {
+          "slowo": "porządek",
+          "typ": "kartka",
+          "tekst": "DOKUMENTY",
+          "poz": [
+            0.8,
+            -2.35
+          ],
+          "obrot": 0.12,
+          "rozmiar": 0.7
         }
       ]
     },
@@ -609,6 +734,14 @@
           "w": "Polsce.",
           "s": 44.812,
           "e": 45.514
+        }
+      ],
+      "ujeciaKamery": [
+        {
+          "slowo": "obrony",
+          "kamera": "woz",
+          "kat": 1.15,
+          "odl": 4.6
         }
       ]
     },

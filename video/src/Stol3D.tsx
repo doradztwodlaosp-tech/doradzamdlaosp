@@ -7,7 +7,7 @@ import { FONT, KOLUMNA, MARKA } from "./marka";
 import { Otoczenie, WozStrazacki } from "./Woz3D";
 import { BudynekRemizy } from "./Remiza3D";
 import { RYSUNEK, SiatkaKreslarska, TrybRysunku } from "./Rysunek3D";
-import { KsiegiUstaw, LaptopPro, StosDokumentow, StosyMonet, useBlat } from "./Przedmioty3D";
+import { AkcjeNaSlowa, KsiegiUstaw, LaptopPro, StosDokumentow, StosyMonet, useBlat } from "./Przedmioty3D";
 import { Dlugopis, Helm, Segregator, type Tekstury, useTekstury } from "./Scena3D";
 import { type ScenaOSP, czasSlowa } from "./typy";
 import type { PropsMapy, ZdarzenieDzwiekowe } from "./Mapy";
@@ -44,27 +44,49 @@ const STACJE: Record<string, Stacja> = {
 };
 
 // Gdzie stoi kamera w chwili t (sekundy filmu): płynny przejazd do miejsca bieżącej sceny + lekki dryf
+type KluczKamery = { t: number; st: Stacja; dur: number };
+// Oś kamery: miejsce każdej sceny (przejazd 2,2 s) + dodatkowe ujęcia na słowa (przejazd 1,1 s).
+const kluczeKamery = (sceny: ScenaOSP[]): KluczKamery[] => {
+  const k: KluczKamery[] = [];
+  sceny.forEach((s) => {
+    const baza = STACJE[s.kamera ?? ""] ?? STACJE.calosc;
+    if (!k.length || k[k.length - 1].st !== baza) k.push({ t: s.start - 0.35, st: baza, dur: PRZEJAZD });
+    (s.ujeciaKamery ?? []).forEach((u) => {
+      const z = STACJE[u.kamera ?? ""] ?? baza;
+      const st: Stacja = { cel: u.cel ?? z.cel, kat: u.kat ?? z.kat, odl: u.odl ?? z.odl, wys: u.wys ?? z.wys };
+      k.push({ t: (czasSlowa(s, u.slowo) ?? s.start) - 0.25, st, dur: 1.1 });
+    });
+  });
+  return k.sort((a, b) => a.t - b.t);
+};
+
+// Stan kamery: płynny przejazd od poprzedniego stanu + powolny najazd i obrót, gdy kamera „stoi” (obraz nigdy nie zamiera)
+const stanKamery = (k: KluczKamery[], i: number, t: number): Stacja => {
+  const cel = k[i].st;
+  const zatrzymanie = k[i].t + k[i].dur;
+  const h = interpolate(t, [zatrzymanie - 0.3, zatrzymanie + 6], [0, 1], Z);
+  const docelowa: Stacja = { cel: cel.cel, kat: cel.kat + 0.06 * h, odl: cel.odl * (1 - 0.09 * h), wys: cel.wys * (1 - 0.04 * h) };
+  if (i === 0) return docelowa;
+  const p = interpolate(t, [k[i].t, k[i].t + k[i].dur], [0, 1], { ...Z, easing: PLYNNIE });
+  if (p >= 1) return docelowa;
+  const a = stanKamery(k, i - 1, k[i].t);
+  const m = (x: number, y: number) => x + (y - x) * p;
+  return {
+    cel: [m(a.cel[0], docelowa.cel[0]), m(a.cel[1], docelowa.cel[1]), m(a.cel[2], docelowa.cel[2])],
+    kat: m(a.kat, docelowa.kat),
+    odl: m(a.odl, docelowa.odl),
+    wys: m(a.wys, docelowa.wys),
+  };
+};
+
 const kameraW = (sceny: ScenaOSP[], t: number) => {
-  const lista = sceny.map((s) => ({ t: s.start - 0.35, st: STACJE[s.kamera ?? ""] ?? STACJE.calosc }));
-  // ostatnia scena, która już się zaczęła, i początek ciągu scen z tym samym miejscem
+  const k = kluczeKamery(sceny);
   let i = 0;
-  lista.forEach((e, j) => {
+  k.forEach((e, j) => {
     if (j > 0 && t >= e.t) i = j;
   });
-  let poczatekCiagu = i;
-  while (poczatekCiagu > 0 && lista[poczatekCiagu - 1].st === lista[i].st) poczatekCiagu--;
-  const obecna = lista[i].st;
-  const poprzednia = poczatekCiagu > 0 ? lista[poczatekCiagu - 1].st : obecna;
-  const poczatek = poczatekCiagu > 0 ? lista[poczatekCiagu].t : -99;
-  const p = interpolate(t, [poczatek, poczatek + PRZEJAZD], [0, 1], { ...Z, easing: PLYNNIE });
-  const m = (a: number, b: number) => a + (b - a) * p;
-  const dryf = Math.sin(t * 0.25) * 0.035;
-  return {
-    cel: [m(poprzednia.cel[0], obecna.cel[0]), m(poprzednia.cel[1], obecna.cel[1]), m(poprzednia.cel[2], obecna.cel[2])] as [number, number, number],
-    kat: m(poprzednia.kat, obecna.kat) + dryf,
-    odl: m(poprzednia.odl, obecna.odl) * (1 - 0.012 * Math.sin(t * 0.18)),
-    wys: m(poprzednia.wys, obecna.wys),
-  };
+  const st = stanKamery(k, i, t);
+  return { ...st, kat: st.kat + Math.sin(t * 0.25) * 0.03 };
 };
 
 const Kamera: React.FC<{ sceny: ScenaOSP[]; t: number }> = ({ sceny, t }) => {
@@ -436,7 +458,8 @@ const Swiat: React.FC<{ sceny: ScenaOSP[]; t: number; tx: TeksturyStolu; ts: Tek
       <Protokol t={t} c={c} tx={tx} />
       <KsiegiUstaw t={t} spadek={c.ustawa} pozycja={[3.2, 0, 6.8]} />
       <Gmina t={t} c={c} tx={tx} />
-      <Helm pozycja={[-3.0, 0.06, 0.3]} obrot={0.75} />
+      <Helm pozycja={[-3.0, 0.06, 0.3]} obrot={0.75 + Math.sin(t * 0.35) * 0.18} />
+      <AkcjeNaSlowa sceny={sceny} t={t} />
       <Dlugopis pozycja={[1.7, 0.1, 4.6]} obrot={0.9} />
     </>
   );
