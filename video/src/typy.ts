@@ -88,6 +88,7 @@ export type Odcinek = {
   naczelnik?: boolean;
   maskotka?: boolean;
   wyglad3d?: "rysunek" | "makieta" | "jasny"; // wygląd scen 3D: rysunek techniczny (domyślnie makieta)
+  emblemat?: string; // plik z logo w public/ (np. "marka/emblemat.png"); brak = emblemat z elementów marki
   styl?: "makieta"; // „makieta”: napisy w ciemnej pigułce nad dolną strefą (jak w filmach instruktażowych 3D)
   szkic?: string; // odcinek bez nagrania lektora: czasy szacunkowe
   wstep?: number; // sekundy z hasłem-hakiem przed pierwszym słowem lektora

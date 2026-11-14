@@ -200,6 +200,41 @@ const porcje = (slowa: Slowo[]): Slowo[][] => {
   return wynik;
 };
 
+// Emblemat marki na dole kadru (nad strefą przycisków Facebooka); znika na planszy końcowej i w studiu.
+// Gdy będzie plik z prawdziwym logo, wystarczy podać go w polu "emblemat" odcinka (plik w public/).
+const Emblemat: React.FC<{ dane: Odcinek }> = ({ dane }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = frame / fps;
+  const scena = [...dane.sceny].reverse().find((s) => s.start <= t);
+  if (!scena || scena.plansza || scena.studio) return null;
+  const w = interpolate(t, [(dane.wstep ?? 0) - 0.2, (dane.wstep ?? 0) + 0.4], [0, 1], ZAKRES);
+  return (
+    <div style={{ position: "absolute", top: 1376, left: KOLUMNA.lewo, width: KOLUMNA.szer, display: "flex", justifyContent: "center", opacity: w }}>
+      {dane.emblemat ? (
+        <Img src={staticFile(dane.emblemat)} style={{ height: 52 }} />
+      ) : (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            background: MARKA.tlo,
+            border: `1.5px solid ${MARKA.zloto}`,
+            borderRadius: 999,
+            padding: "6px 18px 6px 12px",
+            fontFamily: FONT,
+            boxShadow: "0 6px 18px rgba(0,0,0,0.25)",
+          }}
+        >
+          <span style={{ color: MARKA.zloto, fontWeight: 800, fontSize: 30, lineHeight: 1 }}>§</span>
+          <span style={{ color: MARKA.bialy, fontWeight: 700, fontSize: 19, letterSpacing: 2.5 }}>DORADZTWO DLA OSP</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Znacznik części filmu (np. „1/2 JEDNOSTKI”): widz wie, ile jeszcze zostało
 const ZnacznikCzesci: React.FC<{ dane: Odcinek; jasny?: boolean }> = ({ dane, jasny }) => {
   const frame = useCurrentFrame();
@@ -261,7 +296,7 @@ const NapisyPigulka: React.FC<{ scena: ScenaOSP; gora: boolean }> = ({
         left: KOLUMNA.lewo,
         width: KOLUMNA.szer,
         // na dole pigułka „rośnie” w górę, żeby nie wejść w strefę przycisków Facebooka
-        ...(gora ? { top: 215 } : { bottom: 1920 - 1425 }),
+        ...(gora ? { top: 215 } : { bottom: 1920 - 1352 }),
         display: "flex",
         justifyContent: "center",
       }}
@@ -377,7 +412,7 @@ const Nadtytul: React.FC<{ tekst: string; jasny?: boolean }> = ({ tekst, jasny }
       top: U.nadtytulOdGory,
       left: jasny ? KOLUMNA.lewo : SRODEK_X - SZEROKOSC_TRESCI / 2,
       width: jasny ? KOLUMNA.szer : SZEROKOSC_TRESCI,
-      textAlign: jasny ? "left" : "center",
+      textAlign: "center",
       fontFamily: FONT,
       fontWeight: 700,
       fontSize: U.nadtytulRozmiar,
@@ -1021,6 +1056,7 @@ export const RolkaOSP: React.FC<RolkaProps> = ({
 
       {dane.nadtytul && <Nadtytul tekst={dane.nadtytul} jasny={dane.wyglad3d === "jasny"} />}
       <ZnacznikCzesci dane={dane} jasny={dane.wyglad3d === "jasny"} />
+      {dane.styl === "makieta" ? <Emblemat dane={dane} /> : null}
 
       {dane.naczelnik && <PostacNaczelnika dane={dane} glosnosc={glosnosc} />}
 
