@@ -12,6 +12,7 @@ const PROPS = PropertiesService.getScriptProperties();
 const TELEGRAM_TOKEN = PROPS.getProperty("TELEGRAM_TOKEN");
 const TELEGRAM_CHAT_ID = PROPS.getProperty("TELEGRAM_CHAT_ID");
 
+// UWAGA: nazwa musi być IDENTYCZNA jak etykieta w Gmailu (wielkość liter, polskie znaki).
 const ETYKIETA_ZGLOSZENIA = "ZGLOSZENIA";
 const ETYKIETA_OCZEKUJE = "Status/Oczekuje";
 
@@ -121,11 +122,16 @@ function obsluzNoweZgloszenia() {
           thread.addLabel(labelOczekuje);
         }
 
-        thread.markRead();
-        thread.moveToArchive();
-
       } catch (e) {
         Logger.log("Błąd wątku " + thread.getId() + ": " + e);
+      } finally {
+        // Porządki w Gmailu zawsze – także po błędzie, żeby wątek nie został w Odebranych
+        try {
+          thread.markRead();
+          thread.moveToArchive();
+        } catch (e2) {
+          Logger.log("Archiwizacja błąd " + thread.getId() + ": " + e2);
+        }
       }
     }
   } finally {
@@ -190,18 +196,33 @@ function sprawdzTerminyOczekujacych() {
 //  3. FUNKCJE JEDNORAZOWE  (uruchamiane ręcznie)
 // =====================================================================
 
-// Uruchom RAZ, ZANIM włączysz wyzwalacz. Oznacza wszystkie istniejące
-// zgłoszenia jako przetworzone – niczego nie wysyła.
+// Uruchom RAZ, ZANIM włączysz wyzwalacz. Oznacza wszystkie istniejące zgłoszenia
+// etykietą, oznacza jako przeczytane i przenosi z Odebranych do archiwum
+// (zostają pod etykietą). Niczego nie wysyła.
+// Można uruchomić ponownie, żeby uprzątnąć wątki, które zostały w Odebranych.
 function oznaczStareJakoPrzetworzone() {
   const label = pobierzLubStworzEtykiete(ETYKIETA_ZGLOSZENIA);
   let razem = 0;
+
+  // 1) Wątki jeszcze bez etykiety
   while (true) {
     const threads = GmailApp.search('"PROŚBA O KONTAKT" -label:' + ETYKIETA_ZGLOSZENIA, 0, 100);
     if (threads.length === 0) break;
     label.addToThreads(threads);
+    GmailApp.markThreadsRead(threads);
+    GmailApp.moveThreadsToArchive(threads);
     razem += threads.length;
   }
-  Logger.log("Oznaczono wątków: " + razem);
+
+  // 2) Wątki z etykietą, ale nadal w Odebranych
+  while (true) {
+    const threads = GmailApp.search('in:inbox "PROŚBA O KONTAKT" label:' + ETYKIETA_ZGLOSZENIA, 0, 100);
+    if (threads.length === 0) break;
+    GmailApp.markThreadsRead(threads);
+    GmailApp.moveThreadsToArchive(threads);
+    razem += threads.length;
+  }
+  Logger.log("Uporządkowano wątków: " + razem);
 }
 
 // Nadaje arkuszowi firmowy wygląd i naprawia istniejące dane
