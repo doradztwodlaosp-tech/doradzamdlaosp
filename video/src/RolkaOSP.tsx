@@ -199,6 +199,42 @@ const porcje = (slowa: Slowo[]): Slowo[][] => {
   return wynik;
 };
 
+// Znacznik części filmu (np. „1/2 JEDNOSTKI”): widz wie, ile jeszcze zostało
+const ZnacznikCzesci: React.FC<{ dane: Odcinek }> = ({ dane }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = frame / fps;
+  let biezacy: { numer: string; tytul: string } | null = null;
+  let od = 0;
+  dane.sceny.forEach((s) => {
+    if (s.czesc !== undefined && s.start <= t) {
+      biezacy = s.czesc;
+      od = s.start;
+    }
+  });
+  const c = biezacy as { numer: string; tytul: string } | null;
+  if (!c) return null;
+  const w = spring({ frame: frame - Math.round(od * fps), fps, config: { damping: 20 } });
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: 182,
+        left: 60,
+        display: "flex",
+        alignItems: "baseline",
+        gap: 18,
+        fontFamily: FONT,
+        opacity: w,
+        transform: `translateX(${(1 - w) * -20}px)`,
+      }}
+    >
+      <span style={{ fontWeight: 800, fontSize: 64, color: MARKA.zloto, lineHeight: 1 }}>{c.numer}</span>
+      <span style={{ fontWeight: 700, fontSize: 30, letterSpacing: 4, color: MARKA.bialy }}>{c.tytul}</span>
+    </div>
+  );
+};
+
 // Napisy w stylu „makieta”: ciemna pigułka, słowa wypowiedziane białe, bieżące złote, kolejne szare
 const NapisyPigulka: React.FC<{ scena: ScenaOSP; gora: boolean }> = ({
   scena,
@@ -979,6 +1015,7 @@ export const RolkaOSP: React.FC<RolkaProps> = ({
       })}
 
       {dane.nadtytul && <Nadtytul tekst={dane.nadtytul} />}
+      <ZnacznikCzesci dane={dane} />
 
       {dane.naczelnik && <PostacNaczelnika dane={dane} glosnosc={glosnosc} />}
 

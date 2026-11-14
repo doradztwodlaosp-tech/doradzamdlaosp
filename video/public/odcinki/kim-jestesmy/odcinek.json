@@ -439,7 +439,11 @@
           "s": 32.297,
           "e": 33.179
         }
-      ]
+      ],
+      "czesc": {
+        "numer": "1/2",
+        "tytul": "JEDNOSTKI"
+      }
     },
     {
       "tekst": "Status organizacji pożytku publicznego, a z nim 1,5% podatku od mieszkańców. Co roku.",
@@ -836,7 +840,11 @@
           "s": 60.832,
           "e": 61.643
         }
-      ]
+      ],
+      "czesc": {
+        "numer": "2/2",
+        "tytul": "STRAŻACY"
+      }
     },
     {
       "tekst": "Świadczenia po wypadku na akcji. Świadczenie ratownicze. Podatki i sprawy prawne w życiu prywatnym: spadek, darowizna, umowa, pismo do urzędu.",
@@ -1041,7 +1049,8 @@
           "s": 76.796,
           "e": 77.457
         }
-      ]
+      ],
+      "czesc": null
     },
     {
       "tekst": "Bez dojazdów i bez kolejek. Działamy w całej Polsce, w pełni zdalnie.",

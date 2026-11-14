@@ -63,6 +63,7 @@ export type ScenaOSP = {
   studio?: boolean;
   mapa?: string; // mapa 3D (src/Mapy.tsx); kolejne sceny z tą samą mapą tworzą jeden przelot kamery
   karta?: { tytul?: string; wiersze: { tekst: string; slowo: string }[] }; // przy mapach 3D: karta nad przedmiotem, wiersze wchodzą na słowa
+  czesc?: { numer: string; tytul: string } | null; // od tej sceny: znacznik części filmu, np. 1/2 JEDNOSTKI (null = koniec znacznika)
   kamera?: string; // przy mapach 3D: nazwa miejsca, do którego kamera płynie w tej scenie (np. "remiza")
   ilustracja?: string; // starsze rysowane ilustracje (src/ScenyPion.tsx)
   prompt?: string;
