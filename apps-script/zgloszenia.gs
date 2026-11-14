@@ -28,6 +28,9 @@ const KOLOR = {
   zloto: "#D4AF37",
   zlotoCiemne: "#B8962E",
   czern: "#0A0A0A",
+  zlotoTekst: "#9A7A12",   // ciemniejsze złoto do małych napisów na białym tle (czytelność)
+  tloMaila: "#F5F0E8",
+  ramkaMaila: "#EDE8DD",
   karta: "#141414",
   ramka: "#2A2A2A",
   bordo: "#2A0C0C",
@@ -397,56 +400,56 @@ function wyslijAutoresponderHTML(odbiorca, nazwaOsp) {
     STRONA_WWW;
 
   const telBezSpacji = TELEFON_KONTAKTOWY.replace(/\s+/g, "");
-  const czcionka = "font-family:Montserrat,'Segoe UI',Helvetica,Arial,sans-serif;";
-  const szeryf = "font-family:'Playfair Display',Georgia,'Times New Roman',serif;";
-  const naglowekHtml = czyWPracy
-    ? 'Zgłoszenie <em style="color:' + KOLOR.zloto + ';">dotarło</em>'
-    : 'Mamy Wasze <em style="color:' + KOLOR.zloto + ';">zgłoszenie</em>';
+  const czcionka = "font-family:'Segoe UI',Helvetica,Arial,sans-serif;";
+  const naglowek = czyWPracy ? "Zgłoszenie dotarło" : "Mamy Wasze zgłoszenie";
 
   const htmlBody =
-    '<div style="margin:0;padding:0;background-color:' + KOLOR.czern + ';">' +
-    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="' + KOLOR.czern + '" style="background-color:' + KOLOR.czern + ';">' +
+    '<div style="margin:0;padding:0;background-color:' + KOLOR.tloMaila + ';">' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="' + KOLOR.tloMaila + '" style="background-color:' + KOLOR.tloMaila + ';">' +
     '<tr><td align="center" style="padding:28px 12px;">' +
 
-      '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="' + KOLOR.karta + '" style="width:100%;max-width:600px;background-color:' + KOLOR.karta + ';border-radius:14px;overflow:hidden;border:1px solid ' + KOLOR.ramka + ';">' +
+      '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="width:100%;max-width:600px;background-color:#ffffff;border-radius:14px;overflow:hidden;border:1px solid ' + KOLOR.ramkaMaila + ';">' +
 
         // Złoty pasek
-        '<tr><td style="height:4px;line-height:4px;font-size:0;background-color:' + KOLOR.zloto + ';">&nbsp;</td></tr>' +
+        '<tr><td style="height:5px;line-height:5px;font-size:0;background-color:' + KOLOR.zloto + ';">&nbsp;</td></tr>' +
 
-        // Nagłówek z nazwą jak na stronie
-        '<tr><td bgcolor="' + KOLOR.czern + '" style="background-color:' + KOLOR.czern + ';padding:24px 32px;border-bottom:1px solid ' + KOLOR.ramka + ';' + czcionka + 'font-size:15px;line-height:1.35;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:' + KOLOR.bialy + ';">' +
-          'Doradztwo <span style="color:' + KOLOR.zloto + ';">dla Ochotniczej<br>Straży Pożarnej</span>' +
+        // Czarny nagłówek
+        '<tr><td bgcolor="' + KOLOR.czern + '" style="background-color:' + KOLOR.czern + ';padding:26px 32px;">' +
+          '<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>' +
+            '<td style="background-color:' + KOLOR.zloto + ';color:' + KOLOR.czern + ';' + czcionka + 'font-size:13px;font-weight:bold;letter-spacing:1px;padding:5px 10px;border-radius:5px;">OSP</td>' +
+            '<td style="padding-left:12px;color:#ffffff;' + czcionka + 'font-size:19px;font-weight:bold;">Doradztwo dla OSP</td>' +
+          '</tr></table>' +
         '</td></tr>' +
 
         // Treść
-        '<tr><td style="padding:34px 32px 8px 32px;' + czcionka + 'color:' + KOLOR.szary + ';font-size:15px;line-height:1.7;">' +
-          '<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="' + KOLOR.bordo + '" style="background-color:' + KOLOR.bordo + ';border:1px solid ' + KOLOR.bordoRamka + ';border-radius:20px;padding:6px 16px;' + czcionka + 'font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:' + KOLOR.zloto + ';">Potwierdzenie zgłoszenia</td></tr></table>' +
-          '<h1 style="margin:22px 0 20px 0;' + szeryf + 'font-size:28px;line-height:1.25;font-weight:700;color:' + KOLOR.bialy + ';">' + naglowekHtml + '</h1>' +
+        '<tr><td style="padding:34px 32px 10px 32px;' + czcionka + 'color:' + KOLOR.tekst + ';font-size:15px;line-height:1.65;">' +
+          '<div style="color:' + KOLOR.zlotoTekst + ';font-size:12px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Potwierdzenie</div>' +
+          '<h1 style="margin:0 0 20px 0;' + czcionka + 'font-size:24px;line-height:1.25;color:' + KOLOR.czern + ';">' + naglowek + '</h1>' +
           '<p style="margin:0 0 14px 0;">Dzień dobry,</p>' +
-          '<p style="margin:0 0 14px 0;">Dziękujemy za wiadomość' + dlaKogoHtml.replace("<strong>", '<strong style="color:' + KOLOR.bialy + ';">') + '. ' + zdanie + '</p>' +
+          '<p style="margin:0 0 14px 0;">Dziękujemy za wiadomość' + dlaKogoHtml + '. ' + zdanie + '</p>' +
         '</td></tr>' +
 
         // Ramka "pilny kontakt"
-        '<tr><td style="padding:12px 32px 8px 32px;">' +
-          '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="' + KOLOR.czern + '" style="background-color:' + KOLOR.czern + ';border:1px solid ' + KOLOR.ramka + ';border-left:4px solid ' + KOLOR.zloto + ';border-radius:8px;">' +
-            '<tr><td style="padding:18px 20px;' + czcionka + 'font-size:14px;line-height:1.5;color:' + KOLOR.szary + ';">' +
-              '<strong style="color:' + KOLOR.bialy + ';">Pilna sprawa?</strong><br>Zadzwoń — porozmawiamy od razu.' +
+        '<tr><td style="padding:10px 32px 8px 32px;">' +
+          '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="' + KOLOR.tloMaila + '" style="background-color:' + KOLOR.tloMaila + ';border-left:4px solid ' + KOLOR.zloto + ';border-radius:8px;">' +
+            '<tr><td style="padding:18px 20px;' + czcionka + 'font-size:14px;line-height:1.5;color:' + KOLOR.tekst + ';">' +
+              '<strong style="color:' + KOLOR.czern + ';">Pilna sprawa?</strong><br>Zadzwoń — chętnie porozmawiamy od razu.' +
             '</td>' +
             '<td align="right" style="padding:18px 20px;white-space:nowrap;">' +
-              '<a href="tel:' + telBezSpacji + '" style="display:inline-block;background-color:' + KOLOR.zloto + ';color:' + KOLOR.czern + ';' + czcionka + 'font-size:15px;font-weight:800;letter-spacing:.5px;text-decoration:none;padding:12px 20px;border-radius:6px;">' + TELEFON_KONTAKTOWY + '</a>' +
+              '<a href="tel:' + telBezSpacji + '" style="display:inline-block;background-color:' + KOLOR.zloto + ';color:' + KOLOR.czern + ';' + czcionka + 'font-size:15px;font-weight:bold;text-decoration:none;padding:11px 20px;border-radius:8px;">' + TELEFON_KONTAKTOWY + '</a>' +
             '</td></tr>' +
           '</table>' +
         '</td></tr>' +
 
         // Podpis
-        '<tr><td style="padding:22px 32px 34px 32px;' + czcionka + 'color:' + KOLOR.szary + ';font-size:15px;line-height:1.6;">' +
-          'Pozdrawiamy,<br><strong style="color:' + KOLOR.zloto + ';">Zespół Doradztwo dla OSP</strong>' +
+        '<tr><td style="padding:22px 32px 34px 32px;' + czcionka + 'color:' + KOLOR.tekst + ';font-size:15px;line-height:1.6;">' +
+          'Pozdrawiamy,<br><strong style="color:' + KOLOR.czern + ';">Zespół Doradztwo dla OSP</strong>' +
         '</td></tr>' +
 
-        // Stopka
-        '<tr><td bgcolor="' + KOLOR.czern + '" style="background-color:' + KOLOR.czern + ';border-top:1px solid ' + KOLOR.ramka + ';padding:20px 32px;' + czcionka + 'font-size:12px;line-height:1.7;color:' + KOLOR.szaryCiemny + ';">' +
-          '<a href="' + STRONA_WWW + '" style="color:' + KOLOR.zloto + ';text-decoration:none;font-weight:700;">doradztwodlaosp.pl</a>' +
-          ' &nbsp;·&nbsp; tel. <a href="tel:' + telBezSpacji + '" style="color:' + KOLOR.bialy + ';text-decoration:none;">' + TELEFON_KONTAKTOWY + '</a><br>' +
+        // Czarna stopka
+        '<tr><td bgcolor="' + KOLOR.czern + '" style="background-color:' + KOLOR.czern + ';padding:20px 32px;' + czcionka + 'font-size:12px;line-height:1.6;color:' + KOLOR.szaryCiemny + ';">' +
+          '<a href="' + STRONA_WWW + '" style="color:' + KOLOR.zloto + ';text-decoration:none;font-weight:bold;">doradztwodlaosp.pl</a>' +
+          ' &nbsp;·&nbsp; tel. <a href="tel:' + telBezSpacji + '" style="color:#ffffff;text-decoration:none;">' + TELEFON_KONTAKTOWY + '</a><br>' +
           'Wiadomość wysłana automatycznie w odpowiedzi na formularz kontaktowy.' +
         '</td></tr>' +
 
