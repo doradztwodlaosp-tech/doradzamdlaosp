@@ -65,6 +65,7 @@ export type ScenaOSP = {
   karta?: { tytul?: string; wiersze: { tekst: string; slowo: string }[] }; // przy mapach 3D: karta nad przedmiotem, wiersze wchodzą na słowa
   czesc?: { numer: string; tytul: string } | null; // od tej sceny: znacznik części filmu, np. 1/2 JEDNOSTKI (null = koniec znacznika)
   liczba?: { slowo: string; do: number; miejsca?: number; sufiks?: string; podpis: string }; // duża liczba nad przedmiotem (od słowa)
+  haslo?: string; // krótkie hasło sceny (do 6 słów); słowo w *gwiazdkach* jest złote
   kamera?: string;
   // przy mapach 3D: dodatkowe ujęcia kamery w tej scenie, każde od wskazanego słowa (nazwa miejsca i/lub własne liczby)
   ujeciaKamery?: { slowo: string; kamera?: string; cel?: [number, number, number]; kat?: number; odl?: number; wys?: number }[];
@@ -94,6 +95,7 @@ export type Odcinek = {
   maskotka?: boolean;
   wyglad3d?: "rysunek" | "makieta" | "jasny"; // wygląd scen 3D: rysunek techniczny (domyślnie makieta)
   emblemat?: string; // plik z logo w public/ (np. "marka/emblemat.png"); brak = emblemat z elementów marki
+  napisy?: "pigulka" | "haslo"; // „haslo”: zamiast zapisu lektora krótkie hasło sceny u góry (jak BazaOSP)
   styl?: "makieta"; // „makieta”: napisy w ciemnej pigułce nad dolną strefą (jak w filmach instruktażowych 3D)
   szkic?: string; // odcinek bez nagrania lektora: czasy szacunkowe
   wstep?: number; // sekundy z hasłem-hakiem przed pierwszym słowem lektora

@@ -169,7 +169,8 @@ export const WozStrazacki: React.FC<{ t: number; droga?: number; sygnaly?: boole
     }),
     [],
   );
-  const blysk = sygnaly ? (Math.sin(t * 14) > 0 ? 1 : 0) : 0;
+  // spokojne pulsowanie zamiast szybkiego migania (szybkie błyski męczą wzrok na ekranie telefonu)
+  const blysk = sygnaly ? 0.5 + 0.5 * Math.sin(t * 3.2) : 0;
   const nieb = (on: number) => new THREE.MeshStandardMaterial({ color: "#2F6BFF", emissive: "#2F6BFF", emissiveIntensity: 0.25 + on * 3.2, roughness: 0.2, transparent: true, opacity: 0.95 });
   const n1 = useMemo(() => nieb(blysk), [blysk]);
   const n2 = useMemo(() => nieb(sygnaly ? 1 - blysk : 0), [blysk, sygnaly]);

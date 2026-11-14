@@ -412,9 +412,9 @@ type Akcja = NonNullable<import("./typy").ScenaOSP["akcje"]>[number];
 
 const KartkaWjezdza: React.FC<{ a: Akcja; t: number; od: number }> = ({ a, t, od }) => {
   const tex = useMemo(() => kartkaZTytulem(a.tekst ?? ""), [a.tekst]);
-  const p = interpolate(t, [od, od + 0.7], [0, 1], { ...Z, easing: Easing.out(Easing.cubic) });
+  const p = interpolate(t, [od, od + 0.9], [0, 1], { ...Z, easing: Easing.inOut(Easing.cubic) });
   if (p <= 0) return null;
-  const s = a.rozmiar ?? 1;
+  const s = (a.rozmiar ?? 1) * (0.9 + 0.1 * p);
   return (
     <group position={[a.poz[0], 0.012 + (1 - p) * 0.9, a.poz[1] - (1 - p) * 1.2]} rotation={[0, (a.obrot ?? 0) + (1 - p) * 0.5, 0]} scale={s}>
       <mesh castShadow receiveShadow>

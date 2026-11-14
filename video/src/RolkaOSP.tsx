@@ -271,6 +271,59 @@ const ZnacznikCzesci: React.FC<{ dane: Odcinek; jasny?: boolean }> = ({ dane, ja
   );
 };
 
+// Hasła scen (styl BazaOSP): jedno krótkie hasło na scenę, u góry, płynnie przechodzące w kolejne – bez „mrugania”
+const HaslaScen: React.FC<{ dane: Odcinek; jasny: boolean }> = ({ dane, jasny }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = frame / fps;
+  const sceny = dane.sceny.filter((s) => !s.plansza);
+  return (
+    <>
+      {sceny.map((s, i) => {
+        const tekst = s.haslo ?? s.tekst;
+        const nast = sceny[i + 1];
+        const wej = i === 0 ? interpolate(t, [(dane.wstep ?? 0) - 0.1, (dane.wstep ?? 0) + 0.4], [0, 1], ZAKRES) : interpolate(t, [s.start - 0.1, s.start + 0.35], [0, 1], ZAKRES);
+        const wyj = nast ? interpolate(t, [nast.start - 0.15, nast.start + 0.15], [1, 0], ZAKRES) : interpolate(t, [s.koniec + 0.6, s.koniec + 0.9], [1, 0], ZAKRES);
+        const w = Math.min(wej, wyj);
+        if (w <= 0) return null;
+        const dlugosc = tekst.replace(/\*/g, "").length;
+        const rozmiar = dlugosc <= 18 ? 72 : dlugosc <= 30 ? 62 : 54;
+        const studio = !!s.studio || s.postac?.plan === "pelny";
+        return (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              top: 255,
+              left: KOLUMNA.lewo,
+              width: KOLUMNA.szer,
+              fontFamily: FONT,
+              fontWeight: 800,
+              fontSize: rozmiar,
+              lineHeight: 1.12,
+              textAlign: studio ? "center" : "left",
+              color: studio || !jasny ? MARKA.bialy : "#23242A",
+              opacity: w,
+              transform: `translateY(${(1 - wej) * 18}px)`,
+              textWrap: "balance",
+            }}
+          >
+            {tekst.split(/(\*[^*]+\*)/).map((cz, j) =>
+              cz.startsWith("*") ? (
+                <span key={j} style={{ color: jasny && !studio ? "#A8781A" : MARKA.zloto }}>
+                  {cz.slice(1, -1)}
+                </span>
+              ) : (
+                <span key={j}>{cz}</span>
+              ),
+            )}
+          </div>
+        );
+      })}
+    </>
+  );
+};
+
 // Napisy w stylu „makieta”: ciemna pigułka, słowa wypowiedziane białe, bieżące złote, kolejne szare
 const NapisyPigulka: React.FC<{ scena: ScenaOSP; gora: boolean }> = ({
   scena,
@@ -1031,10 +1084,10 @@ export const RolkaOSP: React.FC<RolkaProps> = ({
           left: 0,
           width: 1080,
           top: 0,
-          height: dane.styl === "makieta" ? 300 : U.ilustracjaOdGory + 80,
+          height: dane.napisy === "haslo" ? 470 : dane.styl === "makieta" ? 300 : U.ilustracjaOdGory + 80,
           background:
             dane.wyglad3d === "jasny"
-              ? "linear-gradient(180deg, rgba(244,239,230,0.95) 0%, rgba(244,239,230,0.75) 60%, transparent 100%)"
+              ? "linear-gradient(180deg, rgba(244,239,230,0.97) 0%, rgba(244,239,230,0.9) 62%, rgba(244,239,230,0) 100%)"
               : `linear-gradient(180deg, ${MARKA.tlo}f2 0%, ${MARKA.tlo}e0 70%, transparent 100%)`,
         }}
       />
@@ -1083,8 +1136,9 @@ export const RolkaOSP: React.FC<RolkaProps> = ({
 
       {dane.maskotka && <Maskotka dane={dane} glosnosc={glosnosc} />}
 
+      {dane.napisy === "haslo" ? <HaslaScen dane={dane} jasny={dane.wyglad3d === "jasny"} /> : null}
       {/* Napisy-pigułki („makieta”) leżą nad maskotką; w studiu z pełną postacią przechodzą na górę */}
-      {dane.styl === "makieta"
+      {dane.styl === "makieta" && dane.napisy !== "haslo"
         ? dane.sceny.map((scena, i) => {
             if (scena.plansza) return null;
             const { od, doKlatki } = zakresSceny(i);
@@ -1152,7 +1206,7 @@ export const RolkaOSP: React.FC<RolkaProps> = ({
         </Sequence>
       )}
 
-      <Ziarno />
+      {dane.wyglad3d === "jasny" ? null : <Ziarno />}
 
       {strefy && <Strefy />}
     </AbsoluteFill>
