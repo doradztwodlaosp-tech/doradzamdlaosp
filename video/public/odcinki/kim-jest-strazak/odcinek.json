@@ -1,0 +1,797 @@
+{
+  "tytul": "Strażak ochotnik. Kim jest w świetle prawa?",
+  "nadtytul": "DORADZTWO DLA OSP",
+  "glos": "lektor.mp3",
+  "maskotka": true,
+  "hakPostac": false,
+  "styl": "makieta",
+  "wyglad3d": "jasny",
+  "wstep": 2.2,
+  "hak": [
+    {
+      "tekst": "STRAŻAK OCHOTNIK.",
+      "zloty": true
+    },
+    {
+      "tekst": "KIM JEST"
+    },
+    {
+      "tekst": "W ŚWIETLE PRAWA?"
+    }
+  ],
+  "cta": "Czy w Waszej OSP każdy zna swoje uprawnienia?",
+  "plansza": {
+    "haslo": [
+      {
+        "tekst": "POMAGAMY TYM,",
+        "zloty": true
+      },
+      {
+        "tekst": "KTÓRZY POMAGAJĄ"
+      },
+      {
+        "tekst": "INNYM."
+      }
+    ],
+    "pigulka": "Zaobserwuj nas • doradztwodlaosp.pl",
+    "kontakt": "WhatsApp: 720 868 902",
+    "stopka": "Materiał informacyjny. Nie zastępuje indywidualnej analizy."
+  },
+  "sceny": [
+    {
+      "tekst": "Ochotnicza straż pożarna to nie tylko remiza i wóz.",
+      "lektor": "Ochotnicza straż pożarna to nie tylko remiza i wóz.",
+      "akcent": [
+        "remiza"
+      ],
+      "mapa": "stol-osp",
+      "kamera": "remiza",
+      "start": 0,
+      "koniec": 3.643,
+      "slowa": [
+        {
+          "w": "Ochotnicza",
+          "s": 0,
+          "e": 0.683
+        },
+        {
+          "w": "straż",
+          "s": 0.683,
+          "e": 1.081
+        },
+        {
+          "w": "pożarna",
+          "s": 1.081,
+          "e": 1.594
+        },
+        {
+          "w": "to",
+          "s": 1.594,
+          "e": 1.821
+        },
+        {
+          "w": "nie",
+          "s": 1.821,
+          "e": 2.106
+        },
+        {
+          "w": "tylko",
+          "s": 2.106,
+          "e": 2.504
+        },
+        {
+          "w": "remiza",
+          "s": 2.504,
+          "e": 2.96
+        },
+        {
+          "w": "i",
+          "s": 2.96,
+          "e": 3.131
+        },
+        {
+          "w": "wóz.",
+          "s": 3.131,
+          "e": 3.643
+        }
+      ]
+    },
+    {
+      "tekst": "Prawnie to stowarzyszenie. Działa według Prawa o stowarzyszeniach i jest wpisana do KRS.",
+      "lektor": "Prawnie to stowarzyszenie. Działa według Prawa o stowarzyszeniach i jest wpisana do ka-er-esu.",
+      "akcent": [
+        "stowarzyszenie."
+      ],
+      "mapa": "stol-osp",
+      "kamera": "ustawa",
+      "karta": {
+        "wiersze": [
+          {
+            "tekst": "Stowarzyszenie",
+            "slowo": "stowarzyszenie."
+          },
+          {
+            "tekst": "Prawo o stowarzyszeniach",
+            "slowo": "Prawa"
+          },
+          {
+            "tekst": "Wpis do KRS",
+            "slowo": "wpisana"
+          }
+        ]
+      },
+      "start": 4.193,
+      "koniec": 10.907,
+      "slowa": [
+        {
+          "w": "Prawnie",
+          "s": 4.193,
+          "e": 4.752
+        },
+        {
+          "w": "to",
+          "s": 4.752,
+          "e": 5.001
+        },
+        {
+          "w": "stowarzyszenie.",
+          "s": 5.001,
+          "e": 6.244
+        },
+        {
+          "w": "Działa",
+          "s": 6.244,
+          "e": 6.742
+        },
+        {
+          "w": "według",
+          "s": 6.742,
+          "e": 7.239
+        },
+        {
+          "w": "Prawa",
+          "s": 7.239,
+          "e": 7.674
+        },
+        {
+          "w": "o",
+          "s": 7.674,
+          "e": 7.861
+        },
+        {
+          "w": "stowarzyszeniach",
+          "s": 7.861,
+          "e": 8.98
+        },
+        {
+          "w": "i",
+          "s": 8.98,
+          "e": 9.166
+        },
+        {
+          "w": "jest",
+          "s": 9.166,
+          "e": 9.539
+        },
+        {
+          "w": "wpisana",
+          "s": 9.539,
+          "e": 10.099
+        },
+        {
+          "w": "do",
+          "s": 10.099,
+          "e": 10.348
+        },
+        {
+          "w": "KRS.",
+          "s": 10.348,
+          "e": 10.907
+        }
+      ]
+    },
+    {
+      "tekst": "Od 2022 roku ma też własną ustawę: o ochotniczych strażach pożarnych.",
+      "lektor": "Od dwa tysiące dwudziestego drugiego roku ma też własną ustawę: o ochotniczych strażach pożarnych.",
+      "akcent": [
+        "własną"
+      ],
+      "mapa": "stol-osp",
+      "kamera": "ustawa",
+      "start": 11.457,
+      "koniec": 18.457,
+      "slowa": [
+        {
+          "w": "Od",
+          "s": 11.457,
+          "e": 11.779
+        },
+        {
+          "w": "2022",
+          "s": 11.779,
+          "e": 12.262
+        },
+        {
+          "w": "roku",
+          "s": 12.262,
+          "e": 12.744
+        },
+        {
+          "w": "ma",
+          "s": 12.744,
+          "e": 13.066
+        },
+        {
+          "w": "też",
+          "s": 13.066,
+          "e": 13.469
+        },
+        {
+          "w": "własną",
+          "s": 13.469,
+          "e": 14.112
+        },
+        {
+          "w": "ustawę:",
+          "s": 14.112,
+          "e": 15.078
+        },
+        {
+          "w": "o",
+          "s": 15.078,
+          "e": 15.319
+        },
+        {
+          "w": "ochotniczych",
+          "s": 15.319,
+          "e": 16.446
+        },
+        {
+          "w": "strażach",
+          "s": 16.446,
+          "e": 17.25
+        },
+        {
+          "w": "pożarnych.",
+          "s": 17.25,
+          "e": 18.457
+        }
+      ]
+    },
+    {
+      "tekst": "Ta ustawa daje uprawnienia: ekwiwalent za udział w akcjach, zwolnienie z pracy na czas działań i świadczenie ratownicze.",
+      "akcent": [
+        "uprawnienia:"
+      ],
+      "mapa": "stol-osp",
+      "kamera": "helm",
+      "czesc": {
+        "numer": "1/2",
+        "tytul": "UPRAWNIENIA"
+      },
+      "karta": {
+        "wiersze": [
+          {
+            "tekst": "Ekwiwalent za akcje",
+            "slowo": "ekwiwalent"
+          },
+          {
+            "tekst": "Zwolnienie z pracy",
+            "slowo": "zwolnienie"
+          },
+          {
+            "tekst": "Świadczenie ratownicze",
+            "slowo": "świadczenie"
+          }
+        ]
+      },
+      "start": 19.007,
+      "koniec": 27.579,
+      "slowa": [
+        {
+          "w": "Ta",
+          "s": 19.007,
+          "e": 19.239
+        },
+        {
+          "w": "ustawa",
+          "s": 19.239,
+          "e": 19.702
+        },
+        {
+          "w": "daje",
+          "s": 19.702,
+          "e": 20.05
+        },
+        {
+          "w": "uprawnienia:",
+          "s": 20.05,
+          "e": 21.034
+        },
+        {
+          "w": "ekwiwalent",
+          "s": 21.034,
+          "e": 21.729
+        },
+        {
+          "w": "za",
+          "s": 21.729,
+          "e": 21.961
+        },
+        {
+          "w": "udział",
+          "s": 21.961,
+          "e": 22.424
+        },
+        {
+          "w": "w",
+          "s": 22.424,
+          "e": 22.598
+        },
+        {
+          "w": "akcjach,",
+          "s": 22.598,
+          "e": 23.351
+        },
+        {
+          "w": "zwolnienie",
+          "s": 23.351,
+          "e": 24.046
+        },
+        {
+          "w": "z",
+          "s": 24.046,
+          "e": 24.219
+        },
+        {
+          "w": "pracy",
+          "s": 24.219,
+          "e": 24.625
+        },
+        {
+          "w": "na",
+          "s": 24.625,
+          "e": 24.857
+        },
+        {
+          "w": "czas",
+          "s": 24.857,
+          "e": 25.204
+        },
+        {
+          "w": "działań",
+          "s": 25.204,
+          "e": 25.725
+        },
+        {
+          "w": "i",
+          "s": 25.725,
+          "e": 25.899
+        },
+        {
+          "w": "świadczenie",
+          "s": 25.899,
+          "e": 26.652
+        },
+        {
+          "w": "ratownicze.",
+          "s": 26.652,
+          "e": 27.579
+        }
+      ]
+    },
+    {
+      "tekst": "Ale nakłada też obowiązki: szkolenia, badania lekarskie, gotowość do działań i porządek w dokumentach.",
+      "akcent": [
+        "obowiązki:"
+      ],
+      "mapa": "stol-osp",
+      "kamera": "papiery",
+      "czesc": {
+        "numer": "2/2",
+        "tytul": "OBOWIĄZKI"
+      },
+      "karta": {
+        "wiersze": [
+          {
+            "tekst": "Szkolenia",
+            "slowo": "szkolenia,"
+          },
+          {
+            "tekst": "Badania lekarskie",
+            "slowo": "badania"
+          },
+          {
+            "tekst": "Gotowość do działań",
+            "slowo": "gotowość"
+          },
+          {
+            "tekst": "Porządek w dokumentach",
+            "slowo": "porządek"
+          }
+        ]
+      },
+      "start": 28.129,
+      "koniec": 35.414,
+      "slowa": [
+        {
+          "w": "Ale",
+          "s": 28.129,
+          "e": 28.411
+        },
+        {
+          "w": "nakłada",
+          "s": 28.411,
+          "e": 28.919
+        },
+        {
+          "w": "też",
+          "s": 28.919,
+          "e": 29.202
+        },
+        {
+          "w": "obowiązki:",
+          "s": 29.202,
+          "e": 30.049
+        },
+        {
+          "w": "szkolenia,",
+          "s": 30.049,
+          "e": 30.896
+        },
+        {
+          "w": "badania",
+          "s": 30.896,
+          "e": 31.404
+        },
+        {
+          "w": "lekarskie,",
+          "s": 31.404,
+          "e": 32.251
+        },
+        {
+          "w": "gotowość",
+          "s": 32.251,
+          "e": 32.816
+        },
+        {
+          "w": "do",
+          "s": 32.816,
+          "e": 33.042
+        },
+        {
+          "w": "działań",
+          "s": 33.042,
+          "e": 33.55
+        },
+        {
+          "w": "i",
+          "s": 33.55,
+          "e": 33.72
+        },
+        {
+          "w": "porządek",
+          "s": 33.72,
+          "e": 34.285
+        },
+        {
+          "w": "w",
+          "s": 34.285,
+          "e": 34.454
+        },
+        {
+          "w": "dokumentach.",
+          "s": 34.454,
+          "e": 35.414
+        }
+      ]
+    },
+    {
+      "tekst": "W Polsce działa około 16 tysięcy jednostek OSP.",
+      "lektor": "W Polsce działa około szesnastu tysięcy jednostek o-es-pe.",
+      "akcent": [
+        "16"
+      ],
+      "mapa": "stol-osp",
+      "kamera": "calosc",
+      "czesc": null,
+      "liczba": {
+        "slowo": "16",
+        "do": 16000,
+        "podpis": "jednostek OSP w Polsce"
+      },
+      "start": 35.964,
+      "koniec": 40.107,
+      "slowa": [
+        {
+          "w": "W",
+          "s": 35.964,
+          "e": 36.175
+        },
+        {
+          "w": "Polsce",
+          "s": 36.175,
+          "e": 36.737
+        },
+        {
+          "w": "działa",
+          "s": 36.737,
+          "e": 37.298
+        },
+        {
+          "w": "około",
+          "s": 37.298,
+          "e": 37.79
+        },
+        {
+          "w": "16",
+          "s": 37.79,
+          "e": 38.071
+        },
+        {
+          "w": "tysięcy",
+          "s": 38.071,
+          "e": 38.703
+        },
+        {
+          "w": "jednostek",
+          "s": 38.703,
+          "e": 39.475
+        },
+        {
+          "w": "OSP.",
+          "s": 39.475,
+          "e": 40.107
+        }
+      ]
+    },
+    {
+      "tekst": "To wy jesteście filarem ochrony ludności i obrony cywilnej w Polsce.",
+      "akcent": [
+        "filarem"
+      ],
+      "mapa": "stol-osp",
+      "kamera": "woz",
+      "start": 40.657,
+      "koniec": 45.514,
+      "slowa": [
+        {
+          "w": "To",
+          "s": 40.657,
+          "e": 40.891
+        },
+        {
+          "w": "wy",
+          "s": 40.891,
+          "e": 41.125
+        },
+        {
+          "w": "jesteście",
+          "s": 41.125,
+          "e": 41.769
+        },
+        {
+          "w": "filarem",
+          "s": 41.769,
+          "e": 42.296
+        },
+        {
+          "w": "ochrony",
+          "s": 42.296,
+          "e": 42.822
+        },
+        {
+          "w": "ludności",
+          "s": 42.822,
+          "e": 43.408
+        },
+        {
+          "w": "i",
+          "s": 43.408,
+          "e": 43.583
+        },
+        {
+          "w": "obrony",
+          "s": 43.583,
+          "e": 44.051
+        },
+        {
+          "w": "cywilnej",
+          "s": 44.051,
+          "e": 44.636
+        },
+        {
+          "w": "w",
+          "s": 44.636,
+          "e": 44.812
+        },
+        {
+          "w": "Polsce.",
+          "s": 44.812,
+          "e": 45.514
+        }
+      ]
+    },
+    {
+      "tekst": "Wy ratujecie innych. My pilnujemy, żeby prawo było po waszej stronie.",
+      "akcent": [
+        "prawo"
+      ],
+      "mapa": "stol-osp",
+      "kamera": "marka",
+      "start": 46.064,
+      "koniec": 50.993,
+      "slowa": [
+        {
+          "w": "Wy",
+          "s": 46.064,
+          "e": 46.283
+        },
+        {
+          "w": "ratujecie",
+          "s": 46.283,
+          "e": 46.886
+        },
+        {
+          "w": "innych.",
+          "s": 46.886,
+          "e": 47.543
+        },
+        {
+          "w": "My",
+          "s": 47.543,
+          "e": 47.762
+        },
+        {
+          "w": "pilnujemy,",
+          "s": 47.762,
+          "e": 48.583
+        },
+        {
+          "w": "żeby",
+          "s": 48.583,
+          "e": 48.912
+        },
+        {
+          "w": "prawo",
+          "s": 48.912,
+          "e": 49.295
+        },
+        {
+          "w": "było",
+          "s": 49.295,
+          "e": 49.624
+        },
+        {
+          "w": "po",
+          "s": 49.624,
+          "e": 49.843
+        },
+        {
+          "w": "waszej",
+          "s": 49.843,
+          "e": 50.281
+        },
+        {
+          "w": "stronie.",
+          "s": 50.281,
+          "e": 50.993
+        }
+      ]
+    },
+    {
+      "tekst": "Czy w Waszej OSP każdy zna swoje uprawnienia?",
+      "lektor": "Czy w Waszej o-es-pe każdy zna swoje uprawnienia?",
+      "akcent": [
+        "uprawnienia?"
+      ],
+      "studio": true,
+      "postac": {
+        "plan": "pelny",
+        "poza": "tlumaczy"
+      },
+      "start": 51.543,
+      "koniec": 55.043,
+      "slowa": [
+        {
+          "w": "Czy",
+          "s": 51.543,
+          "e": 51.85
+        },
+        {
+          "w": "w",
+          "s": 51.85,
+          "e": 52.034
+        },
+        {
+          "w": "Waszej",
+          "s": 52.034,
+          "e": 52.525
+        },
+        {
+          "w": "OSP",
+          "s": 52.525,
+          "e": 52.832
+        },
+        {
+          "w": "każdy",
+          "s": 52.832,
+          "e": 53.262
+        },
+        {
+          "w": "zna",
+          "s": 53.262,
+          "e": 53.569
+        },
+        {
+          "w": "swoje",
+          "s": 53.569,
+          "e": 53.999
+        },
+        {
+          "w": "uprawnienia?",
+          "s": 53.999,
+          "e": 55.043
+        }
+      ]
+    },
+    {
+      "tekst": "Zaobserwuj Doradztwo dla OSP. Pomagamy tym, którzy pomagają innym.",
+      "lektor": "Zaobserwuj Doradztwo dla o-es-pe. Pomagamy tym, którzy pomagają innym.",
+      "akcent": [
+        "Zaobserwuj"
+      ],
+      "plansza": true,
+      "start": 55.593,
+      "koniec": 60.593,
+      "slowa": [
+        {
+          "w": "Zaobserwuj",
+          "s": 55.593,
+          "e": 56.299
+        },
+        {
+          "w": "Doradztwo",
+          "s": 56.299,
+          "e": 56.946
+        },
+        {
+          "w": "dla",
+          "s": 56.946,
+          "e": 57.24
+        },
+        {
+          "w": "OSP.",
+          "s": 57.24,
+          "e": 57.769
+        },
+        {
+          "w": "Pomagamy",
+          "s": 57.769,
+          "e": 58.358
+        },
+        {
+          "w": "tym,",
+          "s": 58.358,
+          "e": 58.887
+        },
+        {
+          "w": "którzy",
+          "s": 58.887,
+          "e": 59.358
+        },
+        {
+          "w": "pomagają",
+          "s": 59.358,
+          "e": 59.946
+        },
+        {
+          "w": "innym.",
+          "s": 59.946,
+          "e": 60.593
+        }
+      ]
+    }
+  ],
+  "szkic": "Czasy szacunkowe (bez lektora). Po dodaniu lektor.mp3 uruchom: npm run czasy -- kim-jest-strazak"
+}

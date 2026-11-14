@@ -7,7 +7,7 @@ import { FONT, KOLUMNA, MARKA } from "./marka";
 import { Otoczenie, WozStrazacki } from "./Woz3D";
 import { BudynekRemizy } from "./Remiza3D";
 import { RYSUNEK, SiatkaKreslarska, TrybRysunku } from "./Rysunek3D";
-import { LaptopPro, StosDokumentow, StosyMonet, useBlat } from "./Przedmioty3D";
+import { KsiegiUstaw, LaptopPro, StosDokumentow, StosyMonet, useBlat } from "./Przedmioty3D";
 import { Dlugopis, Helm, Segregator, type Tekstury, useTekstury } from "./Scena3D";
 import { type ScenaOSP, czasSlowa } from "./typy";
 import type { PropsMapy, ZdarzenieDzwiekowe } from "./Mapy";
@@ -39,6 +39,7 @@ const STACJE: Record<string, Stacja> = {
   gmina: { cel: [10.0, 0.9, 0.0], kat: -0.35, odl: 11.5, wys: 3.6 },
   woz: { cel: [-6.55, 0.35, -1.3], kat: 0.75, odl: 5.0, wys: 1.9 },
   helm: { cel: [-3.0, 0.12, 0.3], kat: 0.5, odl: 7.0, wys: 3.4 },
+  ustawa: { cel: [3.2, 0.25, 6.8], kat: 0.3, odl: 6.6, wys: 4.6 },
   calosc: { cel: [-0.5, 0.0, 0.3], kat: 0.3, odl: 19, wys: 13.5 },
 };
 
@@ -99,6 +100,11 @@ const czasy = (sceny: ScenaOSP[]) => {
     oddala: slowo("protokol", "oddala", 1.5),
     traci: slowo("protokol", "traci", 3.5),
     gmina: sc("gmina")?.start ?? 999,
+    ustawa: (() => {
+      const u = sceny.filter((s) => s.kamera === "ustawa");
+      const s2 = u[1] ?? u[0];
+      return s2 ? (czasSlowa(s2, "własną") ?? s2.start + 1) : 999;
+    })(),
     nie: slowo("gmina", "nie", 4),
     calosc: sc("calosc")?.start ?? 999,
   };
@@ -428,6 +434,7 @@ const Swiat: React.FC<{ sceny: ScenaOSP[]; t: number; tx: TeksturyStolu; ts: Tek
       <Segregator t={ts} otwarcie={otw} blask={blask} pozycja={[0.1, 0.06, 3.5]} obrot={0.42} />
       <StosyMonet t={t} od={c.dostawac} pozycja={[-6.0, 0, 3.8]} />
       <Protokol t={t} c={c} tx={tx} />
+      <KsiegiUstaw t={t} spadek={c.ustawa} pozycja={[3.2, 0, 6.8]} />
       <Gmina t={t} c={c} tx={tx} />
       <Helm pozycja={[-3.0, 0.06, 0.3]} obrot={0.75} />
       <Dlugopis pozycja={[1.7, 0.1, 4.6]} obrot={0.9} />
@@ -475,6 +482,23 @@ const Karta: React.FC<{ t: number; od: number; do: number; tytul?: string; wiers
   );
 };
 
+// Dowolna duża liczba (np. 16 000 jednostek): odlicza od zera, z podpisem pod spodem
+const LicznikOgolny: React.FC<{ t: number; od: number; do: number; jasny?: boolean; l: NonNullable<ScenaOSP["liczba"]> }> = ({ t, od, do: koniec, jasny, l }) => {
+  if (t < od - 0.05 || t > koniec + 0.6) return null;
+  const w = interpolate(t, [od, od + 0.6], [0, 1], Z) * interpolate(t, [koniec, koniec + 0.5], [1, 0], Z);
+  const v = interpolate(t, [od, od + 1.8], [0, l.do], { ...Z, easing: Easing.out(Easing.cubic) });
+  const tekst = v.toLocaleString("pl-PL", { minimumFractionDigits: l.miejsca ?? 0, maximumFractionDigits: l.miejsca ?? 0 }).replace(/\u00a0/g, " ");
+  return (
+    <div style={{ position: "absolute", top: 340, left: KOLUMNA.lewo, width: KOLUMNA.szer, textAlign: "center", fontFamily: FONT, opacity: w, transform: `translateY(${(1 - w) * 20}px)` }}>
+      <div style={{ fontWeight: 800, fontSize: 140, color: jasny ? ZLOTO_NA_JASNYM : MARKA.zloto, lineHeight: 1, fontVariantNumeric: "tabular-nums" }}>
+        {tekst}
+        {l.sufiks ?? ""}
+      </div>
+      <div style={{ marginTop: 12, fontWeight: 700, fontSize: 38, color: jasny ? "#23242A" : "white" }}>{l.podpis}</div>
+    </div>
+  );
+};
+
 const Licznik: React.FC<{ t: number; od: number; do: number; jasny?: boolean }> = ({ t, od, do: koniec, jasny }) => {
   if (t < od - 0.05 || t > koniec + 0.6) return null;
   const w = interpolate(t, [od, od + 0.6], [0, 1], Z) * interpolate(t, [koniec, koniec + 0.5], [1, 0], Z);
@@ -516,7 +540,12 @@ export const StolOSP: React.FC<PropsMapy> = ({ sceny, klatkaStartu, wyglad }) =>
           />
         ) : null,
       )}
-      {c.monety ? <Licznik t={t} od={sl(c.monety, "1,5%")} do={c.monety.koniec + 0.4} jasny={wyglad === "jasny"} /> : null}
+      {sceny.map((s, i) =>
+        s.liczba ? (
+          <LicznikOgolny key={`l${i}`} t={t} od={sl(s, s.liczba.slowo)} do={s.koniec + 0.4} l={s.liczba} jasny={wyglad === "jasny"} />
+        ) : null,
+      )}
+      {c.monety && !c.monety.liczba ? <Licznik t={t} od={sl(c.monety, "1,5%")} do={c.monety.koniec + 0.4} jasny={wyglad === "jasny"} /> : null}
     </AbsoluteFill>
   );
 };

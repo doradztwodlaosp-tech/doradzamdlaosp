@@ -307,3 +307,70 @@ export const StosyMonet: React.FC<{ t: number; od: number; pozycja: [number, num
     </group>
   );
 };
+
+// ───────────── Księgi ustaw ─────────────
+const okladkaKsiegi = (gora: string, tytul: string[], dol: string) =>
+  plotno(640, 900, (c) => {
+    c.fillStyle = "#24262E";
+    c.fillRect(0, 0, 640, 900);
+    c.strokeStyle = MARKA.zloto;
+    c.lineWidth = 4;
+    c.strokeRect(34, 34, 572, 832);
+    c.fillStyle = MARKA.zloto;
+    c.textAlign = "center";
+    c.font = `600 30px ${FONT}`;
+    c.fillText(gora, 320, 150);
+    c.fillRect(250, 180, 140, 3);
+    c.fillStyle = "#F2F0EA";
+    let rozmiar = 60;
+    c.font = `800 ${rozmiar}px ${FONT}`;
+    while (Math.max(...tytul.map((l) => c.measureText(l).width)) > 500 && rozmiar > 30) c.font = `800 ${--rozmiar}px ${FONT}`;
+    tytul.forEach((l, i) => c.fillText(l, 320, 330 + i * (rozmiar + 16)));
+    c.fillStyle = "#CBCBD3";
+    c.font = `600 28px ${FONT}`;
+    c.fillText(dol, 320, 790);
+  });
+
+const Ksiega: React.FC<{ okladka: THREE.Texture; pozycja: [number, number, number]; obrot: number; grubosc?: number }> = ({ okladka, pozycja, obrot, grubosc = 0.24 }) => {
+  const m = useMemo(() => {
+    const opr = new THREE.MeshStandardMaterial({ color: "#23252D", roughness: 0.55 });
+    const kartki = new THREE.MeshStandardMaterial({ color: "#EDE6D6", roughness: 0.9 });
+    const wierzch = new THREE.MeshStandardMaterial({ map: okladka, roughness: 0.5 });
+    return { opr, kartki, wierzch };
+  }, [okladka]);
+  const g = useMemo(() => new RoundedBoxGeometry(1.3, grubosc, 1.8, 3, 0.03), [grubosc]);
+  return (
+    <group position={pozycja} rotation={[0, obrot, 0]}>
+      <mesh geometry={g} position={[0, grubosc / 2, 0]} material={m.opr} castShadow receiveShadow />
+      <mesh position={[0.02, grubosc / 2, 0]} material={m.kartki}>
+        <boxGeometry args={[1.26, grubosc - 0.05, 1.72]} />
+      </mesh>
+      <mesh userData={{ tekst: true }} position={[0, grubosc + 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]} material={m.wierzch}>
+        <planeGeometry args={[1.26, 1.76]} />
+      </mesh>
+      {/* złota zakładka */}
+      <mesh position={[0.35, grubosc * 0.6, 0.93]} castShadow>
+        <boxGeometry args={[0.06, 0.01, 0.22]} />
+        <meshStandardMaterial color={MARKA.zloto} metalness={0.6} roughness={0.35} />
+      </mesh>
+    </group>
+  );
+};
+
+// Na dole „Prawo o stowarzyszeniach”, na wierzch na wskazane słowo spada „Ustawa o OSP”
+export const KsiegiUstaw: React.FC<{ t: number; spadek: number; pozycja: [number, number, number] }> = ({ t, spadek, pozycja }) => {
+  const okl = useMemo(
+    () => ({
+      stow: okladkaKsiegi("USTAWA", ["PRAWO", "O STOWARZYSZENIACH"], "z 7 kwietnia 1989 r."),
+      osp: okladkaKsiegi("USTAWA", ["O OCHOTNICZYCH", "STRAŻACH", "POŻARNYCH"], "z 17 grudnia 2021 r."),
+    }),
+    [],
+  );
+  const s = interpolate(t, [spadek - 0.1, spadek + 0.55], [0, 1], { ...Z, easing: Easing.out(Easing.cubic) });
+  return (
+    <group position={pozycja}>
+      <Ksiega okladka={okl.stow} pozycja={[0, 0, 0]} obrot={0.1} grubosc={0.26} />
+      {s > 0 ? <Ksiega okladka={okl.osp} pozycja={[0.06, 0.26 + (1 - s) * 1.6, -0.04]} obrot={-0.06 + (1 - s) * 0.5} grubosc={0.22} /> : null}
+    </group>
+  );
+};
