@@ -6,6 +6,8 @@
 // ================= KONFIGURACJA =================
 // Token i chat_id trzymaj w: Ustawienia projektu -> Właściwości skryptu
 // (TELEGRAM_TOKEN, TELEGRAM_CHAT_ID). Nigdy nie wklejaj ich do kodu.
+// TELEGRAM_CHAT_ID może zawierać kilka numerów oddzielonych przecinkiem,
+// np. 6857300116,123456789 – powiadomienie dostanie każda z tych osób.
 const PROPS = PropertiesService.getScriptProperties();
 const TELEGRAM_TOKEN = PROPS.getProperty("TELEGRAM_TOKEN");
 const TELEGRAM_CHAT_ID = PROPS.getProperty("TELEGRAM_CHAT_ID");
@@ -347,15 +349,24 @@ function wyslijNaTelegram(wiadomosc) {
     return;
   }
   const url = "https://api.telegram.org/bot" + TELEGRAM_TOKEN + "/sendMessage";
-  const res = UrlFetchApp.fetch(url, {
-    method: "post",
-    contentType: "application/json",
-    payload: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: wiadomosc, parse_mode: "HTML" }),
-    muteHttpExceptions: true
+  const odbiorcy = TELEGRAM_CHAT_ID.split(",").map(function (x) { return x.trim(); }).filter(Boolean);
+
+  // Każdy odbiorca osobno – błąd u jednego (np. nie uruchomił bota) nie blokuje pozostałych
+  odbiorcy.forEach(function (chatId) {
+    try {
+      const res = UrlFetchApp.fetch(url, {
+        method: "post",
+        contentType: "application/json",
+        payload: JSON.stringify({ chat_id: chatId, text: wiadomosc, parse_mode: "HTML" }),
+        muteHttpExceptions: true
+      });
+      if (res.getResponseCode() !== 200) {
+        Logger.log("Telegram (" + chatId + ") HTTP " + res.getResponseCode() + ": " + res.getContentText());
+      }
+    } catch (e) {
+      Logger.log("Telegram (" + chatId + ") błąd: " + e);
+    }
   });
-  if (res.getResponseCode() !== 200) {
-    Logger.log("Telegram HTTP " + res.getResponseCode() + ": " + res.getContentText());
-  }
 }
 
 
