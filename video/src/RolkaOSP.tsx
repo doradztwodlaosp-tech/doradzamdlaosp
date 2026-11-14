@@ -11,7 +11,7 @@ import {
   useVideoConfig,
 } from "remotion";
 import { Dzwiek } from "./Dzwiek";
-import { FONT, MARKA, USTAWIENIA as U } from "./marka";
+import { FONT, KOLUMNA, MARKA, USTAWIENIA as U } from "./marka";
 import { MAPY, type ZdarzenieDzwiekowe } from "./Mapy";
 import { Maskotka } from "./Maskotka";
 import { PanelIlustracji, PostacNaczelnika } from "./Starsze";
@@ -46,6 +46,7 @@ const PRZENIKANIE = U.przenikanie;
 // Środek bezpiecznej strefy w poziomie – treść centrujemy względem niej, nie całego ekranu
 const SRODEK_X = U.strefaPrawo / 2;
 const SZEROKOSC_TRESCI = U.strefaPrawo - 100;
+
 
 const wymiaryObrazu = (src: string) =>
   new Promise<[number, number]>((resolve, reject) => {
@@ -200,7 +201,7 @@ const porcje = (slowa: Slowo[]): Slowo[][] => {
 };
 
 // Znacznik części filmu (np. „1/2 JEDNOSTKI”): widz wie, ile jeszcze zostało
-const ZnacznikCzesci: React.FC<{ dane: Odcinek }> = ({ dane }) => {
+const ZnacznikCzesci: React.FC<{ dane: Odcinek; jasny?: boolean }> = ({ dane, jasny }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = frame / fps;
@@ -220,7 +221,7 @@ const ZnacznikCzesci: React.FC<{ dane: Odcinek }> = ({ dane }) => {
       style={{
         position: "absolute",
         top: 182,
-        left: 60,
+        left: KOLUMNA.lewo,
         display: "flex",
         alignItems: "baseline",
         gap: 18,
@@ -229,8 +230,8 @@ const ZnacznikCzesci: React.FC<{ dane: Odcinek }> = ({ dane }) => {
         transform: `translateX(${(1 - w) * -20}px)`,
       }}
     >
-      <span style={{ fontWeight: 800, fontSize: 64, color: MARKA.zloto, lineHeight: 1 }}>{c.numer}</span>
-      <span style={{ fontWeight: 700, fontSize: 30, letterSpacing: 4, color: MARKA.bialy }}>{c.tytul}</span>
+      <span style={{ fontWeight: 800, fontSize: 64, color: jasny ? "#A8781A" : MARKA.zloto, lineHeight: 1 }}>{c.numer}</span>
+      <span style={{ fontWeight: 700, fontSize: 30, letterSpacing: 4, color: jasny ? "#23242A" : MARKA.bialy }}>{c.tytul}</span>
     </div>
   );
 };
@@ -257,8 +258,8 @@ const NapisyPigulka: React.FC<{ scena: ScenaOSP; gora: boolean }> = ({
     <div
       style={{
         position: "absolute",
-        left: SRODEK_X - 430,
-        width: 860,
+        left: KOLUMNA.lewo,
+        width: KOLUMNA.szer,
         // na dole pigułka „rośnie” w górę, żeby nie wejść w strefę przycisków Facebooka
         ...(gora ? { top: 215 } : { bottom: 1920 - 1425 }),
         display: "flex",
@@ -269,8 +270,9 @@ const NapisyPigulka: React.FC<{ scena: ScenaOSP; gora: boolean }> = ({
         style={{
           background: "rgba(28,29,35,0.9)",
           borderRadius: 16,
-          padding: "14px 30px 16px",
-          maxWidth: 860,
+          padding: "16px 30px 18px",
+          width: "100%",
+          boxSizing: "border-box",
           boxShadow: "0 10px 30px rgba(0,0,0,0.35)",
           fontFamily: FONT,
           fontWeight: 700,
@@ -368,19 +370,19 @@ const Napisy: React.FC<{ scena: ScenaOSP }> = ({ scena }) => {
   );
 };
 
-const Nadtytul: React.FC<{ tekst: string }> = ({ tekst }) => (
+const Nadtytul: React.FC<{ tekst: string; jasny?: boolean }> = ({ tekst, jasny }) => (
   <div
     style={{
       position: "absolute",
       top: U.nadtytulOdGory,
-      left: SRODEK_X - SZEROKOSC_TRESCI / 2,
-      width: SZEROKOSC_TRESCI,
-      textAlign: "center",
+      left: jasny ? KOLUMNA.lewo : SRODEK_X - SZEROKOSC_TRESCI / 2,
+      width: jasny ? KOLUMNA.szer : SZEROKOSC_TRESCI,
+      textAlign: jasny ? "left" : "center",
       fontFamily: FONT,
       fontWeight: 700,
       fontSize: U.nadtytulRozmiar,
       letterSpacing: 5,
-      color: MARKA.nadtytul,
+      color: jasny ? "#5A4A2A" : MARKA.nadtytul,
       textTransform: "uppercase",
     }}
   >
@@ -985,7 +987,7 @@ export const RolkaOSP: React.FC<RolkaProps> = ({
         );
       })}
 
-      <Winieta />
+      {dane.wyglad3d === "jasny" ? null : <Winieta />}
 
       {/* Przyciemnienie pod napisami, żeby były czytelne na każdym obrazie */}
       <div
@@ -995,7 +997,10 @@ export const RolkaOSP: React.FC<RolkaProps> = ({
           width: 1080,
           top: 0,
           height: dane.styl === "makieta" ? 300 : U.ilustracjaOdGory + 80,
-          background: `linear-gradient(180deg, ${MARKA.tlo}f2 0%, ${MARKA.tlo}e0 70%, transparent 100%)`,
+          background:
+            dane.wyglad3d === "jasny"
+              ? "linear-gradient(180deg, rgba(244,239,230,0.95) 0%, rgba(244,239,230,0.75) 60%, transparent 100%)"
+              : `linear-gradient(180deg, ${MARKA.tlo}f2 0%, ${MARKA.tlo}e0 70%, transparent 100%)`,
         }}
       />
 
@@ -1014,8 +1019,8 @@ export const RolkaOSP: React.FC<RolkaProps> = ({
         );
       })}
 
-      {dane.nadtytul && <Nadtytul tekst={dane.nadtytul} />}
-      <ZnacznikCzesci dane={dane} />
+      {dane.nadtytul && <Nadtytul tekst={dane.nadtytul} jasny={dane.wyglad3d === "jasny"} />}
+      <ZnacznikCzesci dane={dane} jasny={dane.wyglad3d === "jasny"} />
 
       {dane.naczelnik && <PostacNaczelnika dane={dane} glosnosc={glosnosc} />}
 

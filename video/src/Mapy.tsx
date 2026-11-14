@@ -26,7 +26,7 @@ import { czasSlowa, type ScenaOSP, ZAKRES } from "./typy";
 // Mapy 3D: infografiki, po których „lata” kamera. Wszystko pojawia się na konkretnych słowach lektora.
 // Kolejne sceny odcinka z tym samym polem "mapa" tworzą jeden ciągły przelot.
 
-export type PropsMapy = { sceny: ScenaOSP[]; klatkaStartu: number; pierwsze: boolean; wyglad?: "rysunek" | "makieta" };
+export type PropsMapy = { sceny: ScenaOSP[]; klatkaStartu: number; pierwsze: boolean; wyglad?: "rysunek" | "makieta" | "jasny" };
 export type ZdarzenieDzwiekowe = { t: number; plik: string; glosnosc: number };
 
 const EKRAN: [number, number] = [U.strefaPrawo / 2, 940];

@@ -29,7 +29,7 @@ const plotno = (w: number, h: number, rysuj: (c: CanvasRenderingContext2D) => vo
 };
 
 // ───────────── Blat z desek ─────────────
-export const useBlat = () =>
+export const useBlat = (jasny = false) =>
   useMemo(
     () =>
       plotno(
@@ -39,7 +39,9 @@ export const useBlat = () =>
           const DESKA = 128;
           for (let d = 0; d < 1024 / DESKA; d++) {
             const k = 0.82 + los(d) * 0.3;
-            c.fillStyle = `rgb(${Math.round(96 * k)},${Math.round(72 * k)},${Math.round(56 * k)})`;
+            c.fillStyle = jasny
+              ? `rgb(${Math.round(190 * k)},${Math.round(156 * k)},${Math.round(116 * k)})`
+              : `rgb(${Math.round(96 * k)},${Math.round(72 * k)},${Math.round(56 * k)})`;
             c.fillRect(0, d * DESKA, 1024, DESKA);
             // słoje
             for (let i = 0; i < 46; i++) {
@@ -52,7 +54,7 @@ export const useBlat = () =>
               c.stroke();
             }
             // sęk
-            if (los(d * 9) > 0.55) {
+            if (!jasny && los(d * 9) > 0.55) {
               const x = los(d * 5) * 1000;
               const y = d * DESKA + DESKA / 2;
               const g = c.createRadialGradient(x, y, 2, x, y, 18);
@@ -62,13 +64,13 @@ export const useBlat = () =>
               c.fillRect(x - 20, y - 14, 40, 28);
             }
             // szczelina między deskami
-            c.fillStyle = "rgba(20,12,8,0.75)";
+            c.fillStyle = jasny ? "rgba(90,64,40,0.35)" : "rgba(20,12,8,0.75)";
             c.fillRect(0, d * DESKA, 1024, 3);
           }
         },
         [4, 4],
       ),
-    [],
+    [jasny],
   );
 
 // ───────────── Dokumenty ─────────────

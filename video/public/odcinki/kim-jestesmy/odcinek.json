@@ -1,6 +1,6 @@
 {
   "tytul": "Wy gasicie pożary. My – papiery.",
-  "nadtytul": "DORADZTWO DLA OSP • KIM JESTEŚMY",
+  "nadtytul": "DORADZTWO DLA OSP",
   "glos": "lektor.mp3",
   "maskotka": true,
   "wstep": 2.2,
@@ -1320,5 +1320,5 @@
   "szkic": "Czasy szacunkowe (bez lektora). Po dodaniu lektor.mp3 uruchom: npm run czasy -- kim-jestesmy",
   "styl": "makieta",
   "hakPostac": false,
-  "wyglad3d": "rysunek"
+  "wyglad3d": "jasny"
 }

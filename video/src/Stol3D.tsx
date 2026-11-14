@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { useThree } from "@react-three/fiber";
 import { ThreeCanvas } from "@remotion/three";
 import { AbsoluteFill, Easing, continueRender, delayRender, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { FONT, MARKA } from "./marka";
+import { FONT, KOLUMNA, MARKA } from "./marka";
 import { Otoczenie, WozStrazacki } from "./Woz3D";
 import { BudynekRemizy } from "./Remiza3D";
 import { RYSUNEK, SiatkaKreslarska, TrybRysunku } from "./Rysunek3D";
@@ -20,6 +20,10 @@ const Z = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 const PLYNNIE = Easing.bezier(0.45, 0, 0.25, 1);
 // Ciepłe tło „pokoju” jak w filmach instruktażowych (dalekie części stołu rozpływają się w nim)
 const TLO_POKOJU = "#5E4D40";
+// Jasna, „kancelaryjna” odsłona marki: kremowy papier, grafit i złoto
+const TLO_JASNE = "#EEE7DA";
+// złoto marki przyciemnione tak, by było czytelne na jasnym tle
+const ZLOTO_NA_JASNYM = "#A8781A";
 const PRZEJAZD = 2.2; // sekundy przejazdu kamery między miejscami (spokojnie)
 
 type Stacja = { cel: [number, number, number]; kat: number; odl: number; wys: number };
@@ -384,27 +388,27 @@ const Gmina: React.FC<{ t: number; c: ReturnType<typeof czasy>; tx: TeksturyStol
   );
 };
 
-const Swiat: React.FC<{ sceny: ScenaOSP[]; t: number; tx: TeksturyStolu; ts: Tekstury; rysunek?: boolean }> = ({ sceny, t, tx, ts, rysunek }) => {
+const Swiat: React.FC<{ sceny: ScenaOSP[]; t: number; tx: TeksturyStolu; ts: Tekstury; rysunek?: boolean; jasny?: boolean }> = ({ sceny, t, tx, ts, rysunek, jasny }) => {
   const c = czasy(sceny);
-  const blat = useBlat();
+  const blat = useBlat(jasny);
   const otw = c.otwarty ? interpolate(t, [c.otwarcie, c.otwarcie + 2.0], [0, 1], { ...Z, easing: Easing.bezier(0.55, 0, 0.25, 1) }) : 0;
   const blask = c.otwarty ? interpolate(t, [c.otwarcie + 2.0, c.otwarcie + 3.0], [0, 0.8], Z) : 0;
   return (
     <>
       <Kamera sceny={sceny} t={t} />
-      <Otoczenie sila={0.6} />
-      <color attach="background" args={[rysunek ? RYSUNEK.tlo : TLO_POKOJU]} />
-      <fog attach="fog" args={[rysunek ? RYSUNEK.tlo : TLO_POKOJU, 30, 75]} />
+      <Otoczenie sila={jasny ? 0.7 : 0.6} />
+      <color attach="background" args={[rysunek ? RYSUNEK.tlo : jasny ? TLO_JASNE : TLO_POKOJU]} />
+      <fog attach="fog" args={[rysunek ? RYSUNEK.tlo : jasny ? TLO_JASNE : TLO_POKOJU, jasny ? 26 : 30, jasny ? 60 : 75]} />
       {rysunek ? <TrybRysunku /> : null}
       {rysunek ? <SiatkaKreslarska /> : null}
-      <ambientLight intensity={0.9} color="#B8B0A4" />
+      <ambientLight intensity={jasny ? 0.95 : 0.9} color={jasny ? "#FFF6EA" : "#B8B0A4"} />
       <directionalLight position={[-6, 9, 12]} intensity={1.1} color="#FFE6C4" />
-      <hemisphereLight args={["#ffe2b0", "#15161B", 1.1]} />
+      <hemisphereLight args={["#ffe2b0", jasny ? "#8A7560" : "#15161B", jasny ? 0.8 : 1.1]} />
       <spotLight
         position={[3, 26, 14]}
         angle={0.7}
         penumbra={0.75}
-        intensity={3400}
+        intensity={jasny ? 2600 : 3400}
         decay={2}
         color="#FFD9A0"
         castShadow
@@ -444,8 +448,9 @@ const Karta: React.FC<{ t: number; od: number; do: number; tytul?: string; wiers
       style={{
         position: "absolute",
         top: 330,
-        left: 459 - 380,
-        width: 760,
+        left: KOLUMNA.lewo,
+        width: KOLUMNA.szer,
+        boxSizing: "border-box",
         padding: "30px 38px 34px",
         borderRadius: 22,
         background: "rgba(32,34,42,0.94)",
@@ -470,14 +475,14 @@ const Karta: React.FC<{ t: number; od: number; do: number; tytul?: string; wiers
   );
 };
 
-const Licznik: React.FC<{ t: number; od: number; do: number }> = ({ t, od, do: koniec }) => {
+const Licznik: React.FC<{ t: number; od: number; do: number; jasny?: boolean }> = ({ t, od, do: koniec, jasny }) => {
   if (t < od - 0.05 || t > koniec + 0.6) return null;
   const w = interpolate(t, [od, od + 0.6], [0, 1], Z) * interpolate(t, [koniec, koniec + 0.5], [1, 0], Z);
   const liczba = interpolate(t, [od, od + 1.6], [0, 1.5], { ...Z, easing: Easing.out(Easing.cubic) });
   return (
-    <div style={{ position: "absolute", top: 340, width: 918, textAlign: "center", fontFamily: FONT, opacity: w, transform: `translateY(${(1 - w) * 20}px)` }}>
-      <div style={{ fontWeight: 800, fontSize: 150, color: MARKA.zloto, lineHeight: 1, textShadow: "0 10px 40px rgba(0,0,0,0.6)" }}>{liczba.toFixed(1).replace(".", ",")}%</div>
-      <div style={{ marginTop: 12, fontWeight: 700, fontSize: 38, color: "white", textShadow: "0 4px 18px rgba(0,0,0,0.8)" }}>podatku od mieszkańców co roku</div>
+    <div style={{ position: "absolute", top: 340, left: KOLUMNA.lewo, width: KOLUMNA.szer, textAlign: "center", fontFamily: FONT, opacity: w, transform: `translateY(${(1 - w) * 20}px)` }}>
+      <div style={{ fontWeight: 800, fontSize: 150, color: jasny ? ZLOTO_NA_JASNYM : MARKA.zloto, lineHeight: 1, textShadow: jasny ? "0 6px 24px rgba(120,90,30,0.25)" : "0 10px 40px rgba(0,0,0,0.6)" }}>{liczba.toFixed(1).replace(".", ",")}%</div>
+      <div style={{ marginTop: 12, fontWeight: 700, fontSize: 38, color: jasny ? "#23242A" : "white", textShadow: jasny ? "none" : "0 4px 18px rgba(0,0,0,0.8)" }}>podatku od mieszkańców co roku</div>
     </div>
   );
 };
@@ -495,7 +500,7 @@ export const StolOSP: React.FC<PropsMapy> = ({ sceny, klatkaStartu, wyglad }) =>
     <AbsoluteFill style={{ opacity: klatkaStartu === 0 ? 1 : wejscie }}>
       {tx && ts ? (
         <ThreeCanvas width={width} height={height} shadows camera={{ fov: 32, near: 0.1, far: 120 }} gl={{ antialias: true }}>
-          <Swiat sceny={sceny} t={t} tx={tx} ts={ts} rysunek={wyglad === "rysunek"} />
+          <Swiat sceny={sceny} t={t} tx={tx} ts={ts} rysunek={wyglad === "rysunek"} jasny={wyglad === "jasny"} />
         </ThreeCanvas>
       ) : null}
       
@@ -511,7 +516,7 @@ export const StolOSP: React.FC<PropsMapy> = ({ sceny, klatkaStartu, wyglad }) =>
           />
         ) : null,
       )}
-      {c.monety ? <Licznik t={t} od={sl(c.monety, "1,5%")} do={c.monety.koniec + 0.4} /> : null}
+      {c.monety ? <Licznik t={t} od={sl(c.monety, "1,5%")} do={c.monety.koniec + 0.4} jasny={wyglad === "jasny"} /> : null}
     </AbsoluteFill>
   );
 };

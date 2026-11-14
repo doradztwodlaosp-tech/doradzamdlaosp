@@ -87,7 +87,7 @@ export type Odcinek = {
   cta?: string;
   naczelnik?: boolean;
   maskotka?: boolean;
-  wyglad3d?: "rysunek" | "makieta"; // wygląd scen 3D: rysunek techniczny (domyślnie makieta)
+  wyglad3d?: "rysunek" | "makieta" | "jasny"; // wygląd scen 3D: rysunek techniczny (domyślnie makieta)
   styl?: "makieta"; // „makieta”: napisy w ciemnej pigułce nad dolną strefą (jak w filmach instruktażowych 3D)
   szkic?: string; // odcinek bez nagrania lektora: czasy szacunkowe
   wstep?: number; // sekundy z hasłem-hakiem przed pierwszym słowem lektora
