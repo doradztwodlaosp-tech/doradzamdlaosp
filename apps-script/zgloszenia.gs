@@ -23,21 +23,13 @@ const MAX_NA_URUCHOMIENIE = 15;     // limit wątków na jedno uruchomienie
 const MAX_WIEK_PRZYPOMNIEN_DNI = 7; // starsze nie generują alarmów "minął dzień"
 const QUERY = 'in:inbox newer_than:3d "PROŚBA O KONTAKT" -label:' + ETYKIETA_ZGLOSZENIA;
 
-// Kolory firmowe (z doradztwodlaosp.pl: czerń, złoto, bordowy akcent)
+// Kolory firmowe (z doradztwodlaosp.pl: czerń i złoto)
 const KOLOR = {
   zloto: "#D4AF37",
-  zlotoCiemne: "#B8962E",
   czern: "#0A0A0A",
   zlotoTekst: "#9A7A12",   // ciemniejsze złoto do małych napisów na białym tle (czytelność)
   tloMaila: "#F5F0E8",
   ramkaMaila: "#EDE8DD",
-  karta: "#141414",
-  ramka: "#2A2A2A",
-  bordo: "#2A0C0C",
-  bordoRamka: "#7A1F1F",
-  czerwony: "#D32F2F",
-  bialy: "#FFFFFF",
-  szary: "#B5B5B5",
   szaryCiemny: "#8A8A8A",
   krem: "#FBF6E6",
   tekst: "#222222"
