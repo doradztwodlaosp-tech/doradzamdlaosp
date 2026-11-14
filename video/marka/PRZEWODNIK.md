@@ -116,6 +116,19 @@ Mieści się to w założonych ok. 100 zł miesięcznie.
 - **Podkład** – muzyka w tle, przyciszana pod głosem.
 - **Plansza końcowa** – ostatni ekran: hasło marki, prośba o obserwowanie, kontakt.
 
+## Wzór filmu (zatwierdzony 14 listopada 2026)
+
+Wzorem jest rolka „Kim jesteśmy”. Każdy nowy film wygląda tak samo:
+- jasna, ciepła makieta 3D na jednym stole, w barwach marki (grafit, złoto, biel), spokojna kamera;
+- bez twarzy autora; Druh Paragraf tylko na końcu;
+- na górze „DORADZTWO DLA OSP”, na dole emblemat marki;
+- napisy: całe zdanie w grafitowej pigułce, słowa podświetlają się za lektorem;
+- karty z konkretami, duże liczby, numer części („1/2”), wszystko w jednej równej kolumnie;
+- na końcu pytanie do widza i plansza „Pomagamy tym, którzy pomagają innym”.
+
+Z wzorów wzięliśmy: z filmu o Enigmie – ciepło i realne przedmioty; z BazaOSP – porządek, liczby, brak twarzy;
+z filmu o Claudzie – prawdziwe efekty dźwiękowe (po zgodzie) i konkretne dowody zamiast ogólników.
+
 ## Decyzje strategiczne (listopad 2026)
 
 | Pytanie | Decyzja |

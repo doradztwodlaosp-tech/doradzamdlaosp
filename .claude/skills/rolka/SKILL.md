@@ -19,6 +19,31 @@ Zanim cokolwiek zrobisz, przeczytaj w `video/marka/`: `PRZEWODNIK.md` (jak pracu
 `ZASADY-FILMU.md` (10 obowiązkowych zasad), `BRANDBOOK.md`, `POSTAC.md`, `MOODBOARD.md`, `SLOWNIK-ANIMACJI.md`.
 Gdy użytkownik używa nazwy ze słownika (np. „najazd”, „przenikanie”), zrób dokładnie ten efekt.
 
+## WZÓR FILMU (zatwierdzony 14.11.2026) – stosuj w każdej nowej rolce
+
+Wzorcowy odcinek: `video/public/odcinki/kim-jestesmy/odcinek.json`. Nową rolkę zaczynaj od kopii jego ustawień.
+
+- **Wygląd:** jasna, ciepła „kancelaryjna” makieta 3D na jednym stole (`"wyglad3d": "jasny"`, `"styl": "makieta"`,
+  wszystkie sceny `"mapa": "stol-osp"` z polem `"kamera"`). Barwy marki: grafit, złoto, biel; tło kremowe, blat z jasnego dębu.
+  Ma być profesjonalnie i spokojnie – nie „bajkowo”.
+- **Bez twarzy autora** (jak BazaOSP). Druh Paragraf tylko na końcu (scena z pytaniem w studiu + plansza), stoi spokojnie;
+  `"hakPostac": false`.
+- **Góra kadru:** tylko „DORADZTWO DLA OSP” na środku (`"nadtytul": "DORADZTWO DLA OSP"`).
+- **Dół kadru:** emblemat marki (`"emblemat"`: plik logo w `public/`; bez pliku – pigułka „§ DORADZTWO DLA OSP”).
+- **Napisy:** grafitowa pigułka nad emblematem z CAŁĄ wypowiedzią dla danego obrazu; słowa podświetlają się za lektorem
+  (bieżące złote, powiedziane białe, kolejne szare). Nie dzielić zdań na kawałki.
+- **Układ:** wszystko w jednej kolumnie (`KOLUMNA` w `marka.ts`) – równe brzegi kart, napisów i znacznika części.
+- **Karty** (`"karta"` w scenie): grafitowe ze złotą ramką, wiersze wchodzą na słowa lektora.
+- **Części filmu** (`"czesc": {"numer": "1/2", "tytul": "JEDNOSTKI"}`, koniec: `null`) – gdy film ma bloki.
+- **Duże liczby** dla konkretów (np. licznik 1,5% przy monetach). Tylko prawdziwe, sprawdzalne liczby.
+- **Tempo:** spokojne, kamera płynie między przedmiotami (2,2 s), jeden przedmiot naraz. Szkic: `TEMPO=14 PAUZA=0.55 npm run szkic -- <slug>`.
+- **Zakończenie:** pytanie do widza (pigułka) + plansza „Pomagamy tym, którzy pomagają innym.” z prośbą o obserwowanie.
+- **Przedmioty na stole** (`src/Stol3D.tsx`, `Remiza3D.tsx`, `Woz3D.tsx`, `Przedmioty3D.tsx`, `Scena3D.tsx`):
+  remiza z wozem, stos dokumentów, protokół z pieczęcią, tabliczka marki, statut, monety, urząd gminy, wóz w zbliżeniu,
+  hełm, laptop. Miejsca kamery: `remiza, papiery, protokol, marka, statut, statut-otwarty, monety, gmina, woz, helm,
+  laptop, calosc`. Nowy temat bez pasującego przedmiotu = dobuduj przedmiot w tym samym stylu (detale, zaokrąglone krawędzie).
+- **Długie filmy renderuj w kawałkach:** `bash skrypty/render-czesci.sh <slug> <liczba_klatek>` (odporne na restart).
+
 ## 1. Kolejność pracy (zawsze ta sama)
 
 1. **Temat → scenariusz.** Z tematu napisz scenariusz według `ZASADY-FILMU.md`: hak (hasło na pierwszą klatkę),
