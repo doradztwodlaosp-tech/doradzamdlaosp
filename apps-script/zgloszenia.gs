@@ -23,16 +23,21 @@ const MAX_NA_URUCHOMIENIE = 15;     // limit wątków na jedno uruchomienie
 const MAX_WIEK_PRZYPOMNIEN_DNI = 7; // starsze nie generują alarmów "minął dzień"
 const QUERY = 'in:inbox newer_than:3d "PROŚBA O KONTAKT" -label:' + ETYKIETA_ZGLOSZENIA;
 
-// Kolory firmowe (takie same jak na stronie)
+// Kolory firmowe (z doradztwodlaosp.pl: czerń, złoto, bordowy akcent)
 const KOLOR = {
-  czerwony: "#C0392B",
-  czerwonyCiemny: "#922B21",
-  granat: "#0D1B2A",
-  granat2: "#162337",
-  krem: "#F5F0E8",
-  krem2: "#EDE8DD",
-  szary: "#8FA3B8",
-  tekst: "#2B3440"
+  zloto: "#D4AF37",
+  zlotoCiemne: "#B8962E",
+  czern: "#0A0A0A",
+  karta: "#141414",
+  ramka: "#2A2A2A",
+  bordo: "#2A0C0C",
+  bordoRamka: "#7A1F1F",
+  czerwony: "#D32F2F",
+  bialy: "#FFFFFF",
+  szary: "#B5B5B5",
+  szaryCiemny: "#8A8A8A",
+  krem: "#FBF6E6",
+  tekst: "#222222"
 };
 
 // Arkusz
@@ -40,11 +45,11 @@ const NAGLOWKI = ["Data", "Nazwa OSP", "Imię i Nazwisko", "Telefon", "E-mail", 
 const SZEROKOSCI = [150, 260, 190, 130, 260, 200, 150];
 const STATUSY = ["Nowe", "W trakcie", "Odpowiedziano", "Zamknięte", "Stare"];
 const KOLORY_STATUSOW = {
-  "Nowe":          { tlo: "#FADBD8", tekst: "#922B21" },
+  "Nowe":          { tlo: "#F6E7B0", tekst: "#6B5200" },
   "W trakcie":     { tlo: "#FDEBD0", tekst: "#9C640C" },
   "Odpowiedziano": { tlo: "#D5F5E3", tekst: "#1E8449" },
   "Zamknięte":     { tlo: "#E5E8E8", tekst: "#566573" },
-  "Stare":         { tlo: "#EDE8DD", tekst: "#7B7566" }
+  "Stare":         { tlo: "#EFEFEF", tekst: "#8A8A8A" }
 };
 // ================================================
 
@@ -211,15 +216,15 @@ function sformatujArkusz() {
   // Nagłówek
   sheet.getRange(1, 1, 1, kolumn)
     .setValues([NAGLOWKI])
-    .setBackground(KOLOR.granat)
-    .setFontColor(KOLOR.krem)
+    .setBackground(KOLOR.czern)
+    .setFontColor(KOLOR.zloto)
     .setFontWeight("bold")
     .setFontSize(11)
     .setVerticalAlignment("middle")
     .setHorizontalAlignment("left");
   sheet.setRowHeight(1, 38);
   sheet.setFrozenRows(1);
-  sheet.setTabColor(KOLOR.czerwony);
+  sheet.setTabColor(KOLOR.zloto);
   sheet.setHiddenGridlines(true);
   for (let k = 0; k < kolumn; k++) sheet.setColumnWidth(k + 1, SZEROKOSCI[k]);
 
@@ -257,7 +262,7 @@ function sformatujArkusz() {
   sheet.getBandings().forEach(function (b) { b.remove(); });
   sheet.getRange(1, 1, sheet.getMaxRows(), kolumn)
     .applyRowBanding(SpreadsheetApp.BandingTheme.LIGHT_GREY, true, false)
-    .setHeaderRowColor(KOLOR.granat)
+    .setHeaderRowColor(KOLOR.czern)
     .setFirstRowColor("#FFFFFF")
     .setSecondRowColor(KOLOR.krem);
 
@@ -379,8 +384,6 @@ function wyslijAutoresponderHTML(odbiorca, nazwaOsp) {
     ? "Potwierdzenie otrzymania zgłoszenia – Doradztwo dla OSP"
     : "Otrzymaliśmy Wasze zgłoszenie – Doradztwo dla OSP";
 
-  const naglowek = czyWPracy ? "Zgłoszenie dotarło" : "Mamy Wasze zgłoszenie";
-
   const zdanie = czyWPracy
     ? "Potwierdzamy, że zgłoszenie dotarło do nas pomyślnie. Zapoznajemy się ze szczegółami i odpowiemy najszybciej, jak to możliwe."
     : "Dotarła ona do nas poza standardowymi godzinami pracy lub w dzień świąteczny, dlatego wrócimy do Państwa z odpowiedzią na początku najbliższego dnia roboczego.";
@@ -394,55 +397,56 @@ function wyslijAutoresponderHTML(odbiorca, nazwaOsp) {
     STRONA_WWW;
 
   const telBezSpacji = TELEFON_KONTAKTOWY.replace(/\s+/g, "");
-  const czcionka = "font-family:'Segoe UI',Helvetica,Arial,sans-serif;";
+  const czcionka = "font-family:Montserrat,'Segoe UI',Helvetica,Arial,sans-serif;";
+  const szeryf = "font-family:'Playfair Display',Georgia,'Times New Roman',serif;";
+  const naglowekHtml = czyWPracy
+    ? 'Zgłoszenie <em style="color:' + KOLOR.zloto + ';">dotarło</em>'
+    : 'Mamy Wasze <em style="color:' + KOLOR.zloto + ';">zgłoszenie</em>';
 
   const htmlBody =
-    '<div style="margin:0;padding:0;background-color:' + KOLOR.krem + ';">' +
-    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:' + KOLOR.krem + ';">' +
+    '<div style="margin:0;padding:0;background-color:' + KOLOR.czern + ';">' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="' + KOLOR.czern + '" style="background-color:' + KOLOR.czern + ';">' +
     '<tr><td align="center" style="padding:28px 12px;">' +
 
-      '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background-color:#ffffff;border-radius:14px;overflow:hidden;border:1px solid ' + KOLOR.krem2 + ';">' +
+      '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="' + KOLOR.karta + '" style="width:100%;max-width:600px;background-color:' + KOLOR.karta + ';border-radius:14px;overflow:hidden;border:1px solid ' + KOLOR.ramka + ';">' +
 
-        // Pasek akcentu
-        '<tr><td style="height:5px;line-height:5px;font-size:0;background-color:' + KOLOR.czerwony + ';">&nbsp;</td></tr>' +
+        // Złoty pasek
+        '<tr><td style="height:4px;line-height:4px;font-size:0;background-color:' + KOLOR.zloto + ';">&nbsp;</td></tr>' +
 
-        // Nagłówek
-        '<tr><td style="background-color:' + KOLOR.granat + ';padding:26px 32px;">' +
-          '<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>' +
-            '<td style="background-color:' + KOLOR.czerwony + ';color:#ffffff;' + czcionka + 'font-size:13px;font-weight:bold;letter-spacing:1px;padding:5px 10px;border-radius:5px;">OSP</td>' +
-            '<td style="padding-left:12px;color:' + KOLOR.krem + ';' + czcionka + 'font-size:19px;font-weight:bold;">Doradztwo dla OSP</td>' +
-          '</tr></table>' +
+        // Nagłówek z nazwą jak na stronie
+        '<tr><td bgcolor="' + KOLOR.czern + '" style="background-color:' + KOLOR.czern + ';padding:24px 32px;border-bottom:1px solid ' + KOLOR.ramka + ';' + czcionka + 'font-size:15px;line-height:1.35;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:' + KOLOR.bialy + ';">' +
+          'Doradztwo <span style="color:' + KOLOR.zloto + ';">dla Ochotniczej<br>Straży Pożarnej</span>' +
         '</td></tr>' +
 
         // Treść
-        '<tr><td style="padding:34px 32px 10px 32px;' + czcionka + 'color:' + KOLOR.tekst + ';font-size:15px;line-height:1.65;">' +
-          '<div style="color:' + KOLOR.czerwony + ';font-size:12px;font-weight:bold;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;">Potwierdzenie</div>' +
-          '<h1 style="margin:0 0 20px 0;' + czcionka + 'font-size:24px;line-height:1.25;color:' + KOLOR.granat + ';">' + naglowek + '</h1>' +
+        '<tr><td style="padding:34px 32px 8px 32px;' + czcionka + 'color:' + KOLOR.szary + ';font-size:15px;line-height:1.7;">' +
+          '<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="' + KOLOR.bordo + '" style="background-color:' + KOLOR.bordo + ';border:1px solid ' + KOLOR.bordoRamka + ';border-radius:20px;padding:6px 16px;' + czcionka + 'font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:' + KOLOR.zloto + ';">Potwierdzenie zgłoszenia</td></tr></table>' +
+          '<h1 style="margin:22px 0 20px 0;' + szeryf + 'font-size:28px;line-height:1.25;font-weight:700;color:' + KOLOR.bialy + ';">' + naglowekHtml + '</h1>' +
           '<p style="margin:0 0 14px 0;">Dzień dobry,</p>' +
-          '<p style="margin:0 0 14px 0;">Dziękujemy za wiadomość' + dlaKogoHtml + '. ' + zdanie + '</p>' +
+          '<p style="margin:0 0 14px 0;">Dziękujemy za wiadomość' + dlaKogoHtml.replace("<strong>", '<strong style="color:' + KOLOR.bialy + ';">') + '. ' + zdanie + '</p>' +
         '</td></tr>' +
 
         // Ramka "pilny kontakt"
-        '<tr><td style="padding:10px 32px 8px 32px;">' +
-          '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:' + KOLOR.krem + ';border-left:4px solid ' + KOLOR.czerwony + ';border-radius:8px;">' +
-            '<tr><td style="padding:18px 20px;' + czcionka + 'font-size:14px;line-height:1.5;color:' + KOLOR.tekst + ';">' +
-              '<strong style="color:' + KOLOR.granat + ';">Pilna sprawa?</strong><br>Zadzwoń — chętnie porozmawiamy od razu.' +
+        '<tr><td style="padding:12px 32px 8px 32px;">' +
+          '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="' + KOLOR.czern + '" style="background-color:' + KOLOR.czern + ';border:1px solid ' + KOLOR.ramka + ';border-left:4px solid ' + KOLOR.zloto + ';border-radius:8px;">' +
+            '<tr><td style="padding:18px 20px;' + czcionka + 'font-size:14px;line-height:1.5;color:' + KOLOR.szary + ';">' +
+              '<strong style="color:' + KOLOR.bialy + ';">Pilna sprawa?</strong><br>Zadzwoń — porozmawiamy od razu.' +
             '</td>' +
             '<td align="right" style="padding:18px 20px;white-space:nowrap;">' +
-              '<a href="tel:' + telBezSpacji + '" style="display:inline-block;background-color:' + KOLOR.czerwony + ';color:#ffffff;' + czcionka + 'font-size:15px;font-weight:bold;text-decoration:none;padding:11px 20px;border-radius:8px;">' + TELEFON_KONTAKTOWY + '</a>' +
+              '<a href="tel:' + telBezSpacji + '" style="display:inline-block;background-color:' + KOLOR.zloto + ';color:' + KOLOR.czern + ';' + czcionka + 'font-size:15px;font-weight:800;letter-spacing:.5px;text-decoration:none;padding:12px 20px;border-radius:6px;">' + TELEFON_KONTAKTOWY + '</a>' +
             '</td></tr>' +
           '</table>' +
         '</td></tr>' +
 
         // Podpis
-        '<tr><td style="padding:22px 32px 34px 32px;' + czcionka + 'color:' + KOLOR.tekst + ';font-size:15px;line-height:1.6;">' +
-          'Pozdrawiamy,<br><strong style="color:' + KOLOR.granat + ';">Zespół Doradztwo dla OSP</strong>' +
+        '<tr><td style="padding:22px 32px 34px 32px;' + czcionka + 'color:' + KOLOR.szary + ';font-size:15px;line-height:1.6;">' +
+          'Pozdrawiamy,<br><strong style="color:' + KOLOR.zloto + ';">Zespół Doradztwo dla OSP</strong>' +
         '</td></tr>' +
 
         // Stopka
-        '<tr><td style="background-color:' + KOLOR.granat + ';padding:20px 32px;' + czcionka + 'font-size:12px;line-height:1.6;color:' + KOLOR.szary + ';">' +
-          '<a href="' + STRONA_WWW + '" style="color:' + KOLOR.krem + ';text-decoration:none;font-weight:bold;">doradztwodlaosp.pl</a>' +
-          ' &nbsp;·&nbsp; tel. <a href="tel:' + telBezSpacji + '" style="color:' + KOLOR.krem + ';text-decoration:none;">' + TELEFON_KONTAKTOWY + '</a><br>' +
+        '<tr><td bgcolor="' + KOLOR.czern + '" style="background-color:' + KOLOR.czern + ';border-top:1px solid ' + KOLOR.ramka + ';padding:20px 32px;' + czcionka + 'font-size:12px;line-height:1.7;color:' + KOLOR.szaryCiemny + ';">' +
+          '<a href="' + STRONA_WWW + '" style="color:' + KOLOR.zloto + ';text-decoration:none;font-weight:700;">doradztwodlaosp.pl</a>' +
+          ' &nbsp;·&nbsp; tel. <a href="tel:' + telBezSpacji + '" style="color:' + KOLOR.bialy + ';text-decoration:none;">' + TELEFON_KONTAKTOWY + '</a><br>' +
           'Wiadomość wysłana automatycznie w odpowiedzi na formularz kontaktowy.' +
         '</td></tr>' +
 
