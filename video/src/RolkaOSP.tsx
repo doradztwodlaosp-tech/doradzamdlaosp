@@ -302,7 +302,7 @@ const HaslaScen: React.FC<{ dane: Odcinek; jasny: boolean }> = ({ dane, jasny })
               fontSize: rozmiar,
               lineHeight: 1.12,
               textAlign: studio ? "center" : "left",
-              color: studio || !jasny ? MARKA.bialy : "#23242A",
+              color: jasny ? "#23242A" : MARKA.bialy,
               opacity: w,
               transform: `translateY(${(1 - wej) * 18}px)`,
               textWrap: "balance",
