@@ -8,6 +8,7 @@ import { PokazBlender } from "./PokazBlender";
 import { Okladka } from "./Okladka";
 import { ProbaFoto } from "./ProbaFoto";
 import { ProbaWoz } from "./ProbaWoz";
+import { RolkaFoto, DLUGOSC_ROLKI_FOTO } from "./RolkaFoto";
 
 // Pionowe rolki 9:16 (Facebook Reels): 1080x1920, 30 kl./s
 export const MyComposition = () => {
@@ -26,6 +27,7 @@ export const MyComposition = () => {
       />
       {/* Próba prawdziwego 3D (three.js) */}
       <Composition id="ProbaStatut3D" component={ProbaStatut3D} durationInFrames={300} fps={30} width={1080} height={1920} />
+      <Composition id="RolkaFoto" component={RolkaFoto} durationInFrames={DLUGOSC_ROLKI_FOTO} fps={30} width={1080} height={1920} />
       <Composition id="ProbaWoz" component={ProbaWoz} durationInFrames={405} fps={30} width={1080} height={1920} />
       <Composition id="ProbaFoto" component={ProbaFoto} durationInFrames={210} fps={30} width={1080} height={1920} />
       <Composition id="Okladka" component={Okladka} durationInFrames={1} fps={30} width={1080} height={1920} />
