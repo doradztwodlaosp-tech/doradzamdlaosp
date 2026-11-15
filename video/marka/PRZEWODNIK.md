@@ -145,3 +145,6 @@ z filmu o Claudzie – prawdziwe efekty dźwiękowe (po zgodzie) i konkretne dow
 
 ## Zasada stała: zakończenie każdej rolki
 Każda rolka kończy się **jasną planszą końcową** (`PlanszaJasna`): znak § w grafitowym kole, „DORADZTWO DLA OSP”, złota kreska, „Pomagamy tym, którzy pomagają innym.”, pigułka „Zaobserwuj nas”, „Zadzwoń lub napisz: 720 868 902”, doradztwodlaosp.pl i stopka „Materiał informacyjny. Nie zastępuje indywidualnej analizy.”. Bez żadnych zmian (zatwierdzone przez właściciela).
+
+## Zasada stała: napisy lektora (oglądanie bez dźwięku)
+W każdej rolce: **chwytliwe hasło u góry sceny** (zależne od scenariusza, jedno słowo na złoto) **oraz złote napisy z tego, co mówi lektor, na dole**, między obrazem a czarną plakietką „§ DORADZTWO DLA OSP”. Napisy są w frazach po maks. 5 słów; wypowiedziane słowa pełnym złotem, następne przygaszone. Powód: wiele osób ogląda rolki bez dźwięku (praca, autobus), a rolki z czytelnym tekstem są lepiej oglądane. Komponent: `src/NapisyLektora.tsx`; czasy słów z pliku odcinka (po nagraniu lektora aktualizuje je `npm run czasy -- <slug>`).

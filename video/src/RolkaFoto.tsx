@@ -3,6 +3,8 @@ import { AbsoluteFill, Easing, Img, interpolate, Sequence, staticFile, useCurren
 import { FONT, MARKA } from "./marka";
 import { PlanszaJasna } from "./RolkaOSP";
 import { FilarIlustracja, RemizaIlustracja } from "./Ilustracje";
+import odcinek from "../public/odcinki/kim-jest-strazak/odcinek.json";
+import { NapisyLektora, zbudujFrazy } from "./NapisyLektora";
 
 const ZLOTO = "#A8781A";
 const GRAFIT = "#1E1F25";
@@ -23,6 +25,7 @@ const SCENY = [
   [34.99, 38.49],
 ].map(([a, b]) => [S(a), S(b)] as const);
 const KONIEC_TRESCI = S(38.99);
+const FRAZY = zbudujFrazy(odcinek.sceny as { slowa?: { w: string; s: number; e: number }[] }[], odcinek.wstep);
 const DLUGOSC = S(42.7) + 20;
 
 /** Wejście i wyjście sceny (8 klatek), pierwsza scena nie zaczyna od zera. */
@@ -221,6 +224,7 @@ export const RolkaFoto: React.FC = () => {
       {/* stałe elementy marki */}
       {!wydzielone ? (
         <>
+          <NapisyLektora frazy={FRAZY} top={1500} />
           <div style={{ position: "absolute", top: 110, left: 0, width: 1080, textAlign: "center", fontFamily: FONT, fontWeight: 800, fontSize: 42, letterSpacing: 6, color: ZLOTO }}>DORADZTWO DLA OSP</div>
           <div style={{ position: "absolute", top: 1660, left: 0, width: 1080, display: "flex", justifyContent: "center" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 16, background: MARKA.tlo, border: `3px solid ${MARKA.zloto}`, borderRadius: 999, padding: "14px 36px" }}>
