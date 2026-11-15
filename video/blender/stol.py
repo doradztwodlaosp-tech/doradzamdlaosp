@@ -116,8 +116,7 @@ sc.cycles.samples = a.probki
 sc.cycles.use_denoising = True
 sc.render.resolution_x, sc.render.resolution_y = a.szer, a.wys
 sc.render.fps = 30
-sc.view_settings.view_transform = "AgX"
-sc.view_settings.look = "AgX - Base Contrast"
+sc.view_settings.view_transform = "Khronos PBR Neutral"
 
 
 def C(h):
@@ -146,10 +145,10 @@ def mat(nazwa, kolor, chrop=0.5, metal=0.0, lakier=0.0, tekstura=None, emisja=No
 
 
 M = {
-    "oprawa": mat("oprawa", "#1F2128", 0.5, 0.0, 0.3),
+    "oprawa": mat("oprawa", "#1F2128", 0.55, 0.0, 0.0),
     "kartki": mat("kartki", "#EDE6D6", 0.9),
-    "stow": mat("okl-stow", "#FFFFFF", 0.45, 0, 0.2, T["stow"]),
-    "osp": mat("okl-osp", "#FFFFFF", 0.45, 0, 0.2, T["osp"]),
+    "stow": mat("okl-stow", "#FFFFFF", 0.6, 0, 0.0, T["stow"]),
+    "osp": mat("okl-osp", "#FFFFFF", 0.6, 0, 0.0, T["osp"]),
     "zloto": mat("zloto", ZLOTO, 0.22, 1.0),
     "blat": mat("blat", "#FFFFFF", 0.5, 0, 0.15, T["blat"]),
     "lakier": mat("hełm", "#5C0705", 0.25, 0.0, 0.6),
@@ -231,48 +230,18 @@ ksiega2 = ksiega("ksiega2", (0.05, 0.0, 0.26), M["osp"], 0.24, math.radians(-6))
 
 # stosy monet
 monety = []
-for si, (sx, sy, wysok) in enumerate([(-1.6, -1.0, 9), (-2.15, -0.45, 5), (-1.2, -0.2, 3)]):
+for si, (sx, sy, wysok) in enumerate([(-1.55, -0.95, 9), (-2.05, -0.4, 5), (-1.15, -0.25, 3)]):
     for i in range(wysok):
         m = wal(f"moneta-{si}-{i}", 0.34, 0.07, (sx + random.uniform(-0.012, 0.012), sy + random.uniform(-0.012, 0.012), 0.04 + i * 0.075), M["zloto"], fz=0.01)
         m.rotation_euler[2] = random.random() * 6
         monety.append(m)
 
-# hełm: skorupa, grzebień, przyłbica, rant, odblaski
-bpy.ops.object.empty_add(location=(2.5, -0.9, 0), rotation=(0, 0, math.radians(-35)))
-helm = bpy.context.object
-helm.name = "helm"
-bpy.ops.mesh.primitive_uv_sphere_add(radius=0.62, location=(2.5, -0.9, 0.0), segments=64, ring_count=32)
-sk = bpy.context.object
-sk.scale = (1.0, 1.25, 0.9)
-sk.data.materials.append(M["lakier"])
-bpy.ops.object.shade_smooth()
-# odcięcie dolnej połowy: spłaszczenie przez przesunięcie (kula przycięta modyfikatorem Boolean z kostką)
-tn = kostka("tnaca", (4, 4, 2), (2.5, -0.9, -1.0), M["czarny"], 0)
-b = sk.modifiers.new("tnij", "BOOLEAN")
-b.object = tn
-b.operation = "DIFFERENCE"
-bpy.context.view_layer.objects.active = sk
-bpy.ops.object.modifier_apply(modifier="tnij")
-bpy.data.objects.remove(tn)
-rant = wal("rant", 0.7, 0.05, (2.5, -0.9, 0.025), M["guma"], fz=0.015)
-rant.scale = (1.0, 1.28, 1.0)
-bpy.ops.mesh.primitive_torus_add(major_radius=0.62, minor_radius=0.03, location=(2.5, -0.9, 0.0), major_segments=64, minor_segments=14)
-grz = bpy.context.object
-grz.rotation_euler = (math.pi / 2, 0, math.pi / 2)
-grz.scale = (0.9, 1.0, 1.25)
-grz.data.materials.append(M["lakier"])
-for k, h in enumerate((0.16, 0.3)):
-    xr = 0.62 * math.sqrt(max(0.0, 1 - (h / 0.558) ** 2))
-    bpy.ops.mesh.primitive_torus_add(major_radius=xr + 0.004, minor_radius=0.014, location=(2.5, -0.9, h), major_segments=64, minor_segments=8)
-    pas = bpy.context.object
-    pas.name = f"odblask-{k}"
-    pas.scale = (1.0, 1.25, 1.0)
-    pas.data.materials.append(M["odblask"])
-przyl = kostka("przylbica", (0.7, 0.05, 0.28), (2.5, -0.9 + 0.76, 0.18), M["przylbica"], 0.03)
-helm_czesci = [sk, rant, grz, przyl] + [o for o in bpy.data.objects if o.name.startswith("odblask")]
-for c in helm_czesci:
-    c.parent = helm
-    c.matrix_parent_inverse = helm.matrix_world.inverted()
+# hełm (osobny moduł helm_model.py)
+sys.path.insert(0, KATALOG)
+from helm_model import zbuduj_helm  # noqa: E402
+
+helm = zbuduj_helm((1.55, -0.95, 0.0), math.radians(-165))
+helm.scale = (1.0, 1.0, 1.0)
 
 # pieczątka
 bpy.ops.object.empty_add(location=(-1.0, 1.6, 0))
@@ -310,7 +279,7 @@ swiatlo("wypelnienie", (-6, -2, 4), 400, 6, "#FFE9CC")
 swiatlo("kontur", (0, 7, 5), 500, 4, "#FFE3B8")
 
 kd = bpy.data.cameras.new("kamera")
-kd.lens = 45
+kd.lens = 55
 kd.sensor_fit = "HORIZONTAL"
 kd.sensor_width = 36
 kd.dof.use_dof = True
@@ -336,11 +305,11 @@ def klatka(k):
     ksiega2.rotation_euler = (0, 0, math.radians(-6 + (1 - s) * 7))
     # kamera: powolny półokrąg i łagodny najazd
     w = gladko(t)
-    kat = math.radians(-22 + 36 * w)
-    odl = 6.6 - 1.2 * w
-    wys = 4.0 - 0.8 * w
+    kat = math.radians(-18 + 30 * w)
+    odl = 5.8 - 1.0 * w
+    wys = 4.6 - 0.9 * w
     kam.location = (math.sin(kat) * odl, -math.cos(kat) * odl, wys)
-    cel = Vector((0.2 + 0.9 * w, -0.1 - 0.15 * w, 0.3))
+    cel = Vector((0.15 + 0.55 * w, -0.4, 0.2))
     fokus.location = cel
     kam.rotation_euler = (cel - Vector(kam.location)).to_track_quat("-Z", "Y").to_euler()
 

@@ -36,8 +36,7 @@ sc.render.fps = 30
 sc.render.film_transparent = True  # przezroczyste tło: wóz i jego cień kładziemy na tle marki w Remotion
 sc.render.image_settings.color_mode = "RGBA"
 sc.frame_start, sc.frame_end = 0, 149
-sc.view_settings.view_transform = "AgX"
-sc.view_settings.look = "AgX - High Contrast"
+sc.view_settings.view_transform = "Khronos PBR Neutral"
 
 C = lambda h: tuple(int(h[i : i + 2], 16) / 255 for i in (1, 3, 5)) + (1,)
 
