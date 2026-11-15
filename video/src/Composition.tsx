@@ -4,6 +4,7 @@ import { RolkaOSP, obliczRolke } from "./RolkaOSP";
 import { DLUGOSC_S } from "./scenariusz";
 import { ProbaStatut3D } from "./Scena3D";
 import { ProbaWozu } from "./ProbaWozu";
+import { PokazBlender } from "./PokazBlender";
 
 // Pionowe rolki 9:16 (Facebook Reels): 1080x1920, 30 kl./s
 export const MyComposition = () => {
@@ -22,6 +23,7 @@ export const MyComposition = () => {
       />
       {/* Próba prawdziwego 3D (three.js) */}
       <Composition id="ProbaStatut3D" component={ProbaStatut3D} durationInFrames={300} fps={30} width={1080} height={1920} />
+      <Composition id="PokazBlender" component={PokazBlender} durationInFrames={120} fps={30} width={1080} height={1920} />
       <Composition id="ProbaWozu" component={ProbaWozu} durationInFrames={240} fps={30} width={1080} height={1920} />
       {/* Pierwszy test z rysowaną postacią */}
       <Composition
