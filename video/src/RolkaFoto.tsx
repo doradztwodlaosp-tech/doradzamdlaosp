@@ -5,6 +5,7 @@ import { PlanszaJasna } from "./RolkaOSP";
 import { FilarIlustracja, RemizaIlustracja } from "./Ilustracje";
 import odcinek from "../public/odcinki/kim-jest-strazak/odcinek.json";
 import { NapisyLektora, zbudujFrazy } from "./NapisyLektora";
+import { MapaPolski } from "./MapaPolski";
 
 const ZLOTO = "#A8781A";
 const GRAFIT = "#1E1F25";
@@ -84,13 +85,25 @@ const FotoKarta: React.FC<{ plik: string; autor: string; od: number; do_: number
   );
 };
 
-/** Prawdziwa strona ustawy (render PDF z publicznego serwisu Sejmu) ze złotym podkreśleniem kluczowego zdania. */
-const StronaUstawy: React.FC<{ plik: string; x: number; y: number; w: number; obrot: number; zoom: number; pod: { x0: number; y0: number; x1: number; y1: number }; postep: number }> = ({ plik, x, y, w, obrot, zoom, pod, postep }) => {
+/** Prawdziwa strona ustawy (render PDF z publicznego serwisu Sejmu): złote podkreślenie kluczowego zdania i zbliżenie na ten przepis w ramce. */
+const StronaUstawy: React.FC<{ plik: string; w: number; pod: { x0: number; y0: number; x1: number; y1: number }; postep: number; zoom: number }> = ({ plik, w, pod, postep, zoom }) => {
+  const OKNO = { x: 40, y: 470, w: 1000, h: 960 };
   const sk = w / 910;
+  const px0 = (OKNO.w - w) / 2; // strona na środku okna
+  const py0 = 30;
+  const cx = px0 + (w * (pod.x0 + pod.x1)) / 2 / 910;
+  const cy = py0 + (sk * (pod.y0 + pod.y1)) / 2;
+  const z = 1 + 0.78 * zoom;
+  const tx = (OKNO.w / 2 - cx) * zoom;
+  const ty = (OKNO.h * 0.42 - cy) * zoom;
   return (
-    <div style={{ position: "absolute", left: x, top: y, width: w, height: 1287 * sk, transform: `rotate(${obrot}deg) scale(${zoom})`, transformOrigin: "50% 40%", boxShadow: "0 26px 56px rgba(40,34,24,0.34), 0 2px 6px rgba(40,34,24,0.22)", background: "#fff" }}>
-      <Img src={staticFile(plik)} style={{ width: "100%", height: "100%", display: "block" }} />
-      <div style={{ position: "absolute", left: pod.x0 * sk, top: pod.y0 * sk, width: (pod.x1 - pod.x0) * sk * postep, height: (pod.y1 - pod.y0) * sk, background: "rgba(232,176,48,0.55)", mixBlendMode: "multiply", borderRadius: 3 }} />
+    <div style={{ position: "absolute", left: OKNO.x, top: OKNO.y, width: OKNO.w, height: OKNO.h, overflow: "hidden", borderRadius: 28, boxShadow: zoom > 0.02 ? "inset 0 0 0 4px rgba(201,150,47,0.95)" : "none" }}>
+      <div style={{ position: "absolute", inset: 0, transformOrigin: `${cx}px ${cy}px`, transform: `translate(${tx}px, ${ty}px) scale(${z})` }}>
+        <div style={{ position: "absolute", left: px0, top: py0, width: w, height: 1287 * sk, boxShadow: "0 26px 56px rgba(40,34,24,0.34), 0 2px 6px rgba(40,34,24,0.22)", background: "#fff", transform: `rotate(${-1.2 * (1 - zoom)}deg)` }}>
+          <Img src={staticFile(plik)} style={{ width: "100%", height: "100%", display: "block" }} />
+          <div style={{ position: "absolute", left: pod.x0 * sk, top: pod.y0 * sk, width: (pod.x1 - pod.x0) * sk * postep, height: (pod.y1 - pod.y0) * sk, background: "rgba(232,176,48,0.55)", mixBlendMode: "multiply", borderRadius: 3 }} />
+        </div>
+      </div>
     </div>
   );
 };
@@ -124,7 +137,7 @@ export const RolkaFoto: React.FC = () => {
   const kart = (i: number) => interpolate(f, [SCENY[4][0] + 12 + i * 12, SCENY[4][0] + 28 + i * 12], [0, 1], { ...Z, easing: Easing.out(Easing.cubic) });
   return (
     <AbsoluteFill style={{ backgroundColor: "#F2ECE1" }}>
-      <Tlo podloga={[3, 5, 7, 8].some((i) => f >= SCENY[i][0] - 2 && f <= SCENY[i][1] + 2)} />
+      <Tlo podloga={[3, 7, 8].some((i) => f >= SCENY[i][0] - 2 && f <= SCENY[i][1] + 2)} />
       {/* S0 remiza z wozami */}
       {f < SCENY[0][1] + 2 ? (
         <div style={{ opacity: okno(f, 0) }}>
@@ -144,14 +157,14 @@ export const RolkaFoto: React.FC = () => {
       {f >= SCENY[1][0] - 1 && f <= SCENY[1][1] + 1 ? (
         <div style={{ opacity: okno(f, 1) }}>
           <Slowa tekst={"*Stowarzyszenie*|w KRS"} />
-          <StronaUstawy plik="foto/ustawy/stow-2261-03.png" x={220} y={520 - t(1) * 20} w={640} obrot={-2 + t(1) * 1.5} zoom={1 + t(1) * 0.04} pod={{ x0: 108, y0: 571, x1: 836, y1: 593 }} postep={interpolate(f, [SCENY[1][0] + 28, SCENY[1][0] + 58], [0, 1], E)} />
+          <StronaUstawy plik="foto/ustawy/stow-2261-hi-06.png" w={640} pod={{ x0: 108, y0: 811, x1: 834, y1: 866 }} postep={interpolate(f, [SCENY[1][0] + 28, SCENY[1][0] + 50], [0, 1], E)} zoom={interpolate(f, [SCENY[1][0] + 54, SCENY[1][0] + 88], [0, 1], E)} />
         </div>
       ) : null}
       {/* S2 ustawa o OSP */}
       {f >= SCENY[2][0] - 1 && f <= SCENY[2][1] + 1 ? (
         <div style={{ opacity: okno(f, 2) }}>
           <Slowa tekst={"Własna *ustawa*|od 2022"} />
-          <StronaUstawy plik="foto/ustawy/osp-2490-01.png" x={220} y={520 - t(2) * 20} w={640} obrot={1.5 - t(2) * 1.2} zoom={1 + t(2) * 0.04} pod={{ x0: 108, y0: 619, x1: 836, y1: 654 }} postep={interpolate(f, [SCENY[2][0] + 34, SCENY[2][0] + 70], [0, 1], E)} />
+          <StronaUstawy plik="foto/ustawy/osp-2490-hi-01.png" w={640} pod={{ x0: 108, y0: 619, x1: 836, y1: 654 }} postep={interpolate(f, [SCENY[2][0] + 30, SCENY[2][0] + 62], [0, 1], E)} zoom={interpolate(f, [SCENY[2][0] + 66, SCENY[2][0] + 116], [0, 1], E)} />
         </div>
       ) : null}
       {/* S3 uprawnienia – bok wozu */}
@@ -179,13 +192,15 @@ export const RolkaFoto: React.FC = () => {
           <Kartka napis="DOKUMENTY" x={550} y={1080} obrot={-3.5} wejscie={kart(3)} />
         </div>
       ) : null}
-      {/* S5 w całej Polsce – liczba */}
+      {/* S5 w całej Polsce – liczba i mapa z remizami */}
       {f >= SCENY[5][0] - 1 && f <= SCENY[5][1] + 1 ? (
         <div style={{ opacity: okno(f, 5) }}>
-          <Slowa tekst={"W całej *Polsce*"} rozmiar={96} top={250} />
-          <div style={{ position: "absolute", top: 440, left: 0, width: 1080, textAlign: "center", fontFamily: FONT, fontWeight: 800, fontSize: 210, color: ZLOTO, lineHeight: 1 }}>{liczTxt}</div>
-          <div style={{ position: "absolute", top: 680, left: 0, width: 1080, textAlign: "center", fontFamily: FONT, fontWeight: 700, fontSize: 52, color: GRAFIT }}>jednostek OSP</div>
-          <Woz {...PRZOD} szer={sz5} lewo={540 - sz5 / 2} dol={1520} />
+          <Slowa tekst={"W całej *Polsce*"} rozmiar={96} top={230} />
+          <div style={{ position: "absolute", top: 350, left: 0, width: 1080, textAlign: "center", fontFamily: FONT, fontWeight: 800, fontSize: 170, color: ZLOTO, lineHeight: 1 }}>{liczTxt}</div>
+          <div style={{ position: "absolute", top: 535, left: 0, width: 1080, textAlign: "center", fontFamily: FONT, fontWeight: 700, fontSize: 48, color: GRAFIT }}>jednostek OSP</div>
+          <div style={{ position: "absolute", left: 122, top: 620 }}>
+            <MapaPolski wys={800} postep={interpolate(f, [SCENY[5][0] + 14, SCENY[5][0] + 72], [0, 1], E)} />
+          </div>
         </div>
       ) : null}
       {/* S6 filar – remiza */}
