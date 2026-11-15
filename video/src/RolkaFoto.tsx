@@ -2,6 +2,7 @@ import React from "react";
 import { AbsoluteFill, Easing, Img, interpolate, Sequence, staticFile, useCurrentFrame } from "remotion";
 import { FONT, MARKA } from "./marka";
 import { PlanszaJasna } from "./RolkaOSP";
+import { FilarIlustracja, RemizaIlustracja } from "./Ilustracje";
 
 const ZLOTO = "#A8781A";
 const GRAFIT = "#1E1F25";
@@ -134,7 +135,9 @@ export const RolkaFoto: React.FC = () => {
       {/* S0 remiza z wozami */}
       {f < SCENY[0][1] + 2 ? (
         <div style={{ opacity: okno(f, 0) }}>
-          <FotoKarta plik="foto/remizy/konie-garaze.jpg" autor="Patryk Zagawa" od={0} do_={SCENY[0][1]} f={f} />
+          <div style={{ position: "absolute", left: 70, top: 700 - t(0) * 20, transform: `scale(${1 + t(0) * 0.05})`, transformOrigin: "50% 60%" }}>
+            <RemizaIlustracja szer={940} />
+          </div>
           <div style={{ opacity: hak * hakWejscie }}>
             <Slowa tekst={"*STRAŻAK|OCHOTNIK*"} rozmiar={120} top={250} />
           </div>
@@ -196,7 +199,9 @@ export const RolkaFoto: React.FC = () => {
       {f >= SCENY[6][0] - 1 && f <= SCENY[6][1] + 1 ? (
         <div style={{ opacity: okno(f, 6) }}>
           <Slowa tekst={"*Filar*|ochrony ludności"} />
-          <FotoKarta plik="foto/remizy/kruszewo.jpg" autor="Patryk Zagawa" od={SCENY[6][0]} do_={SCENY[6][1]} f={f} />
+          <div style={{ position: "absolute", left: 270, top: 620 - t(6) * 18, transform: `scale(${1 + t(6) * 0.05})`, transformOrigin: "50% 60%" }}>
+            <FilarIlustracja wys={900} />
+          </div>
         </div>
       ) : null}
       {/* S7 my pilnujemy prawa – bok */}
