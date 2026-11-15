@@ -171,8 +171,9 @@ Dane dostępowe serwera (host, port SSH) zna użytkownik — nie zapisujemy ich 
   (diagnoza 15.11: `systemctl list-timers` = 0, brak plików w `/etc/systemd/system/`, brak crona).
   Użytkownik dostał polecenia instalacji (heredoc `eureka-bot.service` + `eureka-bot.timer`,
   `timedatectl set-timezone Europe/Warsaw`, `systemctl enable --now eureka-bot.timer`).
-  **Do potwierdzenia**: wynik `systemctl list-timers eureka-bot.timer` (NEXT = sobota 00:00).
-  Jeśli systemd na Mikrusie odmówi — przejść na cron (`0 0 * * 6`, z `cd /root/eureka-bot && ./uruchom.sh`).
+  **Potwierdzone 15.11**: timer zainstalowany i włączony, NEXT = Sat 2026-11-21 00:00 CET
+  (systemd na Mikrusie działa). Do sprawdzenia po 21.11: czy przyszedł mail i
+  `journalctl -u eureka-bot.service -n 50 --no-pager`.
 - Pierwszy pełny bieg (nr 4, 13.11, ręczny): 78 fraz, 780 nowych, 233 potwierdzone,
   17 do weryfikacji, 524 odrzucone bez pobierania, 0 błędów; mail i Dysk OK.
 
