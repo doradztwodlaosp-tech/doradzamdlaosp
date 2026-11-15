@@ -35,6 +35,9 @@ p.add_argument("--realizm", action="store_true", help="podłoga PBR i światło 
 p.add_argument("--podloga", default="diagonal_parquet")
 p.add_argument("--powtorzen", type=float, default=100)
 p.add_argument("--hdri", type=float, default=1.0)
+p.add_argument("--nasyc", type=float, default=0.55)
+p.add_argument("--jasn", type=float, default=0.95)
+p.add_argument("--blysk", type=float, default=0.05)
 p.add_argument("--fps", type=int, default=15, help="klatki renderowane na sekundę (resztę dorabia ffmpeg)")
 a = p.parse_args(sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else sys.argv[1:])
 
@@ -255,12 +258,16 @@ def podloga_pbr(nazwa):
     r = obraz(f"{nazwa}_rough_1k.jpg", False)
     nm = obraz(f"{nazwa}_nor_gl_1k.jpg", False)
     nn = n.new("ShaderNodeNormalMap")
-    l.new(d.outputs["Color"], b.inputs["Base Color"])
+    hs = n.new("ShaderNodeHueSaturation")
+    hs.inputs["Saturation"].default_value = a.nasyc
+    hs.inputs["Value"].default_value = a.jasn
+    l.new(d.outputs["Color"], hs.inputs["Color"])
+    l.new(hs.outputs["Color"], b.inputs["Base Color"])
     l.new(r.outputs["Color"], b.inputs["Roughness"])
     l.new(nm.outputs["Color"], nn.inputs["Color"])
     l.new(nn.outputs["Normal"], b.inputs["Normal"])
-    b.inputs["Coat Weight"].default_value = 0.2
-    b.inputs["Coat Roughness"].default_value = 0.1
+    b.inputs["Coat Weight"].default_value = a.blysk
+    b.inputs["Coat Roughness"].default_value = 0.3
     return m
 
 
