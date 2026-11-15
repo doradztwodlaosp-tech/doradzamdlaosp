@@ -31,6 +31,10 @@ p.add_argument("--szer", type=int, default=1080)
 p.add_argument("--wys", type=int, default=1920)
 p.add_argument("--probki", type=int, default=48)
 p.add_argument("--odcinek", default="kim-jest-strazak")
+p.add_argument("--realizm", action="store_true", help="podłoga PBR i światło HDRI z Poly Haven (CC0)")
+p.add_argument("--podloga", default="diagonal_parquet")
+p.add_argument("--powtorzen", type=float, default=100)
+p.add_argument("--hdri", type=float, default=1.0)
 p.add_argument("--fps", type=int, default=15, help="klatki renderowane na sekundę (resztę dorabia ffmpeg)")
 a = p.parse_args(sys.argv[sys.argv.index("--") + 1 :] if "--" in sys.argv else sys.argv[1:])
 
@@ -230,15 +234,45 @@ def ksiega(nazwa, poz, okl, grub=0.26, rot_z=0.0):
     return r
 
 
+PH = os.path.join(KATALOG, "zasoby", "polyhaven")
+
+
+def podloga_pbr(nazwa):
+    """Realistyczna podłoga: mapy koloru, chropowatości i normalnych (Poly Haven, CC0)."""
+    m = bpy.data.materials.new("podloga-pbr")
+    m.use_nodes = True
+    n, l = m.node_tree.nodes, m.node_tree.links
+    b = n["Principled BSDF"]
+
+    def obraz(plik, kolor):
+        t = n.new("ShaderNodeTexImage")
+        t.image = bpy.data.images.load(os.path.join(PH, plik))
+        t.image.colorspace_settings.name = "sRGB" if kolor else "Non-Color"
+        return t
+
+    kol = "col" if nazwa == "fine_grained_wood" else "diff"
+    d = obraz(f"{nazwa}_{kol}_1k.jpg", True)
+    r = obraz(f"{nazwa}_rough_1k.jpg", False)
+    nm = obraz(f"{nazwa}_nor_gl_1k.jpg", False)
+    nn = n.new("ShaderNodeNormalMap")
+    l.new(d.outputs["Color"], b.inputs["Base Color"])
+    l.new(r.outputs["Color"], b.inputs["Roughness"])
+    l.new(nm.outputs["Color"], nn.inputs["Color"])
+    l.new(nn.outputs["Normal"], b.inputs["Normal"])
+    b.inputs["Coat Weight"].default_value = 0.2
+    b.inputs["Coat Roughness"].default_value = 0.1
+    return m
+
+
 # ───────────── Obiekty sceny ─────────────
 bpy.ops.mesh.primitive_plane_add(size=120, location=(0, 0, 0))
 stol = bpy.context.object
-stol.data.materials.append(M["blat"])
+stol.data.materials.append(podloga_pbr(a.podloga) if a.realizm else M["blat"])
 
 # mapowanie UV blatu (skala), by słoje były drobne
 uv = stol.data.uv_layers.active.data
 for petla in uv:
-    petla.uv = (petla.uv[0] * 50, petla.uv[1] * 50)
+    petla.uv = (petla.uv[0] * (a.powtorzen if a.realizm else 50), petla.uv[1] * (a.powtorzen if a.realizm else 50))
 
 ksiega1 = ksiega("ksiega1", (0.0, 0.0, 0.0), M["stow"], 0.26, math.radians(8))
 ksiega2 = ksiega("ksiega2", (0.05, 0.0, 0.26), M["osp"], 0.24, math.radians(-6))
@@ -370,6 +404,11 @@ sc.world = sw
 sw.use_nodes = True
 sw.node_tree.nodes["Background"].inputs["Color"].default_value = C("#EDE5D6")
 sw.node_tree.nodes["Background"].inputs["Strength"].default_value = 0.3
+if a.realizm:
+    env = sw.node_tree.nodes.new("ShaderNodeTexEnvironment")
+    env.image = bpy.data.images.load(os.path.join(PH, "brown_photostudio_02_2k.hdr"))
+    sw.node_tree.links.new(env.outputs["Color"], sw.node_tree.nodes["Background"].inputs["Color"])
+    sw.node_tree.nodes["Background"].inputs["Strength"].default_value = a.hdri
 
 
 def swiatlo(nazwa, poz, energia, rozmiar, kolor="#FFFFFF", cel=(0, 0, 0.3)):
