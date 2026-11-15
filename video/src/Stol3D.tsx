@@ -516,7 +516,7 @@ const Karta: React.FC<{ t: number; od: number; do: number; tytul?: string; wiers
 };
 
 // Dowolna duża liczba (np. 16 000 jednostek): odlicza od zera, z podpisem pod spodem
-const LicznikOgolny: React.FC<{ t: number; od: number; do: number; jasny?: boolean; l: NonNullable<ScenaOSP["liczba"]> }> = ({ t, od, do: koniec, jasny, l }) => {
+export const LicznikOgolny: React.FC<{ t: number; od: number; do: number; jasny?: boolean; l: NonNullable<ScenaOSP["liczba"]> }> = ({ t, od, do: koniec, jasny, l }) => {
   if (t < od - 0.05 || t > koniec + 0.6) return null;
   const w = interpolate(t, [od, od + 0.6], [0, 1], Z) * interpolate(t, [koniec, koniec + 0.5], [1, 0], Z);
   const v = interpolate(t, [od, od + 1.8], [0, l.do], { ...Z, easing: Easing.out(Easing.cubic) });

@@ -1,4 +1,5 @@
 import { StolOSP, dzwiekiStolu } from "./Stol3D";
+import { KlipBlender, dzwiekiKlipu } from "./KlipBlender";
 import React from "react";
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { FONT, MARKA, USTAWIENIA as U } from "./marka";
@@ -26,7 +27,7 @@ import { czasSlowa, type ScenaOSP, ZAKRES } from "./typy";
 // Mapy 3D: infografiki, po których „lata” kamera. Wszystko pojawia się na konkretnych słowach lektora.
 // Kolejne sceny odcinka z tym samym polem "mapa" tworzą jeden ciągły przelot.
 
-export type PropsMapy = { sceny: ScenaOSP[]; klatkaStartu: number; pierwsze: boolean; wyglad?: "rysunek" | "makieta" | "jasny" };
+export type PropsMapy = { sceny: ScenaOSP[]; klatkaStartu: number; pierwsze: boolean; wyglad?: "rysunek" | "makieta" | "jasny"; odcinek?: string };
 export type ZdarzenieDzwiekowe = { t: number; plik: string; glosnosc: number };
 
 const EKRAN: [number, number] = [U.strefaPrawo / 2, 940];
@@ -411,6 +412,7 @@ const dzwiekiOpp = (sceny: ScenaOSP[]): ZdarzenieDzwiekowe[] => {
 
 export const MAPY: Record<string, { Widok: React.FC<PropsMapy>; dzwieki: (sceny: ScenaOSP[]) => ZdarzenieDzwiekowe[] }> = {
   "stol-osp": { Widok: StolOSP, dzwieki: dzwiekiStolu },
+  "klip-blender": { Widok: KlipBlender, dzwieki: dzwiekiKlipu },
   "droga-wniosku": { Widok: DrogaWniosku, dzwieki: dzwiekiWniosku },
   "droga-opp": { Widok: DrogaOPP, dzwieki: dzwiekiOpp },
 };

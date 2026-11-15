@@ -1,0 +1,504 @@
+{
+  "tytul": "Strażak ochotnik. Kim jest w świetle prawa? (Blender)",
+  "nadtytul": "DORADZTWO DLA OSP",
+  "glos": "lektor.mp3",
+  "maskotka": false,
+  "hakPostac": false,
+  "styl": "makieta",
+  "wyglad3d": "jasny",
+  "wstep": 2.2,
+  "hak": [
+    {
+      "tekst": "STRAŻAK OCHOTNIK.",
+      "zloty": true
+    },
+    {
+      "tekst": "KIM JEST"
+    },
+    {
+      "tekst": "W ŚWIETLE PRAWA?"
+    }
+  ],
+  "cta": "Znacie swoje uprawnienia?",
+  "plansza": {
+    "haslo": [
+      {
+        "tekst": "Pomagamy tym,"
+      },
+      {
+        "tekst": "którzy pomagają innym.",
+        "zloty": true
+      }
+    ],
+    "pigulka": "Zaobserwuj nas",
+    "kontakt": "Zadzwoń lub napisz: 720 868 902",
+    "stopka": "Materiał informacyjny. Nie zastępuje indywidualnej analizy."
+  },
+  "sceny": [
+    {
+      "tekst": "OSP to nie tylko remiza i wóz.",
+      "lektor": "O-es-pe to nie tylko remiza i wóz.",
+      "haslo": "Nie tylko *remiza* i wóz",
+      "mapa": "klip-blender",
+      "kamera": "remiza",
+      "start": 0,
+      "koniec": 2.429,
+      "slowa": [
+        {
+          "w": "OSP",
+          "s": 0,
+          "e": 0.296
+        },
+        {
+          "w": "to",
+          "s": 0.296,
+          "e": 0.533
+        },
+        {
+          "w": "nie",
+          "s": 0.533,
+          "e": 0.829
+        },
+        {
+          "w": "tylko",
+          "s": 0.829,
+          "e": 1.244
+        },
+        {
+          "w": "remiza",
+          "s": 1.244,
+          "e": 1.718
+        },
+        {
+          "w": "i",
+          "s": 1.718,
+          "e": 1.895
+        },
+        {
+          "w": "wóz.",
+          "s": 1.895,
+          "e": 2.429
+        }
+      ]
+    },
+    {
+      "tekst": "Prawnie to stowarzyszenie wpisane do KRS.",
+      "lektor": "Prawnie to stowarzyszenie wpisane do ka-er-esu.",
+      "haslo": "*Stowarzyszenie* w KRS",
+      "mapa": "klip-blender",
+      "kamera": "ustawa",
+      "start": 2.929,
+      "koniec": 6.286,
+      "slowa": [
+        {
+          "w": "Prawnie",
+          "s": 2.929,
+          "e": 3.521
+        },
+        {
+          "w": "to",
+          "s": 3.521,
+          "e": 3.784
+        },
+        {
+          "w": "stowarzyszenie",
+          "s": 3.784,
+          "e": 4.838
+        },
+        {
+          "w": "wpisane",
+          "s": 4.838,
+          "e": 5.43
+        },
+        {
+          "w": "do",
+          "s": 5.43,
+          "e": 5.693
+        },
+        {
+          "w": "KRS.",
+          "s": 5.693,
+          "e": 6.286
+        }
+      ]
+    },
+    {
+      "tekst": "Od 2022 roku ma też własną ustawę.",
+      "lektor": "Od dwa tysiące dwudziestego drugiego roku ma też własną ustawę.",
+      "haslo": "Własna *ustawa* od 2022",
+      "mapa": "klip-blender",
+      "kamera": "ustawa",
+      "start": 6.786,
+      "koniec": 11.286,
+      "slowa": [
+        {
+          "w": "Od",
+          "s": 6.786,
+          "e": 7.186
+        },
+        {
+          "w": "2022",
+          "s": 7.186,
+          "e": 7.786
+        },
+        {
+          "w": "roku",
+          "s": 7.786,
+          "e": 8.386
+        },
+        {
+          "w": "ma",
+          "s": 8.386,
+          "e": 8.786
+        },
+        {
+          "w": "też",
+          "s": 8.786,
+          "e": 9.286
+        },
+        {
+          "w": "własną",
+          "s": 9.286,
+          "e": 10.086
+        },
+        {
+          "w": "ustawę.",
+          "s": 10.086,
+          "e": 11.286
+        }
+      ]
+    },
+    {
+      "tekst": "Daje uprawnienia: ekwiwalent, zwolnienie z pracy i świadczenie ratownicze.",
+      "haslo": "Co wam *przysługuje*",
+      "mapa": "klip-blender",
+      "kamera": "helm",
+      "czesc": {
+        "numer": "1/2",
+        "tytul": "UPRAWNIENIA"
+      },
+      "start": 11.786,
+      "koniec": 17.071,
+      "slowa": [
+        {
+          "w": "Daje",
+          "s": 11.786,
+          "e": 12.127
+        },
+        {
+          "w": "uprawnienia:",
+          "s": 12.127,
+          "e": 13.093
+        },
+        {
+          "w": "ekwiwalent,",
+          "s": 13.093,
+          "e": 14.002
+        },
+        {
+          "w": "zwolnienie",
+          "s": 14.002,
+          "e": 14.684
+        },
+        {
+          "w": "z",
+          "s": 14.684,
+          "e": 14.855
+        },
+        {
+          "w": "pracy",
+          "s": 14.855,
+          "e": 15.253
+        },
+        {
+          "w": "i",
+          "s": 15.253,
+          "e": 15.423
+        },
+        {
+          "w": "świadczenie",
+          "s": 15.423,
+          "e": 16.162
+        },
+        {
+          "w": "ratownicze.",
+          "s": 16.162,
+          "e": 17.071
+        }
+      ]
+    },
+    {
+      "tekst": "I nakłada obowiązki: szkolenia, badania, gotowość, dokumenty.",
+      "haslo": "Czego się od was *wymaga*",
+      "mapa": "klip-blender",
+      "kamera": "papiery",
+      "czesc": {
+        "numer": "2/2",
+        "tytul": "OBOWIĄZKI"
+      },
+      "start": 17.571,
+      "koniec": 21.929,
+      "slowa": [
+        {
+          "w": "I",
+          "s": 17.571,
+          "e": 17.727
+        },
+        {
+          "w": "nakłada",
+          "s": 17.727,
+          "e": 18.194
+        },
+        {
+          "w": "obowiązki:",
+          "s": 18.194,
+          "e": 18.972
+        },
+        {
+          "w": "szkolenia,",
+          "s": 18.972,
+          "e": 19.75
+        },
+        {
+          "w": "badania,",
+          "s": 19.75,
+          "e": 20.424
+        },
+        {
+          "w": "gotowość,",
+          "s": 20.424,
+          "e": 21.151
+        },
+        {
+          "w": "dokumenty.",
+          "s": 21.151,
+          "e": 21.929
+        }
+      ]
+    },
+    {
+      "tekst": "W Polsce działa około 16 tysięcy jednostek.",
+      "lektor": "W Polsce działa około szesnastu tysięcy jednostek.",
+      "haslo": "W całej *Polsce*",
+      "mapa": "klip-blender",
+      "kamera": "calosc",
+      "czesc": null,
+      "liczba": {
+        "slowo": "16",
+        "do": 16000,
+        "podpis": "jednostek OSP"
+      },
+      "start": 22.429,
+      "koniec": 26,
+      "slowa": [
+        {
+          "w": "W",
+          "s": 22.429,
+          "e": 22.627
+        },
+        {
+          "w": "Polsce",
+          "s": 22.627,
+          "e": 23.156
+        },
+        {
+          "w": "działa",
+          "s": 23.156,
+          "e": 23.685
+        },
+        {
+          "w": "około",
+          "s": 23.685,
+          "e": 24.148
+        },
+        {
+          "w": "16",
+          "s": 24.148,
+          "e": 24.413
+        },
+        {
+          "w": "tysięcy",
+          "s": 24.413,
+          "e": 25.008
+        },
+        {
+          "w": "jednostek.",
+          "s": 25.008,
+          "e": 26
+        }
+      ]
+    },
+    {
+      "tekst": "To wy jesteście filarem ochrony ludności.",
+      "haslo": "*Filar* ochrony ludności",
+      "mapa": "klip-blender",
+      "kamera": "woz",
+      "start": 26.5,
+      "koniec": 29.429,
+      "slowa": [
+        {
+          "w": "To",
+          "s": 26.5,
+          "e": 26.73
+        },
+        {
+          "w": "wy",
+          "s": 26.73,
+          "e": 26.959
+        },
+        {
+          "w": "jesteście",
+          "s": 26.959,
+          "e": 27.591
+        },
+        {
+          "w": "filarem",
+          "s": 27.591,
+          "e": 28.108
+        },
+        {
+          "w": "ochrony",
+          "s": 28.108,
+          "e": 28.625
+        },
+        {
+          "w": "ludności.",
+          "s": 28.625,
+          "e": 29.429
+        }
+      ]
+    },
+    {
+      "tekst": "Wy ratujecie. My pilnujemy prawa.",
+      "haslo": "My pilnujemy *prawa*",
+      "mapa": "klip-blender",
+      "kamera": "marka",
+      "start": 29.929,
+      "koniec": 32.286,
+      "slowa": [
+        {
+          "w": "Wy",
+          "s": 29.929,
+          "e": 30.138
+        },
+        {
+          "w": "ratujecie.",
+          "s": 30.138,
+          "e": 30.924
+        },
+        {
+          "w": "My",
+          "s": 30.924,
+          "e": 31.133
+        },
+        {
+          "w": "pilnujemy",
+          "s": 31.133,
+          "e": 31.71
+        },
+        {
+          "w": "prawa.",
+          "s": 31.71,
+          "e": 32.286
+        }
+      ]
+    },
+    {
+      "tekst": "Czy każdy w Waszej OSP zna swoje uprawnienia?",
+      "lektor": "Czy każdy w Waszej o-es-pe zna swoje uprawnienia?",
+      "haslo": "Znacie swoje *uprawnienia*?",
+      "start": 32.786,
+      "koniec": 36.286,
+      "slowa": [
+        {
+          "w": "Czy",
+          "s": 32.786,
+          "e": 33.093
+        },
+        {
+          "w": "każdy",
+          "s": 33.093,
+          "e": 33.523
+        },
+        {
+          "w": "w",
+          "s": 33.523,
+          "e": 33.707
+        },
+        {
+          "w": "Waszej",
+          "s": 33.707,
+          "e": 34.198
+        },
+        {
+          "w": "OSP",
+          "s": 34.198,
+          "e": 34.505
+        },
+        {
+          "w": "zna",
+          "s": 34.505,
+          "e": 34.812
+        },
+        {
+          "w": "swoje",
+          "s": 34.812,
+          "e": 35.242
+        },
+        {
+          "w": "uprawnienia?",
+          "s": 35.242,
+          "e": 36.286
+        }
+      ],
+      "mapa": "klip-blender",
+      "kamera": "calosc"
+    },
+    {
+      "tekst": "Pomagamy tym, którzy pomagają innym. Zaobserwuj nas.",
+      "lektor": "Pomagamy tym, którzy pomagają innym. Zaobserwuj nas.",
+      "plansza": true,
+      "start": 36.786,
+      "koniec": 40.5,
+      "slowa": [
+        {
+          "w": "Pomagamy",
+          "s": 36.786,
+          "e": 37.324
+        },
+        {
+          "w": "tym,",
+          "s": 37.324,
+          "e": 37.808
+        },
+        {
+          "w": "którzy",
+          "s": 37.808,
+          "e": 38.239
+        },
+        {
+          "w": "pomagają",
+          "s": 38.239,
+          "e": 38.777
+        },
+        {
+          "w": "innym.",
+          "s": 38.777,
+          "e": 39.37
+        },
+        {
+          "w": "Zaobserwuj",
+          "s": 39.37,
+          "e": 40.016
+        },
+        {
+          "w": "nas.",
+          "s": 40.016,
+          "e": 40.5
+        }
+      ]
+    }
+  ],
+  "szkic": "Czasy szacunkowe (bez lektora). Po dodaniu lektor.mp3 uruchom: npm run czasy -- kim-jest-strazak",
+  "napisy": "haslo"
+}

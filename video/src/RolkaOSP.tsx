@@ -1088,7 +1088,7 @@ export const RolkaOSP: React.FC<RolkaProps> = ({
             durationInFrames={dlugosc}
             layout="none"
           >
-            <Mapa sceny={w.mapa.sceny} klatkaStartu={od} pierwsze={od === 0} wyglad={dane.wyglad3d} />
+            <Mapa sceny={w.mapa.sceny} klatkaStartu={od} pierwsze={od === 0} wyglad={dane.wyglad3d} odcinek={odcinek} />
           </Sequence>
         );
       })}
