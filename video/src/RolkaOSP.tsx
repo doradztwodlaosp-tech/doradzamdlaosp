@@ -210,7 +210,7 @@ const Emblemat: React.FC<{ dane: Odcinek }> = ({ dane }) => {
   if (!scena || scena.plansza || scena.studio) return null;
   const w = interpolate(t, [(dane.wstep ?? 0) - 0.2, (dane.wstep ?? 0) + 0.4], [0, 1], ZAKRES);
   return (
-    <div style={{ position: "absolute", top: 1440, left: 0, width: 1080, display: "flex", justifyContent: "center", opacity: w }}>
+    <div style={{ position: "absolute", top: 1640, left: 0, width: 1080, display: "flex", justifyContent: "center", opacity: w }}>
       {dane.emblemat ? (
         <Img src={staticFile(dane.emblemat)} style={{ height: 52 }} />
       ) : (
