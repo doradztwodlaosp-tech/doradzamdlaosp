@@ -84,26 +84,16 @@ const FotoKarta: React.FC<{ plik: string; autor: string; od: number; do_: number
   );
 };
 
-/** Stylizowana kartka ustawy (tytuł i data; reszta jako szare wiersze – to nie jest skan). */
-const Ustawa: React.FC<{ rok: string; tytul: string[]; obrot: number; x: number; y: number; w?: number; wsp?: number }> = ({ rok, tytul, obrot, x, y, w = 600, wsp = 1 }) => (
-  <div style={{ position: "absolute", left: x, top: y, width: w, height: w * 1.38, transform: `rotate(${obrot}deg) scale(${wsp})`, background: "#FFFEFA", borderRadius: 6, boxShadow: "0 24px 50px rgba(40,34,24,0.3), 0 2px 6px rgba(40,34,24,0.2)", padding: "56px 54px", boxSizing: "border-box", fontFamily: "Georgia, 'Times New Roman', serif", color: "#2A2A2E" }}>
-    <div style={{ textAlign: "center", fontSize: 22, letterSpacing: 4, fontWeight: 700 }}>DZIENNIK USTAW</div>
-    <div style={{ textAlign: "center", fontSize: 15, letterSpacing: 3, marginTop: 4 }}>RZECZYPOSPOLITEJ POLSKIEJ</div>
-    <div style={{ height: 2, background: "#2A2A2E", margin: "16px 0 26px" }} />
-    <div style={{ textAlign: "center", fontSize: 40, fontWeight: 700, letterSpacing: 6 }}>USTAWA</div>
-    <div style={{ textAlign: "center", fontSize: 24, marginTop: 8 }}>z dnia {rok}</div>
-    <div style={{ textAlign: "center", fontSize: 30, fontWeight: 700, lineHeight: 1.2, marginTop: 20 }}>
-      {tytul.map((l, i) => (
-        <div key={i}>{l}</div>
-      ))}
+/** Prawdziwa strona ustawy (render PDF z publicznego serwisu Sejmu) ze złotym podkreśleniem kluczowego zdania. */
+const StronaUstawy: React.FC<{ plik: string; x: number; y: number; w: number; obrot: number; zoom: number; pod: { x0: number; y0: number; x1: number; y1: number }; postep: number }> = ({ plik, x, y, w, obrot, zoom, pod, postep }) => {
+  const sk = w / 910;
+  return (
+    <div style={{ position: "absolute", left: x, top: y, width: w, height: 1287 * sk, transform: `rotate(${obrot}deg) scale(${zoom})`, transformOrigin: "50% 40%", boxShadow: "0 26px 56px rgba(40,34,24,0.34), 0 2px 6px rgba(40,34,24,0.22)", background: "#fff" }}>
+      <Img src={staticFile(plik)} style={{ width: "100%", height: "100%", display: "block" }} />
+      <div style={{ position: "absolute", left: pod.x0 * sk, top: pod.y0 * sk, width: (pod.x1 - pod.x0) * sk * postep, height: (pod.y1 - pod.y0) * sk, background: "rgba(232,176,48,0.55)", mixBlendMode: "multiply", borderRadius: 3 }} />
     </div>
-    <div style={{ marginTop: 36 }}>
-      {Array.from({ length: 9 }).map((_, i) => (
-        <div key={i} style={{ height: 9, borderRadius: 4, background: "#D6D2C8", margin: "0 0 17px", width: i % 4 === 3 ? "62%" : "100%" }} />
-      ))}
-    </div>
-  </div>
-);
+  );
+};
 
 const Kartka: React.FC<{ napis: string; x: number; y: number; obrot: number; wejscie: number }> = ({ napis, x, y, obrot, wejscie }) => (
   <div style={{ position: "absolute", left: x, top: y + (1 - wejscie) * 60, width: 440, height: 300, transform: `rotate(${obrot}deg)`, opacity: wejscie, background: "#FFFEFA", borderRadius: 14, boxShadow: "0 20px 44px rgba(40,34,24,0.28)", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", fontFamily: FONT, fontWeight: 800, fontSize: 46, lineHeight: 1.15, color: GRAFIT, padding: 24, boxSizing: "border-box", border: `3px solid ${MARKA.zloto}` }}>
@@ -154,14 +144,14 @@ export const RolkaFoto: React.FC = () => {
       {f >= SCENY[1][0] - 1 && f <= SCENY[1][1] + 1 ? (
         <div style={{ opacity: okno(f, 1) }}>
           <Slowa tekst={"*Stowarzyszenie*|w KRS"} />
-          <Ustawa rok="7 kwietnia 1989 r." tytul={["Prawo o stowarzyszeniach"]} obrot={-3 + t(1) * 2} x={230} y={560 - t(1) * 24} />
+          <StronaUstawy plik="foto/ustawy/stow-2261-03.png" x={220} y={520 - t(1) * 20} w={640} obrot={-2 + t(1) * 1.5} zoom={1 + t(1) * 0.04} pod={{ x0: 108, y0: 571, x1: 836, y1: 593 }} postep={interpolate(f, [SCENY[1][0] + 28, SCENY[1][0] + 58], [0, 1], E)} />
         </div>
       ) : null}
       {/* S2 ustawa o OSP */}
       {f >= SCENY[2][0] - 1 && f <= SCENY[2][1] + 1 ? (
         <div style={{ opacity: okno(f, 2) }}>
           <Slowa tekst={"Własna *ustawa*|od 2022"} />
-          <Ustawa rok="17 grudnia 2021 r." tytul={["o ochotniczych", "strażach pożarnych"]} obrot={2.5 - t(2) * 2} x={230} y={580 - t(2) * 30} />
+          <StronaUstawy plik="foto/ustawy/osp-2490-01.png" x={220} y={520 - t(2) * 20} w={640} obrot={1.5 - t(2) * 1.2} zoom={1 + t(2) * 0.04} pod={{ x0: 108, y0: 619, x1: 836, y1: 654 }} postep={interpolate(f, [SCENY[2][0] + 34, SCENY[2][0] + 70], [0, 1], E)} />
         </div>
       ) : null}
       {/* S3 uprawnienia – bok wozu */}

@@ -148,3 +148,6 @@ Każda rolka kończy się **jasną planszą końcową** (`PlanszaJasna`): znak �
 
 ## Zasada stała: napisy lektora (oglądanie bez dźwięku)
 W każdej rolce: **chwytliwe hasło u góry sceny** (zależne od scenariusza, jedno słowo na złoto) **oraz złote napisy z tego, co mówi lektor, na dole**, między obrazem a czarną plakietką „§ DORADZTWO DLA OSP”. Napisy są w frazach po maks. 5 słów; wypowiedziane słowa pełnym złotem, następne przygaszone. Powód: wiele osób ogląda rolki bez dźwięku (praca, autobus), a rolki z czytelnym tekstem są lepiej oglądane. Komponent: `src/NapisyLektora.tsx`; czasy słów z pliku odcinka (po nagraniu lektora aktualizuje je `npm run czasy -- <slug>`).
+
+## Prawdziwe teksty ustaw (Sejm)
+API: https://api.sejm.gov.pl/eli/acts/DU/<rok>/<poz> (metadane JSON) oraz .../text.pdf (PDF). Strona 1 do PNG: `pdftoppm -r 110 -f 1 -l 1 -png plik.pdf wynik`. Ustawa o OSP: DU/2021/2490; Prawo o stowarzyszeniach (tekst jednolity): DU/2020/2261 (strona 3). Adresy wymagają dopisania do dozwolonych domen środowiska.
