@@ -289,7 +289,7 @@ sys.path.insert(0, KATALOG)
 from woz_model import zbuduj_woz  # noqa: E402
 
 MW = {
-    "lakier": mat("w-lakier", "#7A0907", 0.25, 0.0, 0.6),
+    "lakier": mat("w-lakier", "#9A0D09", 0.25, 0.0, 0.6),
     "ciemny": mat("w-ciemny", "#15161A", 0.6),
     "grafit": mat("w-grafit", "#2C2F36", 0.45, 0.4),
     "bialy": mat("w-bialy", "#F2F2EF", 0.4),
