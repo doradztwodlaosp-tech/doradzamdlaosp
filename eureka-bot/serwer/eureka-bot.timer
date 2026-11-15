@@ -1,0 +1,12 @@
+[Unit]
+Description=Uruchamianie bota EUREKA raz w tygodniu
+
+[Timer]
+# Sobota 00:00 (noc z piątku na sobotę), czas serwera. Zmiana dnia/godziny tutaj, potem:
+#   sudo systemctl daemon-reload && sudo systemctl restart eureka-bot.timer
+OnCalendar=Sat 00:00
+# Jeśli serwer był wyłączony o północy, bieg nadrobi się po włączeniu.
+Persistent=true
+
+[Install]
+WantedBy=timers.target
