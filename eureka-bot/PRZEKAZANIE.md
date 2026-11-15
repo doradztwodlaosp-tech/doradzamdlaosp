@@ -148,7 +148,31 @@ Dane dostępowe serwera (host, port SSH) zna użytkownik — nie zapisujemy ich 
    jeden profil, `--bez-wysylki`), potem Gmail, Dysk, harmonogram, pełny bieg w tle.
 5. Każdy błąd z serwera → test, który go odtwarza, poprawka, plik do podmiany.
 
-## 7. Otwarte sprawy w bocie EUREKA
+## 7. Zmiany po wdrożeniu (14–15.11.2026)
+
+- **Osobny mail dla estońskiego CIT**: `EUREKA_MAIL_DO_ESTONSKI` (+ opcjonalnie
+  `EUREKA_DRIVE_LINK_ESTONSKI`) w `eureka.env`. Gdy ustawione — dwa maile z każdego biegu
+  (ulgi → `EUREKA_MAIL_DO`, estoński CIT → nowy adres), każdy ze swoimi streszczeniami
+  i swoim Excelem. Gdy puste — jeden wspólny mail. Dysk bez zmian.
+- **Pułapka: aplikacja Claude tłumaczy nazwy plików w podglądzie załączników**
+  (`reports.py` → „Raporty.py”, `main.py` → „Główne.py”). Przy każdym pliku do podmiany
+  przypominać, że na serwerze nazwa musi być dokładnie taka jak w repozytorium.
+- **Użytkownik może sam zmieniać ustawienia** (`eureka.env`, `OnCalendar=` w timerze,
+  frazy w `profiles.py` / `tematy.py`) — procedura: kopia `plik.kopia`, edycja w FileZilli,
+  `./uruchom.sh --lista-profili`, `--podglad`. **Jeśli zmienił plik `.py` na serwerze,
+  zapytać o to i przenieść zmianę do repozytorium**, zanim wyśle się mu nowy plik
+  (inaczej nadpiszemy jego zmianę).
+- Zmiana logiki (np. podział maili) dotyka kilku plików naraz (config → reports →
+  wysylka → main) — wyjaśniać użytkownikowi, czemu plików jest kilka.
+
+## 8. Otwarte sprawy w bocie EUREKA
+
+- **Sobotni bieg (14.11, 00:00) nie przysłał maila — nie zdiagnozowane.** Możliwe przyczyny:
+  timer nie został włączony (brak potwierdzenia `systemctl list-timers eureka-bot.timer`),
+  albo o północy trwał jeszcze ręczny bieg z piątku (blokada → kod 3, brak maila).
+  Diagnoza: `systemctl list-timers eureka-bot.timer --all`,
+  `journalctl -u eureka-bot.service --since "2026-11-13" --no-pager | tail -40`,
+  lista biegów z tabeli `biegi`, `tail -15 /root/eureka-dane/bieg_reczny.log`.
 
 - Brakujące ulgi bez profilu (bot je słusznie odrzuca): ulga na złe długi (art. 18f CIT,
   art. 26i PIT — 8 interpretacji w 45 dniach), ulga prorodzinna (art. 27f PIT), SSE/PSI.
