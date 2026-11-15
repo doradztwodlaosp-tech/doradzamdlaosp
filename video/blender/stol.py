@@ -80,22 +80,32 @@ def okladka(nazwa, gora, tytul, dol):
 
 
 def blat():
-    random.seed(7)
-    obraz = Image.new("RGB", (2048, 2048), "#B88A5B")
-    d = ImageDraw.Draw(obraz)
-    n = 8
-    h = 2048 // n
+    """Drewniany blat z desek: drobne słoje, spokojny kontrast, delikatne łączenia."""
+    from PIL import ImageFilter
+
+    random.seed(11)
+    R = 2048
+    n = 6
+    h = R // n
+    obraz = Image.new("RGB", (R, R), (170, 132, 98))
+    d = ImageDraw.Draw(obraz, "RGBA")
     for i in range(n):
-        k = 0.82 + random.random() * 0.3
-        kolor = tuple(int(c * k) for c in (190, 148, 104))
-        d.rectangle((0, i * h, 2048, (i + 1) * h), fill=kolor)
-        for _ in range(70):
+        k = 0.9 + random.random() * 0.2
+        kolor = tuple(int(c * k) for c in (170, 132, 98))
+        d.rectangle((0, i * h, R, (i + 1) * h), fill=kolor)
+        for _ in range(320):
             y0 = i * h + random.random() * h
-            ciemny = random.random() > 0.5
-            col = (70, 44, 24) if ciemny else (226, 188, 140)
-            pts = [(x, y0 + math.sin(x / 190 + random.random() * 0.2 + i) * 6) for x in range(0, 2049, 64)]
-            d.line(pts, fill=col, width=random.choice([1, 2, 2, 3]))
-        d.rectangle((0, i * h, 2048, i * h + 4), fill=(80, 54, 32))
+            amp = random.random() * 5
+            faza = random.random() * 6
+            dl = random.randint(300, 1400)
+            x0 = random.randint(-200, R)
+            ciemny = random.random() > 0.45
+            kol = (96, 62, 34, random.randint(10, 26)) if ciemny else (230, 196, 150, random.randint(8, 18))
+            pts = [(x, y0 + math.sin(x / 150 + faza) * amp) for x in range(x0, x0 + dl, 48)]
+            if len(pts) > 1:
+                d.line(pts, fill=kol, width=1)
+        d.rectangle((0, i * h, R, i * h + 2), fill=(90, 60, 36, 150))
+    obraz = obraz.filter(ImageFilter.GaussianBlur(0.9))
     sciezka = os.path.join(TEKSTURY, "blat.png")
     obraz.save(sciezka)
     return sciezka
@@ -157,6 +167,8 @@ M = {
     "odblask": mat("odblask", "#E6E8EC", 0.25, 0.9),
     "drewno": mat("drewno", "#6B4429", 0.45, 0, 0.3),
     "czarny": mat("czarny", "#17181C", 0.35, 0.3),
+    "guma_czarna": mat("guma-czarna", "#0F1013", 0.9),
+    "tusz": mat("tusz", "#8A1410", 0.45),
 }
 
 
@@ -243,14 +255,18 @@ from helm_model import zbuduj_helm  # noqa: E402
 helm = zbuduj_helm((1.55, -0.95, 0.0), math.radians(-165))
 helm.scale = (1.0, 1.0, 1.0)
 
-# pieczątka
-bpy.ops.object.empty_add(location=(-1.0, 1.6, 0))
+# pieczątka: gumowa płyta, drewniany korpus z uchwytem i gałką, obok poduszka z czerwonym tuszem
+bpy.ops.object.empty_add(location=(0, 0, 0))
 piecz = bpy.context.object
 piecz.name = "pieczatka"
+PX, PY = -1.05, 1.25
 czesci_p = [
-    kostka("p-podstawa", (0.9, 0.5, 0.14), (-1.0, 1.6, 0.07), M["czarny"], 0.04),
-    wal("p-trzonek", 0.1, 0.35, (-1.0, 1.6, 0.31), M["drewno"], fz=0.01),
-    kostka("p-gala", (0.22, 0.22, 0.2), (-1.0, 1.6, 0.56), M["drewno"], 0.07),
+    kostka("p-guma", (0.78, 0.44, 0.05), (PX, PY, 0.025), M["guma_czarna"], 0.02),
+    kostka("p-korpus", (0.7, 0.38, 0.16), (PX, PY, 0.13), M["drewno"], 0.05),
+    wal("p-szyjka", 0.085, 0.3, (PX, PY, 0.36), M["drewno"], fz=0.015),
+    kostka("p-galka", (0.2, 0.2, 0.16), (PX, PY, 0.58), M["drewno"], 0.075),
+    kostka("p-poduszka", (0.7, 0.5, 0.07), (PX + 1.05, PY + 0.05, 0.035), M["czarny"], 0.03),
+    kostka("p-tusz", (0.6, 0.4, 0.015), (PX + 1.05, PY + 0.05, 0.072), M["tusz"], 0.006),
 ]
 for c in czesci_p:
     c.parent = piecz
@@ -298,11 +314,13 @@ def gladko(t):
 
 
 def klatka(k):
-    t = k / 149
+    t = k / 119
     # księga 2 opada spokojnie na księgę 1 (klatki 12–70)
     s = gladko((k - 12) / 58)
     ksiega2.location = (0.05 + (1 - s) * 0.1, (1 - s) * 0.55, 0.26 + (1 - s) * 0.55)
     ksiega2.rotation_euler = (0, 0, math.radians(-6 + (1 - s) * 7))
+    # hełm powoli obraca się wokół własnej osi (widać przyłbicę, grzebień i osłonę karku)
+    helm.rotation_euler = (0, 0, math.radians(-165 + 170 * gladko(k / 119)))
     # kamera: powolny półokrąg i łagodny najazd
     w = gladko(t)
     kat = math.radians(-18 + 30 * w)
