@@ -31,27 +31,22 @@ const Woz: React.FC<{ szer: number; lewo: number; dol: number; opacity: number }
 
 export const ProbaWoz: React.FC = () => {
   const f = useCurrentFrame();
-  const o = (od: number, do_: number) => interpolate(f, [od, od + 12, do_ - 12, do_], [od === 0 ? 1 : 0, 1, 1, 0], Z);
-  // A: cały wóz, powolny najazd
-  const szA = interpolate(f, [0, 112], [1000, 1150], { ...Z, easing: Easing.inOut(Easing.cubic) });
-  const lewoA = 540 - szA / 2;
-  // B: bliżej, przejazd od kabiny do zabudowy
-  const szB = 2300;
-  const lewoB = interpolate(f, [98, 205], [80, -1260], { ...Z, easing: Easing.inOut(Easing.cubic) });
-  const szC = interpolate(f, [193, 300], [1180, 1020], { ...Z, easing: Easing.inOut(Easing.cubic) });
-  const napC = interpolate(f, [208, 222], [0, 1], Z);
-  const haslo = interpolate(f, [252, 268], [0, 1], Z);
-  const nap = interpolate(f, [8, 22, 88, 100], [0, 1, 1, 0], Z);
+  // jedna ciągła „kamera": cały wóz → najazd i przejazd wzdłuż boku → odjazd na cały wóz
+  const E = { ...Z, easing: Easing.inOut(Easing.cubic) };
+  const szer = interpolate(f, [0, 70, 105, 192, 222, 300], [1000, 1000, 2300, 2300, 1040, 1080], E);
+  const lewo = interpolate(f, [0, 70, 105, 192, 222, 300], [40, 40, 80, -1260, 20, 0], E);
+  const dol = interpolate(f, [0, 70, 105, 192, 222, 300], [1400, 1400, 1500, 1500, 1400, 1400], E);
+  const nap = interpolate(f, [8, 22, 62, 74], [0, 1, 1, 0], Z);
   const napB = interpolate(f, [112, 126, 184, 196], [0, 1, 1, 0], Z);
+  const napC = interpolate(f, [214, 228], [0, 1], Z);
+  const haslo = interpolate(f, [258, 274], [0, 1], Z);
   return (
     <AbsoluteFill style={{ backgroundColor: "#F2ECE1" }}>
       <AbsoluteFill style={{ background: "radial-gradient(ellipse 80% 40% at 50% 30%, #FBF8F2 0%, rgba(242,236,225,0) 75%)" }} />
       {/* podłoga */}
       <div style={{ position: "absolute", left: 0, top: 1250, width: 1080, height: 670, background: "linear-gradient(to bottom, #E8DEC9 0%, #D8CAAE 100%)" }} />
       <div style={{ position: "absolute", left: 0, top: 1246, width: 1080, height: 6, background: "rgba(168,120,26,0.35)" }} />
-      <Woz szer={szA} lewo={lewoA} dol={1380} opacity={f <= 112 ? o(0, 112) : 0} />
-      <Woz szer={szB} lewo={lewoB} dol={1480} opacity={f >= 98 && f <= 205 ? o(98, 205) : 0} />
-      <Woz szer={szC} lewo={540 - szC / 2} dol={1380} opacity={f >= 193 ? interpolate(f, [193, 205], [0, 1], Z) : 0} />
+      <Woz szer={szer} lewo={lewo} dol={dol} opacity={1} />
       <div style={{ opacity: nap }}>
         <Haslo linie={[{ t: "STRAŻAK" }, { t: "OCHOTNIK", z: true }]} rozmiar={128} top={230} />
         <div style={{ position: "absolute", top: 540, left: 70, width: 940, textAlign: "center", fontFamily: FONT, fontWeight: 700, fontSize: 52, color: GRAFIT }}>Kim jest w świetle prawa?</div>
