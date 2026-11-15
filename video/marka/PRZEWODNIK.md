@@ -142,3 +142,6 @@ z filmu o Claudzie – prawdziwe efekty dźwiękowe (po zgodzie) i konkretne dow
 | Budżet | do ok. 100 zł miesięcznie |
 | Rytm | 2–3 rolki tygodniowo |
 | Hasło marki na planszy | „Pomagamy tym, którzy pomagają innym.” + prośba o obserwowanie |
+
+## Zasada stała: zakończenie każdej rolki
+Każda rolka kończy się **jasną planszą końcową** (`PlanszaJasna`): znak § w grafitowym kole, „DORADZTWO DLA OSP”, złota kreska, „Pomagamy tym, którzy pomagają innym.”, pigułka „Zaobserwuj nas”, „Zadzwoń lub napisz: 720 868 902”, doradztwodlaosp.pl i stopka „Materiał informacyjny. Nie zastępuje indywidualnej analizy.”. Bez żadnych zmian (zatwierdzone przez właściciela).

@@ -769,7 +769,7 @@ const Hak: React.FC<{ linie: LiniaHasla[]; postac?: boolean }> = ({
 
 // Plansza końcowa: nic na siebie nie nachodzi, wszystko w bezpiecznej strefie
 // Plansza końcowa w jasnej odsłonie marki: duża nazwa, hasło, prośba o obserwowanie i kontakt (bez maskotki)
-const PlanszaJasna: React.FC<NonNullable<Odcinek["plansza"]>> = ({ haslo, pigulka, kontakt, stopka }) => {
+export const PlanszaJasna: React.FC<NonNullable<Odcinek["plansza"]>> = ({ haslo, pigulka, kontakt, stopka }) => {
   const frame = useCurrentFrame();
   const tlo = interpolate(frame, [0, 12], [0, 1], ZAKRES);
   const w = (od: number) => interpolate(frame, [od, od + 14], [0, 1], { ...ZAKRES, easing: Easing.out(Easing.cubic) });

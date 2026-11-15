@@ -185,3 +185,6 @@ Commit (folder odcinka z obrazami i `lektor.mp3`; `out/` nie trafia do repozytor
 - Muzyka i efekty w `video/public/dzwieki` są na razie syntetyczne (`skrypty/dzwieki.py`). Docelowo podkład
   z licencją (np. Pixabay) zapisany jako `public/dzwieki/podklad.mp3`.
 - `NowyZarzad` (`video/src/Rolka.tsx`) i `video/src/Starsze.tsx` to stare wersje – nie używaj ich w nowych odcinkach.
+
+## Zasada stała: zakończenie każdej rolki
+Każda rolka kończy się **jasną planszą końcową** (`PlanszaJasna`): znak § w grafitowym kole, „DORADZTWO DLA OSP”, złota kreska, „Pomagamy tym, którzy pomagają innym.”, pigułka „Zaobserwuj nas”, „Zadzwoń lub napisz: 720 868 902”, doradztwodlaosp.pl i stopka „Materiał informacyjny. Nie zastępuje indywidualnej analizy.”. Bez żadnych zmian (zatwierdzone przez właściciela).

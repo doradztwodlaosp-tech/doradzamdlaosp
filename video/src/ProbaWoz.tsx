@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill, Easing, Img, interpolate, staticFile, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Easing, Img, interpolate, Sequence, staticFile, useCurrentFrame } from "remotion";
+import { PlanszaJasna } from "./RolkaOSP";
 import { FONT, MARKA } from "./marka";
 
 const ZLOTO = "#A8781A";
@@ -52,7 +53,6 @@ export const ProbaWoz: React.FC = () => {
   const nap = interpolate(f, [8, 22, 62, 74], [0, 1, 1, 0], Z);
   const napB = interpolate(f, [112, 126, 178, 190], [0, 1, 1, 0], Z);
   const napC = interpolate(f, [214, 228, 255, 266], [0, 1, 1, 0], Z);
-  const haslo = interpolate(f, [284, 296], [0, 1], Z);
   return (
     <AbsoluteFill style={{ backgroundColor: "#F2ECE1" }}>
       <AbsoluteFill style={{ background: "radial-gradient(ellipse 80% 40% at 50% 30%, #FBF8F2 0%, rgba(242,236,225,0) 75%)" }} />
@@ -72,9 +72,6 @@ export const ProbaWoz: React.FC = () => {
       <div style={{ opacity: napC }}>
         <Haslo linie={[{ t: "Własna ustawa" }, { t: "od 2022", z: true }]} rozmiar={100} top={230} />
       </div>
-      <div style={{ opacity: haslo, position: "absolute", top: 1500, left: 30, width: 1020, textAlign: "center", fontFamily: FONT, fontWeight: 700, fontSize: 40, color: GRAFIT }}>
-        Pomagamy tym, <span style={{ color: ZLOTO }}>którzy pomagają</span> innym.
-      </div>
       <div style={{ position: "absolute", top: 110, left: 0, width: 1080, textAlign: "center", fontFamily: FONT, fontWeight: 800, fontSize: 42, letterSpacing: 6, color: ZLOTO }}>DORADZTWO DLA OSP</div>
       <div style={{ position: "absolute", top: 1660, left: 0, width: 1080, display: "flex", justifyContent: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 16, background: MARKA.tlo, border: `3px solid ${MARKA.zloto}`, borderRadius: 999, padding: "14px 36px" }}>
@@ -82,6 +79,14 @@ export const ProbaWoz: React.FC = () => {
           <span style={{ color: MARKA.bialy, fontWeight: 800, fontSize: 32, letterSpacing: 4, fontFamily: FONT }}>DORADZTWO DLA OSP</span>
         </div>
       </div>
+      <Sequence from={300} durationInFrames={105}>
+        <PlanszaJasna
+          haslo={[{ tekst: "Pomagamy tym," }, { tekst: "którzy pomagają innym.", zloty: true }]}
+          pigulka="Zaobserwuj nas"
+          kontakt="Zadzwoń lub napisz: 720 868 902"
+          stopka="Materiał informacyjny. Nie zastępuje indywidualnej analizy."
+        />
+      </Sequence>
     </AbsoluteFill>
   );
 };
