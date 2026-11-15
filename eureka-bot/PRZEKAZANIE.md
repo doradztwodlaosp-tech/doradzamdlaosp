@@ -167,12 +167,14 @@ Dane dostępowe serwera (host, port SSH) zna użytkownik — nie zapisujemy ich 
 
 ## 8. Otwarte sprawy w bocie EUREKA
 
-- **Sobotni bieg (14.11, 00:00) nie przysłał maila — nie zdiagnozowane.** Możliwe przyczyny:
-  timer nie został włączony (brak potwierdzenia `systemctl list-timers eureka-bot.timer`),
-  albo o północy trwał jeszcze ręczny bieg z piątku (blokada → kod 3, brak maila).
-  Diagnoza: `systemctl list-timers eureka-bot.timer --all`,
-  `journalctl -u eureka-bot.service --since "2026-11-13" --no-pager | tail -40`,
-  lista biegów z tabeli `biegi`, `tail -15 /root/eureka-dane/bieg_reczny.log`.
+- **Sobotni bieg (14.11) się nie odbył — przyczyna: harmonogram nie był zainstalowany**
+  (diagnoza 15.11: `systemctl list-timers` = 0, brak plików w `/etc/systemd/system/`, brak crona).
+  Użytkownik dostał polecenia instalacji (heredoc `eureka-bot.service` + `eureka-bot.timer`,
+  `timedatectl set-timezone Europe/Warsaw`, `systemctl enable --now eureka-bot.timer`).
+  **Do potwierdzenia**: wynik `systemctl list-timers eureka-bot.timer` (NEXT = sobota 00:00).
+  Jeśli systemd na Mikrusie odmówi — przejść na cron (`0 0 * * 6`, z `cd /root/eureka-bot && ./uruchom.sh`).
+- Pierwszy pełny bieg (nr 4, 13.11, ręczny): 78 fraz, 780 nowych, 233 potwierdzone,
+  17 do weryfikacji, 524 odrzucone bez pobierania, 0 błędów; mail i Dysk OK.
 
 - Brakujące ulgi bez profilu (bot je słusznie odrzuca): ulga na złe długi (art. 18f CIT,
   art. 26i PIT — 8 interpretacji w 45 dniach), ulga prorodzinna (art. 27f PIT), SSE/PSI.
