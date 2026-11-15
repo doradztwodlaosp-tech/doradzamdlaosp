@@ -3,7 +3,7 @@ import argparse, math, os, sys
 import bpy
 from mathutils import Vector
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import woz_model
+import woz_model, woz_scania
 p = argparse.ArgumentParser()
 p.add_argument("--wyjscie", default="out/blender/woz2.png"); p.add_argument("--kat", type=float, default=35)
 p.add_argument("--wys_k", type=float, default=2.2); p.add_argument("--odl", type=float, default=13)
@@ -36,7 +36,7 @@ def walec(n, r, d, poz, m, rot=(0, math.pi / 2, 0), fazka=0.0):
     if fazka:
         w = o.modifiers.new("f", "BEVEL"); w.width = fazka; w.segments = 3
     o.data.materials.append(m); bpy.ops.object.shade_smooth(); return o
-woz_model.zbuduj_woz(M, bryla, walec, (0, 0, 0), 0.0, 1.0)
+woz_scania.zbuduj_woz(M, bryla, walec, (0, 0, 0), 0.0, 1.0)
 bpy.ops.mesh.primitive_plane_add(size=60, location=(0, 0, 0)); pod = bpy.context.object
 pod.data.materials.append(mat("pod", "#D8D2C6", 0.6))
 w = bpy.data.worlds.new("w"); sc.world = w; w.use_nodes = True

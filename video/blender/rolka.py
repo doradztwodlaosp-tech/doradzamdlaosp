@@ -327,7 +327,7 @@ CZAS = [(s["start"] + WSTEP if i else 0.0, s["koniec"] + WSTEP) for i, s in enum
 
 # ───────────── Wóz strażacki (z woz_model.py), pomniejszony ─────────────
 sys.path.insert(0, KATALOG)
-from woz_model import zbuduj_woz  # noqa: E402
+from woz_scania import zbuduj_woz  # noqa: E402
 
 MW = {
     "lakier": mat("w-lakier", "#9A0D09", 0.25, 0.0, 0.6),
@@ -353,7 +353,7 @@ def walec_w(nazwa, r, d, poz, material, rot=(0, math.pi / 2, 0), fazka=0.0):
 
 
 WOZ_POZ = (-4.4, 2.3, 0.0)
-woz, woz_koguty, woz_kola = zbuduj_woz(MW, bryla_w, walec_w, WOZ_POZ, -math.pi / 2, 0.3)
+woz, woz_koguty, woz_kola = zbuduj_woz(MW, bryla_w, walec_w, WOZ_POZ, -math.pi / 2, 0.26)
 
 # ───────────── Więcej monet (na zdanie o 16 tysiącach jednostek) ─────────────
 random.seed(5)
